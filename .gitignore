@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/maven,java,node,visualstudiocode,linux,jetbrains
 # Edit at https://www.toptal.com/developers/gitignore?templates=maven,java,node,visualstudiocode,linux,jetbrains
 
+# Personal
+.spring-initialize-api
+
 ### Java ###
 # Compiled class file
 *.class

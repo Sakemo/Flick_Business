@@ -5,8 +5,6 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -24,18 +22,22 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
   }
 
-  // Exceção para validação de argumentos
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-    Map<String, Object> errors = new HashMap<>();
-    for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-      errors.put(error.getField(), error.getDefaultMessage());
-    }
+  // Exceção para recurso não deletável
+  @ExceptionHandler(RecursoNaoDeletavel.class)
+  public ResponseEntity<Object> handleRecursoNaoDeletavelException(RecursoNaoDeletavel ex, WebRequest request) {
     Map<String, Object> body = new HashMap<>();
-    body.put("message", "Validation failed");
-    body.put("errors", errors);
+    body.put("message", ex.getMessage());
     body.put("status", HttpStatus.BAD_REQUEST.value());
     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
+
+  // Exceção para recurso já cadastrado
+  @ExceptionHandler(RecursoJaCadastrado.class)
+  public ResponseEntity<Object> handleRecursoJaCadastradoException(RecursoJaCadastrado ex, WebRequest request) {
+    Map<String, Object> body = new HashMap<>();
+    body.put("message", ex.getMessage());
+    body.put("status", HttpStatus.CONFLICT.value());
+    return new ResponseEntity<>(body, HttpStatus.CONFLICT);
   }
 
   // Exceção genérica

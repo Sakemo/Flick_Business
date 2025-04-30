@@ -40,6 +40,34 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(body, HttpStatus.CONFLICT);
   }
 
+  // Exceção para registro inativo
+  @ExceptionHandler(RegistroInativo.class)
+  public ResponseEntity<Object> handleRegistroInativoException(RegistroInativo ex, WebRequest request) {
+    Map<String, Object> body = new HashMap<>();
+    body.put("message", ex.getMessage());
+    body.put("status", HttpStatus.BAD_REQUEST.value());
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
+
+  // Exceção para preço inválido
+  @ExceptionHandler(PrecoInvalido.class)
+  public ResponseEntity<Object> handlePrecoInvalidoException(PrecoInvalido ex, WebRequest request) {
+    Map<String, Object> body = new HashMap<>();
+    body.put("message", ex.getMessage());
+    body.put("status", HttpStatus.BAD_REQUEST.value());
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
+
+  // Exceção para limite de fiado excedido
+  @ExceptionHandler(LimiteFiadoExcedido.class)
+  public ResponseEntity<Object> handleLimiteFiadoExcedidoException(LimiteFiadoExcedido ex,
+      WebRequest request) {
+    Map<String, Object> body = new HashMap<>();
+    body.put("message", ex.getMessage());
+    body.put("status", HttpStatus.BAD_REQUEST.value());
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
+
   // Exceção genérica
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Object> handleGenericException(Exception ex, WebRequest request) {

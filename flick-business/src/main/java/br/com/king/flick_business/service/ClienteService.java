@@ -68,7 +68,6 @@ public class ClienteService {
     Cliente cliente = clienteRepository.findById(id)
         .orElseThrow(() -> new RecursoNaoEncontrado("Cliente não encontrado com o ID: " + id));
 
-    // TODO: adicionar validação - pode deletear cliente com saldo devedor?
     if (cliente.getSaldoDevedor() != null && cliente.getSaldoDevedor().compareTo(java.math.BigDecimal.ZERO) > 0) {
       throw new RecursoNaoDeletavel("Cliente com saldo devedor não pode ser deletado");
     }
@@ -91,9 +90,12 @@ public class ClienteService {
     Cliente cliente = clienteRepository.findById(id)
         .orElseThrow(() -> new RecursoNaoEncontrado("Cliente não encontrado com o ID: " + id));
 
+    if (cliente.getSaldoDevedor() != null && cliente.getSaldoDevedor().compareTo(java.math.BigDecimal.ZERO) > 0) {
+      throw new RecursoNaoDeletavel("Cliente com saldo devedor não pode ser inativado");
+    }
+
     cliente.setAtivo(ativo);
     Cliente clienteAtualizado = clienteRepository.save(cliente);
-
     return ClienteMapper.toDto(clienteAtualizado);
   }
 

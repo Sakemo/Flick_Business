@@ -72,16 +72,4 @@ public class ProdutoService {
     produto.setAtivo(false);
     produtoRepository.save(produto);
   }
-
-  /*
-   * @Transactional
-   * public void deletarFisicamente(Long id) {
-   * Produto produto = produtoRepository.findById(id)
-   * .orElseThrow(() -> new RecursoNaoEncontrado("Produto não encontrado com ID: "
-   * + id));
-   * produtoRepository.delete(produto);
-   * }
-   */
-
-  // TODO: Implementar métodos adicionais se necessário
 }

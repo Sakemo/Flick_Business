@@ -231,8 +231,6 @@ class ProdutoServiceTest {
     verify(produtoMapperMock, never()).toResponseDTO(any());
   }
 
-  // *** INÍCIO DA IMPLEMENTAÇÃO DOS TESTES DA TODO LIST ***
-
   @Test
   @DisplayName("Deve lançar RecursoNaoEncontrado ao salvar se Fornecedor não existe")
   void salvar_quandoFornecedorNaoExiste_deveLancarRecursoNaoEncontrado() {

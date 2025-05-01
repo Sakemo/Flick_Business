@@ -6,10 +6,3 @@ public class RecursoNaoEncontrado extends RuntimeException {
         super(mensagem);
     }
 }
-
-/*
- * TODO:
- * - [x] Criar Exceptions
- * - [ ] Exceptions genéricas (e.g., NotFoundException, BusinessException)
- * - [ ] Exceptions específicas do domínio
- */

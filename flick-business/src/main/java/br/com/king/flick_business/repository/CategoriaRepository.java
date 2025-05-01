@@ -9,11 +9,3 @@ import org.springframework.stereotype.Repository;
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
 
 }
-
-/*
- * TODO:
- * - [ ] Criar Repositories
- * - [ ] Interface do repositório
- * - [ ] Implementação (se necessário)
- * 
- */

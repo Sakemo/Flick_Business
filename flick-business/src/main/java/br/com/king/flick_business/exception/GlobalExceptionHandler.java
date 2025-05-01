@@ -68,6 +68,15 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
   }
 
+  // Business exception
+  @ExceptionHandler(BusinessException.class)
+  public ResponseEntity<Object> handleBusinessException(BusinessException ex, WebRequest request) {
+    Map<String, Object> body = new HashMap<>();
+    body.put("message", ex.getMessage());
+    body.put("status", HttpStatus.BAD_REQUEST.value());
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+  }
+
   // Exceção genérica
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Object> handleGenericException(Exception ex, WebRequest request) {

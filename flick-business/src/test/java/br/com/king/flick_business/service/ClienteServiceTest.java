@@ -77,6 +77,7 @@ class ClienteServiceTest {
         cpfNovo,
         "22888887777",
         "Avenida Nova, 456",
+        true,
         new BigDecimal("50.00"),
         true);
 
@@ -86,6 +87,7 @@ class ClienteServiceTest {
         cpfExistente, // Mantendo o mesmo CPF na atualização de exemplo
         "11777776666",
         "Rua Atualizada, 789",
+        true,
         new BigDecimal("150.00"),
         true);
   }
@@ -210,7 +212,8 @@ class ClienteServiceTest {
   void atualizar_quandoCpfPertenceOutroCliente_deveLancarRecursoJaCadastrado() {
     // Arrange
     Cliente outroClienteComCpf = Cliente.builder().id(5L).cpf(cpfNovo).build(); // Outro cliente tem o CPF desejado
-    ClienteRequestDTO dtoComCpfDeOutro = new ClienteRequestDTO("Nome", cpfNovo, "tel", "end", BigDecimal.ONE, true);
+    ClienteRequestDTO dtoComCpfDeOutro = new ClienteRequestDTO("Nome", cpfNovo, "tel", "end", true, BigDecimal.ONE,
+        true);
 
     when(clienteRepositoryMock.findById(idExistente)).thenReturn(Optional.of(clienteExistente));
     // Simula encontrar OUTRO cliente com o CPF que queremos usar na atualização

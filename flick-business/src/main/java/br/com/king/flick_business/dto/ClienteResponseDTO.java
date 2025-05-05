@@ -17,6 +17,7 @@ public record ClienteResponseDTO(
     // -- FIADO -- //
     BigDecimal limiteFiado,
     BigDecimal saldoDevedor,
+    LocalDateTime dataUltimaCompraFiado,
 
     // -- METADADOS -- //
     LocalDateTime dataCadastro,
@@ -33,6 +34,7 @@ public record ClienteResponseDTO(
         cliente.getEndereco(),
         cliente.getLimiteFiado(),
         cliente.getSaldoDevedor(),
+        cliente.getDataUltimaCompraFiado(),
         cliente.getDataCadastro(),
         cliente.getDataAtualizacao(),
         cliente.getAtivo() != null && cliente.getAtivo());

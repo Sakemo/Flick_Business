@@ -8,10 +8,12 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.king.flick_business.exception.BusinessException;
 import br.com.king.flick_business.dto.ItemVendaRequestDTO;
 import br.com.king.flick_business.dto.VendaRequestDTO;
 import br.com.king.flick_business.dto.VendaResponseDTO;
 import br.com.king.flick_business.entity.Cliente;
+import br.com.king.flick_business.entity.ConfiguracaoGeral;
 import br.com.king.flick_business.entity.ItemVenda;
 import br.com.king.flick_business.entity.Produto;
 import br.com.king.flick_business.entity.Venda;
@@ -26,12 +28,14 @@ public class VendaService {
   private final VendaRepository vendaRepository;
   private final ClienteRepository clienteRepository;
   private final ProdutoRepository produtoRepository;
+  private final ConfiguracaoGeralService configuracaoService;
 
   public VendaService(VendaRepository vendaRepository, ClienteRepository clienteRepository,
-      ProdutoRepository produtoRepository) {
+      ProdutoRepository produtoRepository, ConfiguracaoGeralService configuracaoService) {
     this.vendaRepository = vendaRepository;
     this.clienteRepository = clienteRepository;
     this.produtoRepository = produtoRepository;
+    this.configuracaoService = configuracaoService;
   }
 
   @Transactional
@@ -106,11 +110,17 @@ public class VendaService {
 
     if (vendaSalva.getFormaPagamento() == FormaPagamento.FIADO && cliente != null) {
       BigDecimal novoSaldoDevedor = cliente.getSaldoDevedor().add(vendaSalva.getValorTotal());
+
+      Optional<ConfiguracaoGeral> configOpt = configuracaoService.buscarEntidadeConfiguracao();
+      Integer prazoGlobal = configOpt.map(ConfiguracaoGeral::getPrazoPagamentoFiado).orElse(null);
+      BigDecimal taxaGlobal = configOpt.map(ConfiguracaoGeral::getTaxaJurosAtraso).orElse(null);
+
       if (cliente.getLimiteFiado() != null && novoSaldoDevedor.compareTo(cliente.getLimiteFiado()) > 0) {
-        throw new RecursoNaoEncontrado("Limite fiado excedido para o cliente: " + cliente.getNome() +
+        throw new BusinessException("Limite fiado excedido para o cliente: " + cliente.getNome() +
             ". Limite: " + cliente.getLimiteFiado() + ", Saldo após venda: " + novoSaldoDevedor);
       }
       cliente.setSaldoDevedor(novoSaldoDevedor);
+      cliente.setDataUltimaCompraFiado(vendaSalva.getDataVenda());
       clienteRepository.save(cliente);
     }
 

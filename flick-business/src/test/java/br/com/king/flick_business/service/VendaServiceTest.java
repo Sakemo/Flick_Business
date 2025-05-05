@@ -7,6 +7,8 @@ import br.com.king.flick_business.exception.*; // Importar Exceções
 import br.com.king.flick_business.repository.ClienteRepository;
 import br.com.king.flick_business.repository.ProdutoRepository;
 import br.com.king.flick_business.repository.VendaRepository;
+import br.com.king.flick_business.service.ConfiguracaoGeralService;
+import br.com.king.flick_business.exception.BusinessException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,6 +37,8 @@ class VendaServiceTest {
     private ClienteRepository clienteRepositoryMock;
     @Mock
     private ProdutoRepository produtoRepositoryMock; // Mock do repositório agora
+    @Mock
+    private ConfiguracaoGeralService configuracaoServiceMock;
 
     @InjectMocks
     private VendaService vendaService;
@@ -190,6 +194,8 @@ class VendaServiceTest {
         // Mock save do cliente (retorna o próprio cliente modificado)
         when(clienteRepositoryMock.save(any(Cliente.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
+        when(configuracaoServiceMock.buscarEntidadeConfiguracao()).thenReturn(Optional.empty());
+
         // Act
         VendaResponseDTO response = vendaService.registrarVenda(vendaFiadoRequestDTO);
 
@@ -218,6 +224,8 @@ class VendaServiceTest {
         Cliente clienteSalvo = clienteCaptor.getValue();
         // Saldo inicial 10.00 + Venda 51.00 = 61.00
         assertEquals(0, new BigDecimal("61.00").compareTo(clienteSalvo.getSaldoDevedor()));
+
+        verify(configuracaoServiceMock).buscarEntidadeConfiguracao();
     }
 
     // --- Testes de Falha registrarVenda ---
@@ -357,8 +365,10 @@ class VendaServiceTest {
             return v;
         });
 
+        when(configuracaoServiceMock.buscarEntidadeConfiguracao()).thenReturn(Optional.empty());
+
         // Act & Assert
-        RecursoNaoEncontrado exception = assertThrows(RecursoNaoEncontrado.class, () -> {
+        BusinessException exception = assertThrows(BusinessException.class, () -> {
             vendaService.registrarVenda(vendaFiadoLimiteExcedidoDTO);
         });
         assertTrue(exception.getMessage().contains("Limite fiado excedido"));
@@ -373,6 +383,7 @@ class VendaServiceTest {
         // desfaria o save da Venda e do Estoque. Aqui no teste unitário, apenas
         // verificamos que a exceção ocorreu onde esperado e o save do cliente não
         // aconteceu.
+        verify(configuracaoServiceMock).buscarEntidadeConfiguracao();
     }
 
     // --- Testes listarVendas e buscarVendaPorId ---

@@ -17,6 +17,7 @@ public class ClienteMapper {
         .cpf(dto.cpf())
         .telefone(dto.telefone())
         .endereco(dto.endereco())
+        .controleFiado(dto.controleFiado())
         .limiteFiado(dto.limiteFiado())
         .build();
   }
@@ -29,6 +30,7 @@ public class ClienteMapper {
     clienteExistente.setCpf(dto.cpf());
     clienteExistente.setTelefone(dto.telefone());
     clienteExistente.setEndereco(dto.endereco());
+    clienteExistente.setControleFiado(dto.controleFiado());
     clienteExistente.setLimiteFiado(dto.limiteFiado());
 
     if (dto.ativo() != null) {

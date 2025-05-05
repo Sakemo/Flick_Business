@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos Globais e Reset */
+@layer base {
+  // Default //
+  body {
+    @apply font-sans antialiased;
+    @apply bg-bg-light text-text-primary;
+    @apply transition-colors duration-300 ease-in-out;
+  }
+
+  // Dark Mode
+  .dark body {
+    @apply bg-bg-dark text-gray-100;
+  }
+
+  // Margin //
+  body, h1, h2, h3, h4, h5, h6, p, blockquote, figure, ol, ul {
+    @apply m-0;
+  }
+
+  // Paddings //
+  body {
+    @apply p-0;
+  }
+
+  // Links //
+  a {
+    @apply text-brand-primary no-underline;
+    @apply transition-colors duration-200;
+  }
+  a:hover {
+    @apply text-opacity-80;
+  }
+  .dark a {
+    @apply text-brand-accent;
+  }
+  .dark a:hover {
+    @apply text-opacity-80;
+  }
+
+  // Elementos de Formulário //
+  input, button, textarea, select {
+    @apply font-inherit;
+  }
+
+  // Acessibilidade //
+  *:focus-visible {
+    @apply outline-none ring-2 ring-brand-primary/50 dark:ring-brand-accent/50 ring-offset-2 dark:ring-offset-bg-dark;
+  }
+}
+
+// Estilos Reutilizáveis //
+  @layer components {
+  .card-base {
+    @apply bg-card-light dark:bg-card-dark rounded-card shadow-card p-card-padding border border-gray-200 dark:border-gray-700;
+  }
+
+  // Botão 1 //
+  .btn-primary {
+    @apply bg-brand-primary text-white font-semibold py-2 px-5 rounded-btn;
+    @apply hover: bg-opacity-90 focus:ring-2 focus:ring-brand-primary/50 focus:outline-none;
+    @apply transition-all duration-200 ease-in-out;
+  }
+  .dark .btn-primary {
+    @apply bg-brand-accent text-bg-dark;
+  }
+
+  // Botão 2 //
+  .btn-secondary {
+    @apply bg-transparent border border-brand-muted dark:border-gray-600 text-brand-primary dark:text-gray-200 font-semibold py-2 px-5 rounded-btn;
+    @apply hover:bg-brand-muted/30 dark:hover:bg-gray-700 focus:ring-2 focus:ring-brand-primary/50 focus:outline-none;
+    @apply transition-all duration-200 ease-in-out;
+  }
+}
+
+// UTILIDADES //
+@layer utilities {
+  .text-shadow-soft {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}

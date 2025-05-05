@@ -74,6 +74,10 @@ public class Cliente {
   @Builder.Default
   private BigDecimal saldoDevedor = BigDecimal.ZERO;
 
+  // Data de Ultima Compra Fiado //
+  @Column(name = "data_ultima_compra_fiado")
+  private LocalDateTime dataUltimaCompraFiado;
+
   // -- METADADOS -- //
   @CreationTimestamp
   @Column(name = "data_cadastro", updatable = false)

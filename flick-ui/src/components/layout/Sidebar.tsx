@@ -21,7 +21,7 @@ const Sidebar: React.FC = () => {
     { path: '/vendas', name:'Vendas', icon:LuShoppingCart },
     { path: '/produtos', name:'Produtos', icon:LuPackage },
     { path: '/clientes', name:'Clientes', icon:LuUsers },
-    { path: '/despesas', name:'Despsas', icon:LuDollarSign }
+    { path: '/despesas', name:'Despesas', icon:LuDollarSign }
   ];
 
   const settingsItem: SidebarItem = { path: '/configuracoes', name:'Configurações', icon:LuSettings };

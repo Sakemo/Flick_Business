@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/produtos")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class ProdutoController {
   private final ProdutoService produtoService;
 
@@ -33,7 +35,7 @@ public class ProdutoController {
   public ResponseEntity<ProdutoResponseDTO> criarProduto(@Valid @RequestBody ProdutoRequestDTO requestDTO,
       UriComponentsBuilder uriBuilder) {
     ProdutoResponseDTO produtoSalvoDTO = produtoService.salvar(requestDTO);
-    URI uri = uriBuilder.path("/api/produtos/{id}").buildAndExpand(produtoSalvoDTO.id()).toUri();
+    URI uri = uriBuilder.path("/{id}").buildAndExpand(produtoSalvoDTO.id()).toUri();
     return ResponseEntity.created(uri).body(produtoSalvoDTO);
   }
 

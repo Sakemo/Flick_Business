@@ -34,10 +34,22 @@ public class ProdutoService {
 
   @Transactional
   public ProdutoResponseDTO salvar(ProdutoRequestDTO requestDTO) {
+    System.out.println("LOG: ProdutoService.salvar - categoriaId recebido: " + requestDTO.categoriaId());
     Categoria categoria = categoriaService.buscarEntidadePorId(requestDTO.categoriaId());
-    Fornecedor fornecedor = fornecedorService.buscarEntidadePorId(requestDTO.fornecedorId());
+    System.out
+        .println(
+            "LOG: ProdutoService.salvar - Categoria buscada: " + (categoria != null ? categoria.getNome() : "NULA"));
+    Fornecedor fornecedor = null;
+    if (requestDTO.fornecedorId() != null) {
+      fornecedor = fornecedorService.buscarEntidadePorId(requestDTO.fornecedorId());
+    }
     Produto produto = produtoMapper.toEntity(requestDTO, categoria, fornecedor);
+    System.out.println("LOG: ProdutoService.salvar - Produto mapeado par salvar, categoria do produto: "
+        + (produto.getCategoria() != null ? produto.getCategoria().getNome() : "NULA"));
     Produto produtoSalvo = produtoRepository.save(produto);
+    System.out.println(
+        "LOG: ProdutoService.salvar - Produto salvo, categoria do produtoSalvo: "
+            + (produtoSalvo.getCategoria() != null ? produtoSalvo.getCategoria().getNome() : "NULA"));
     return produtoMapper.toResponseDTO(produtoSalvo);
   }
 
@@ -45,16 +57,33 @@ public class ProdutoService {
   public ProdutoResponseDTO atualizar(Long id, ProdutoRequestDTO requestDTO) {
     Produto produtoExistente = produtoRepository.findById(id)
         .orElseThrow(() -> new RecursoNaoEncontrado("Produto não encontrado com ID: " + id));
+    System.out.println("LOG: ProdutoService.atualizar - categoriaId recebido: " + (requestDTO.categoriaId()));
     Categoria novaCategoria = categoriaService.buscarEntidadePorId(requestDTO.categoriaId());
-    Fornecedor novoFornecedor = fornecedorService.buscarEntidadePorId(requestDTO.fornecedorId());
+    System.out.println("LOG: ProdutoService.atualizar - categoria buscada: "
+        + (novaCategoria != null ? novaCategoria.getNome() : "NULA"));
+    Fornecedor novoFornecedor;
+    if (requestDTO.fornecedorId() != null) {
+      novoFornecedor = fornecedorService.buscarEntidadePorId(requestDTO.fornecedorId());
+    } else if (produtoExistente.getFornecedor() != null) {
+      novoFornecedor = produtoExistente.getFornecedor();
+    } else {
+      novoFornecedor = null;
+    }
     produtoMapper.updateEntityFromDTO(requestDTO, produtoExistente, novaCategoria, novoFornecedor);
+    System.out.println("LOG: ProdutoService.atualizar - produtoMapper: " + (produtoMapper));
     Produto produtoAtualizado = produtoRepository.save(produtoExistente);
+    System.out.println("LOG: ProdutoService.atualizar - produto: " + (produtoAtualizado));
     return produtoMapper.toResponseDTO(produtoAtualizado);
   }
 
   @Transactional(readOnly = true)
-  public List<ProdutoResponseDTO> listarTodos() {
-    List<Produto> produtos = produtoRepository.findAll();
+  public List<ProdutoResponseDTO> listarTodos(Long categoriaId) {
+    List<Produto> produtos;
+    if (categoriaId != null) {
+      produtos = produtoRepository.findByCategoriaIdWithFornecedor(categoriaId);
+    } else {
+      produtos = produtoRepository.findAllWithCategoriaAndFornecedor();
+    }
     return produtoMapper.toResponseDTOList(produtos);
   }
 

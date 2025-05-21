@@ -112,8 +112,8 @@ class ProdutoServiceTest {
         mockProduto.getPrecoCustoUnitario(),
         mockProduto.getTipoUnidadeVenda(),
         mockProduto.isAtivo(),
-        mockProduto.getCategoria() != null ? mockProduto.getCategoria().getNome() : null, // Nome Categoria
-        mockProduto.getFornecedor() != null ? mockProduto.getFornecedor().getNome() : null, // Nome Fornecedor
+        mockProduto.getCategoria(), // Nome Categoria
+        mockProduto.getFornecedor(), // Nome Fornecedor
         mockProduto.getCriadoEm(), // Data Criação
         mockProduto.getAtualizadoEm() // Data Atualização
     );
@@ -199,7 +199,8 @@ class ProdutoServiceTest {
     assertNotNull(resultado);
     assertEquals(dtoEsperado.id(), resultado.id());
     assertEquals(dtoEsperado.nome(), resultado.nome());
-    assertEquals(dtoEsperado.nomeCategoria(), resultado.nomeCategoria()); // Verifica campo aninhado
+    assertNotNull(resultado.categoria(), "Categoria no resultado não deveria ser nula");
+    assertEquals(dtoEsperado.categoria().getNome(), resultado.categoria().getNome());
     assertEquals(dtoEsperado, resultado);
 
     // Verify
@@ -292,7 +293,7 @@ class ProdutoServiceTest {
         requestUpdateComNovoFornecedor.quantidadeEstoque(), requestUpdateComNovoFornecedor.precoVenda(),
         requestUpdateComNovoFornecedor.precoCustoUnitario(),
         requestUpdateComNovoFornecedor.tipoUnidadeVenda(), requestUpdateComNovoFornecedor.ativo(),
-        mockCategoria.getNome(), novoFornecedorMock.getNome(), // Nomes atualizados/novos
+        mockCategoria, novoFornecedorMock,
         mockProduto.getCriadoEm(), LocalDateTime.now() // Atualizado agora
     );
     when(produtoMapperMock.toResponseDTO(mockProduto)).thenReturn(dtoEsperado);
@@ -303,8 +304,9 @@ class ProdutoServiceTest {
     // Assert
     assertNotNull(resultado);
     assertEquals(dtoEsperado.id(), resultado.id());
-    assertEquals("Produto Atualizado", resultado.nome()); // Verifica o nome atualizado
-    assertEquals("Novo Fornecedor", resultado.nomeFornecedor()); // Verifica o fornecedor atualizado
+    assertEquals("Produto Atualizado", resultado.nome());
+    assertNotNull(resultado.fornecedor(), "O fornecedeor não deveria ser nulo.");
+    assertEquals("Novo Fornecedor", resultado.fornecedor().getNome());
     assertEquals(dtoEsperado, resultado);
 
     // Verify
@@ -464,7 +466,7 @@ class ProdutoServiceTest {
     when(produtoMapperMock.toResponseDTOList(listaProdutos)).thenReturn(List.of(dto1, dto2)); // Mock do método de lista
 
     // Act
-    List<ProdutoResponseDTO> resultado = produtoService.listarTodos();
+    List<ProdutoResponseDTO> resultado = produtoService.listarTodos(null);
 
     // Assert
     assertNotNull(resultado);
@@ -485,7 +487,7 @@ class ProdutoServiceTest {
     when(produtoMapperMock.toResponseDTOList(Collections.emptyList())).thenReturn(Collections.emptyList());
 
     // Act
-    List<ProdutoResponseDTO> resultado = produtoService.listarTodos();
+    List<ProdutoResponseDTO> resultado = produtoService.listarTodos(null);
 
     // Assert
     assertNotNull(resultado);
@@ -494,5 +496,32 @@ class ProdutoServiceTest {
     // Verify
     verify(produtoRepositoryMock).findAll();
     verify(produtoMapperMock).toResponseDTOList(Collections.emptyList());
+  }
+
+  @Test
+  @DisplayName("Deve retornar lista de DTOs filtrada por categoria ao listar por categoriaId")
+  void listarTodos_quandoCategoriaIdFornecido_deveRetornarListaFiltrada() {
+    // Arrange
+    // mockProduto já tem categoriaId = 1L
+    List<Produto> listaFiltrada = List.of(mockProduto);
+    when(produtoRepositoryMock.findByCategoriaId(categoriaId)).thenReturn(listaFiltrada);
+
+    ProdutoResponseDTO dtoEsperado = new ProdutoResponseDTO(mockProduto);
+    when(produtoMapperMock.toResponseDTOList(listaFiltrada)).thenReturn(List.of(dtoEsperado));
+
+    // Act
+    List<ProdutoResponseDTO> resultado = produtoService.listarTodos(categoriaId);
+
+    // Assert
+    assertNotNull(resultado);
+    assertEquals(1, resultado.size());
+    assertEquals(dtoEsperado.id(), resultado.get(0).id());
+    assertNotNull(resultado.get(0).categoria(), "Categoria no DTO não deve ser nula");
+    assertEquals(mockCategoria.getNome(), resultado.get(0).categoria().getNome()); // Verifica o nome da categoria
+
+    // Verify
+    verify(produtoRepositoryMock).findByCategoriaId(categoriaId);
+    verify(produtoMapperMock).toResponseDTOList(listaFiltrada);
+    verify(produtoRepositoryMock, never()).findAll(); // Não deve chamar findAll
   }
 }

@@ -43,6 +43,6 @@ export interface ProdutoRequest{
   precoCustoUnitario?: number | null;
   tipoUnidadeVenda: TipoUnidadeVenda;
   ativo: boolean;
-  categoriaId: number;
-  fornecedorId:number;
+  categoriaId: number | undefined;
+  fornecedorId:number | null;
 }

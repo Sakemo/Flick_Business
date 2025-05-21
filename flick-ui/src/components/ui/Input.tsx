@@ -3,7 +3,7 @@ import clsx from 'clsx';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  error?: string;
+  error?: string | null;
   iconLeft?: React.ReactElement<{ className?: string }>;
   iconRight?: React.ReactElement<{ className?: string }>;
   wrapperClassName?: string;

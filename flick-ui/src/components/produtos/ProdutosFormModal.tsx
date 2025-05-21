@@ -14,6 +14,9 @@ import {
 import { createProduto, updateProduto } from '../../services/produtoService';
 import { getCategorias } from '../../services/categoriaService';
 import { getFornecedores } from '../../services/fornecedorService';
+import { LuPlus } from 'react-icons/lu';
+import CategoriaAddModal from '../categorias/CategoriaAddModal';
+import FornecedorAddModal from '../fornecedores/FornecedorAddModal';
 
 interface ProdutoFormModalProps {
   isOpen: boolean;
@@ -35,6 +38,9 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const [isCategoriaAddModalOpen, setCategoriaAddModalOpen] = useState(false);
+  const [isFornecedorAddModalOpen, setIsFornecedorAddModalOpen] = useState(false);
+
   const fetchDataForSelects = useCallback(async () => {
     try {
       const [cats, forns] = await Promise.all([getCategorias(), getFornecedores()]);
@@ -47,8 +53,10 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
   }, []);
 
   useEffect(() => {
-    fetchDataForSelects();
-  }, [fetchDataForSelects]);
+    if (isOpen) {
+      fetchDataForSelects();
+    }
+  }, [isOpen, fetchDataForSelects]);
 
   useEffect(() => {
     if (isEditMode && produtoInicial) {
@@ -57,7 +65,7 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
         descricao: produtoInicial.descricao,
         quantidadeEstoque: produtoInicial.quantidadeEstoque,
         precoVenda: produtoInicial.precoVenda,
-        precoCustoUnitario: produtoInicial.precoCustoUnitario,
+        precoCustoUnitario: produtoInicial.precoCustoUnitario || undefined,
         tipoUnidadeVenda: produtoInicial.tipoUnidadeVenda,
         ativo: produtoInicial.ativo,
         categoriaId: produtoInicial.categoria?.id,
@@ -70,12 +78,17 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
         tipoUnidadeVenda: TipoUnidadeVenda.UNIDADE,
       });
     }
-  }, [isEditMode, produtoInicial]);
+  }, [isEditMode, produtoInicial, isOpen]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
+
+    if (name === 'categoriaId' || name === 'fornecedorId') {
+      setFormData((prev) => ({ ...prev, [name]: value === '' ? undefined : parseInt(value, 10) }));
+      return;
+    }
 
     if (type === 'checkbox') {
       const { checked } = e.target as HTMLInputElement;
@@ -99,10 +112,8 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
     if (formData.quantidadeEstoque === undefined)
       newErrors.quantidadeEstoque = 'Estoque não pode ser negativo.';
     if (formData.categoriaId === undefined) newErrors.categoriaId = 'Categoria é obrigatória.';
-    if (formData.fornecedorId === undefined) newErrors.fornecedorId = 'Fornecedor é obrigatório.';
     if (formData.tipoUnidadeVenda === undefined)
       newErrors.tipoUnidadeVenda = 'Tipo de Unidade é obrigatório.';
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -122,9 +133,10 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
         precoCustoUnitario: formData.precoCustoUnitario,
         tipoUnidadeVenda: formData.tipoUnidadeVenda!,
         ativo: formData.ativo ?? true,
-        categoriaId: formData.categoriaId!,
-        fornecedorId: formData.fornecedorId!,
+        categoriaId: formData.categoriaId ? Number(formData.categoriaId) : undefined,
+        fornecedorId: formData.fornecedorId ? Number(formData.fornecedorId) : null,
       };
+      console.log('Payload: ', payload);
 
       if (isEditMode && produtoInicial) {
         await updateProduto(produtoInicial.id, payload);
@@ -145,147 +157,220 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
     }
   };
 
+  const handleNovaCategoriaAdicionada = (novaCategoria: CategoriaResponse) => {
+    setCategorias((prev) => [...prev, novaCategoria].sort((a, b) => a.nome.localeCompare(b.nome)));
+    setFormData((prevFormData) => ({ ...prevFormData, categoriaId: novaCategoria.id }));
+    setCategoriaAddModalOpen(false);
+  };
+
+  const handleNovoFornecedorAdicionado = (novoFornecedor: FornecedorResponse) => {
+    setFornecedores((prev) =>
+      [...prev, novoFornecedor].sort((a, b) => a.nome.localeCompare(b.nome))
+    );
+    setFormData((prev) => ({ ...prev, fornecedorId: novoFornecedor.id }));
+    setIsFornecedorAddModalOpen(false);
+  };
+
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={isEditMode ? 'Editar Produto' : 'Adicionar Produto'}
-    >
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
-          <Input
-            label="Nome do Produto *"
-            name="nome"
-            value={formData.nome || ''}
-            onChange={handleChange}
-            error={errors.nome}
-            maxLength={100}
-            required
-          />
-          <Select
-            label="Categoria *"
-            name="categoriaId"
-            value={formData.categoriaId || ''}
-            onChange={handleChange}
-            error={errors.categoriaId}
-            required
-          >
-            <option value="">Selecione...</option>
-            {categorias.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.nome}
-              </option>
-            ))}
-          </Select>
-          <Input
-            label="Preço de Venda *"
-            name="precoVenda"
-            type="number"
-            step="0.01"
-            min="0.01"
-            value={formData.precoVenda || ''}
-            onChange={handleChange}
-            error={errors.precoVenda}
-            required
-          />
-          <Input
-            label="Estoque Atual"
-            name="quantidadeEstoque"
-            type="number"
-            step={0.001}
-            min={0}
-            value={formData.quantidadeEstoque ?? ''}
-            onChange={handleChange}
-            error={errors.quantidadeEstoque}
-          />
-          <Select
-            label="Unidade de Venda *"
-            name="tipoUnidadeVenda"
-            value={formData.tipoUnidadeVenda || ''}
-            onChange={handleChange}
-            error={errors.tipoUnidadeVenda}
-            required
-          >
-            {Object.values(TipoUnidadeVenda).map((tipo) => (
-              <option key={tipo} value={tipo}>
-                {tipo}
-              </option>
-            ))}
-          </Select>
-          <Select
-            label="Fornecedor"
-            name="fornecedorId"
-            value={formData.fornecedorId || ''}
-            onChange={handleChange}
-            error={errors.fornecedorId}
-          >
-            <option value="" disabled>
-              Selecione...
-            </option>
-            {fornecedores.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.nome}
-              </option>
-            ))}
-          </Select>
-          <Input
-            label="Preço de Custo"
-            name="precoCustoUnitario"
-            type="number"
-            step="0.01"
-            min="0"
-            value={formData.precoCustoUnitario || ''}
-            onChange={handleChange}
-            error={errors.precoCustoUnitario}
-          />
-          <Input
-            label="Código de Barras"
-            name="codigoBarras"
-            value={formData.codigoBarras || ''}
-            onChange={handleChange}
-            error={errors.codigoBarras}
-            maxLength={50}
-          />
-          <Textarea
-            label="Descrição"
-            name="descricao"
-            value={formData.descricao || ''}
-            onChange={handleChange}
-            error={errors.descricao}
-            rows={3}
-            wrapperClassName="md:col-span-2"
-            maxLength={500}
-          />
-          <div className="flex items-center md:col-span-2">
-            <input
-              id="ativo"
-              name="ativo"
-              type="checkbox"
-              checked={formData.ativo ?? true}
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={isEditMode ? 'Editar Produto' : 'Adicionar Produto'}
+        className="sm:max-w-2xl md:max-w-3xl"
+      >
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+            <Input
+              label="Nome do Produto *"
+              name="nome"
+              value={formData.nome || ''}
               onChange={handleChange}
-              className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+              error={errors.nome}
+              maxLength={100}
+              required
             />
-            <label
-              htmlFor="ativo"
-              className="ml-2 block text-sm text-text-secondary dark:text-gray-300"
+            <div className="flex flex-col">
+              <label
+                htmlFor="categoriaId"
+                className="bloc text-sm font-medium text-text-secondary dark:text-gray-300 mb-1"
+              ></label>
+              <div className="flex items-center space-x-2">
+                <Select
+                  label="Categoria *"
+                  name="categoriaId"
+                  value={formData.categoriaId || ''}
+                  onChange={handleChange}
+                  error={errors.categoriaId}
+                  required
+                >
+                  <option value="">Selecione...</option>
+                  {categorias.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.nome}
+                    </option>
+                  ))}
+                </Select>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setCategoriaAddModalOpen(true)}
+                  title="Adicionar"
+                >
+                  <LuPlus />
+                </Button>
+              </div>
+              {errors.categroaiId && <p className="mt-1 text-xs text-red-500"></p>}
+            </div>
+
+            <Input
+              label="Preço de Venda *"
+              name="precoVenda"
+              type="number"
+              step="0.01"
+              min="0.01"
+              value={formData.precoVenda || ''}
+              onChange={handleChange}
+              error={errors.precoVenda}
+              required
+            />
+            <Input
+              label="Estoque Atual"
+              name="quantidadeEstoque"
+              type="number"
+              step={0.001}
+              min={0}
+              value={formData.quantidadeEstoque ?? ''}
+              onChange={handleChange}
+              error={errors.quantidadeEstoque}
+            />
+            <Select
+              label="Unidade de Venda *"
+              name="tipoUnidadeVenda"
+              value={formData.tipoUnidadeVenda || ''}
+              onChange={handleChange}
+              error={errors.tipoUnidadeVenda}
+              required
             >
-              Produto Ativo
-            </label>
+              {Object.values(TipoUnidadeVenda).map((tipo) => (
+                <option key={tipo} value={tipo}>
+                  {tipo}
+                </option>
+              ))}
+            </Select>
+
+            <div className="flex flex-col">
+              <label
+                htmlFor="fornecedorId"
+                className="bloc text-sm font-medium text-text-secondary dark:text-gray-300 mb-1"
+              ></label>
+              <div className="flex items-center space-x-2">
+                <Select
+                  label="Fornecedor"
+                  name="fornecedorId"
+                  value={formData.fornecedorId || ''}
+                  onChange={handleChange}
+                  error={errors.fornecedorId}
+                >
+                  <option value="" disabled>
+                    Selecione...
+                  </option>
+                  {fornecedores.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.nome}
+                    </option>
+                  ))}
+                </Select>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsFornecedorAddModalOpen(true)}
+                  title="Adicionar Fornecedor"
+                >
+                  <LuPlus />
+                </Button>
+              </div>
+              {errors.fornecedorId && (
+                <p className="mt-l text-xstext-red-500">{errors.fornecedorId}</p>
+              )}
+            </div>
+            <Input
+              label="Preço de Custo"
+              name="precoCustoUnitario"
+              type="number"
+              step="0.01"
+              min="0"
+              value={formData.precoCustoUnitario || ''}
+              onChange={handleChange}
+              error={errors.precoCustoUnitario}
+            />
+            <Input
+              label="Código de Barras"
+              name="codigoBarras"
+              value={formData.codigoBarras || ''}
+              onChange={handleChange}
+              error={errors.codigoBarras}
+              maxLength={50}
+            />
+            <Textarea
+              label="Descrição"
+              name="descricao"
+              value={formData.descricao || ''}
+              onChange={handleChange}
+              error={errors.descricao}
+              rows={3}
+              wrapperClassName="md:col-span-2"
+              maxLength={500}
+            />
+            <div className="flex items-center md:col-span-2">
+              <input
+                id="ativo"
+                name="ativo"
+                type="checkbox"
+                checked={formData.ativo ?? true}
+                onChange={handleChange}
+                className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+              />
+              <label
+                htmlFor="ativo"
+                className="ml-2 block text-sm text-text-secondary dark:text-gray-300"
+              >
+                Produto Ativo
+              </label>
+            </div>
+
+            {errors.form && <p className="text-sm text-red-500 md:col-span-2">{errors.form}</p>}
           </div>
 
-          {errors.form && <p className="text-sm text-red-500 md:col-span-2">{errors.form}</p>}
-        </div>
+          <div>
+            <Button type="button" variant="secondary" onClick={onClose} disabled={isLoading}>
+              Cancelar
+            </Button>
+            <Button type="submit" variant="primary" isLoading={isLoading} disabled={isLoading}>
+              {isEditMode ? 'Salvar Alterações' : 'Criar Produto'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
 
-        <div>
-          <Button type="button" variant="secondary" onClick={onClose} disabled={isLoading}>
-            Cancelar
-          </Button>
-          <Button type="submit" variant="primary" isLoading={isLoading} disabled={isLoading}>
-            {isEditMode ? 'Salvar Alterações' : 'Criar Produto'}
-          </Button>
-        </div>
-      </form>
-    </Modal>
+      {isCategoriaAddModalOpen && (
+        <CategoriaAddModal
+          isOpen={isCategoriaAddModalOpen}
+          onClose={() => setCategoriaAddModalOpen(false)}
+          onCategoriaAdded={handleNovaCategoriaAdicionada}
+        />
+      )}
+
+      {isFornecedorAddModalOpen && (
+        <FornecedorAddModal
+          isOpen={isFornecedorAddModalOpen}
+          onClose={() => setIsFornecedorAddModalOpen(false)}
+          onFornecedorAdded={handleNovoFornecedorAdicionado}
+        />
+      )}
+    </>
   );
 };
 

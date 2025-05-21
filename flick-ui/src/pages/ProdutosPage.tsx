@@ -27,6 +27,7 @@ const ProdutosPage: React.FC = () => {
     try {
       const params = filtroCategoriaId ? { categoriaId: parseInt(filtroCategoriaId) } : {};
       const data = await getProdutos(params);
+      console.log('LOG: PRODUTOS - ', JSON.stringify(data, null, 2));
       setProdutos(data);
     } catch (err) {
       setError('Falha ao carregar produtos.');
@@ -34,7 +35,7 @@ const ProdutosPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [filtroCategoriaId]); // Depende do filtro
+  }, [filtroCategoriaId]);
 
   const fetchCategorias = useCallback(async () => {
     try {

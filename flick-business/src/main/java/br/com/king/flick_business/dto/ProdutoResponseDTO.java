@@ -3,6 +3,8 @@ package br.com.king.flick_business.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import br.com.king.flick_business.entity.Categoria;
+import br.com.king.flick_business.entity.Fornecedor;
 import br.com.king.flick_business.entity.Produto;
 import br.com.king.flick_business.enums.TipoUnidadeVenda;
 
@@ -16,8 +18,8 @@ public record ProdutoResponseDTO(
     BigDecimal precoCustoUnitario,
     TipoUnidadeVenda tipoUnidadeVenda,
     boolean ativo,
-    String nomeCategoria,
-    String nomeFornecedor,
+    Categoria categoria,
+    Fornecedor fornecedor,
     LocalDateTime criadoEm,
     LocalDateTime atualizadoEm) {
   public ProdutoResponseDTO(Produto produto) {
@@ -31,8 +33,8 @@ public record ProdutoResponseDTO(
         produto.getPrecoCustoUnitario(),
         produto.getTipoUnidadeVenda(),
         produto.isAtivo(),
-        produto.getCategoria() != null ? produto.getCategoria().getNome() : null,
-        produto.getFornecedor() != null ? produto.getFornecedor().getNome() : null,
+        produto.getCategoria() != null ? produto.getCategoria() : null,
+        produto.getFornecedor() != null ? produto.getFornecedor() : null,
         produto.getCriadoEm(),
         produto.getAtualizadoEm());
   }

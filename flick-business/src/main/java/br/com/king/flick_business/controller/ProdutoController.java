@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -41,8 +42,11 @@ public class ProdutoController {
 
   // Listar Produtos
   @GetMapping
-  public ResponseEntity<List<ProdutoResponseDTO>> listarProdutos() {
-    List<ProdutoResponseDTO> produtos = produtoService.listarTodos();
+  public ResponseEntity<List<ProdutoResponseDTO>> listarProdutos(
+      @RequestParam(required = false) Long categoriaId // <<< ADICIONAR @RequestParam
+  ) {
+    // Passe o categoriaId para o serviço
+    List<ProdutoResponseDTO> produtos = produtoService.listarTodos(categoriaId);
     return ResponseEntity.ok(produtos);
   }
 

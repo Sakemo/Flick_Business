@@ -179,8 +179,25 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
         title={isEditMode ? 'Editar Produto' : 'Adicionar Produto'}
         className="sm:max-w-2xl md:max-w-3xl"
       >
+        <div className="flex items-center mb-2 ml-1 md:col-span-2">
+          <input
+            id="ativo"
+            name="ativo"
+            type="checkbox"
+            checked={formData.ativo ?? true}
+            onChange={handleChange}
+            className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+          />
+          <label
+            htmlFor="ativo"
+            className="ml-2 block text-sm text-text-secondary dark:text-gray-300"
+          >
+            Produto Ativo
+          </label>
+        </div>
+
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-1">
             <Input
               label="Nome do Produto *"
               name="nome"
@@ -324,28 +341,18 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
               wrapperClassName="md:col-span-2"
               maxLength={500}
             />
-            <div className="flex items-center md:col-span-2">
-              <input
-                id="ativo"
-                name="ativo"
-                type="checkbox"
-                checked={formData.ativo ?? true}
-                onChange={handleChange}
-                className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
-              />
-              <label
-                htmlFor="ativo"
-                className="ml-2 block text-sm text-text-secondary dark:text-gray-300"
-              >
-                Produto Ativo
-              </label>
-            </div>
 
             {errors.form && <p className="text-sm text-red-500 md:col-span-2">{errors.form}</p>}
           </div>
 
           <div>
-            <Button type="button" variant="secondary" onClick={onClose} disabled={isLoading}>
+            <Button
+              className="mr-3 mt-4 mb-1"
+              type="button"
+              variant="secondary"
+              onClick={onClose}
+              disabled={isLoading}
+            >
               Cancelar
             </Button>
             <Button type="submit" variant="primary" isLoading={isLoading} disabled={isLoading}>

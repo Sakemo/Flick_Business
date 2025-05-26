@@ -1,6 +1,6 @@
 // src/pages/ProdutosPage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { LuPlus, LuX } from 'react-icons/lu';
+import { LuFilter, LuPlus, LuX } from 'react-icons/lu';
 import { getProdutos, deleteProduto } from '../services/produtoService';
 import { getCategorias } from '../services/categoriaService';
 import { ProdutoResponse, CategoriaResponse } from '../types/domain';
@@ -107,11 +107,11 @@ const ProdutosPage: React.FC = () => {
   // --- Renderização ---
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-text-primary dark:text-white">
           Gerenciamento de Produtos
         </h1>
-        <Button onClick={handleOpenAddModal} iconLeft={<LuPlus />}>
+        <Button className="p-4" onClick={handleOpenAddModal} iconLeft={<LuPlus className="mr-1" />}>
           Adicionar Produto
         </Button>
       </div>
@@ -149,13 +149,11 @@ const ProdutosPage: React.FC = () => {
       </Card>
 
       {/* Conteúdo Principal: Tabela ou Mensagens */}
-      <Card>
-        {loading && <p className="p-6 text-center text-text-secondary">Carregando produtos...</p>}
-        {error && <p className="p-6 text-center text-red-500">{error}</p>}
-        {!loading && !error && (
-          <ProdutosTable produtos={produtos} onEdit={handleOpenEditModal} onDelete={handleDelete} />
-        )}
-      </Card>
+      {loading && <p className="p-6 text-center text-text-secondary">Carregando produtos...</p>}
+      {error && <p className="p-6 text-center text-red-500">{error}</p>}
+      {!loading && !error && (
+        <ProdutosTable produtos={produtos} onEdit={handleOpenEditModal} onDelete={handleDelete} />
+      )}
 
       {/* Modal de Formulário (renderizado condicionalmente) */}
       {isModalOpen && (

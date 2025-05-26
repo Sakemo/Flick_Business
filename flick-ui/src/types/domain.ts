@@ -4,6 +4,34 @@ export enum TipoUnidadeVenda{
   VOLUME = 'VOLUME'
 }
 
+export enum TipoPessoa {
+  FISICA = 'FISICA',
+  JURIDICA = 'JURIDICA',
+}
+
+export interface FornecedorResponse {
+  id: number;
+  nome: string;
+  tipoPessoa?: TipoPessoa | null;
+  cnpjCpf?: string | null;
+  telefone?: string | null;
+  email?: string | null;
+  notas?: string | null;
+}
+
+export interface FornecedorAddQuickRequest {
+  nome: string;
+  tipoPessoa?: TipoPessoa | '';
+}
+
+export enum FormaPagamento {
+  DINHEIRO = 'DINHEIRO',
+  DEBITO = 'DEBITO',
+  CREDITO = 'CREDITO',
+  FIADO = 'FIADO',
+  PIX = 'PIX',
+}
+
 export interface CategoriaResponse {
   id: number;
   nome: string;

@@ -1,15 +1,19 @@
 import apiClient from "../lib/axios";
-import { FornecedorResponse } from "../types/domain";
+import { FornecedorResponse, TipoPessoa } from "../types/domain";
 
-export interface FornecedorRequest {
+interface BackendFornecedorDTO {
+  id?: number | null;
   nome: string;
-  /* TODO:  
-     * tipoPessoa
-     * cnpjCpf
-     * telefone
-     * email
-     * notas
-  */
+  tipoPessoa?: TipoPessoa | null;
+  cnpjCpf?: string | null;
+  telefone?: string | null;
+  email?: string | null;
+  notas?: string | null;
+}
+
+export interface FornecedorAddQuickRequest {
+  nome: string;
+  tipoPessoa?: TipoPessoa | '' | null;
 }
 
 export const getFornecedores = async (): Promise<FornecedorResponse[]> => {
@@ -22,10 +26,19 @@ export const getFornecedores = async (): Promise<FornecedorResponse[]> => {
   }
 };
 
-export const createFornecedor = async (data:FornecedorRequest):
+export const createFornecedor = async (data:FornecedorAddQuickRequest):
 Promise<FornecedorResponse> => {
   try{
-    const response = await apiClient.post<FornecedorResponse>('api/fornecedores', data);
+    const payload: BackendFornecedorDTO = {
+      nome: data.nome,
+      tipoPessoa: data.tipoPessoa === '' ? null : data.tipoPessoa || null,
+      cnpjCpf: null,
+      telefone: null,
+      email: null,
+      notas: null,
+    };
+    console.log("Payload para criar fornecedor: ", payload);
+    const response = await apiClient.post<FornecedorResponse>('api/fornecedores', payload);
     return response.data;
   }catch(error){
     console.error("Erro ao criar fornecedor: ", error);

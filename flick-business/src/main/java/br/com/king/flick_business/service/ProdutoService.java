@@ -2,6 +2,7 @@ package br.com.king.flick_business.service;
 
 import java.util.List;
 
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,8 +71,9 @@ public class ProdutoService {
       novoFornecedor = null;
     }
     produtoMapper.updateEntityFromDTO(requestDTO, produtoExistente, novaCategoria, novoFornecedor);
-    System.out.println("LOG: ProdutoService.atualizar - produtoMapper: " + (produtoMapper));
     Produto produtoAtualizado = produtoRepository.save(produtoExistente);
+
+    System.out.println("LOG: ProdutoService.atualizar - produtoMapper: " + (produtoMapper));
     System.out.println("LOG: ProdutoService.atualizar - produto: " + (produtoAtualizado));
     return produtoMapper.toResponseDTO(produtoAtualizado);
   }

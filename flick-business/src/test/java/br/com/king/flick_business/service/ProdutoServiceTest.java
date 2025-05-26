@@ -17,22 +17,23 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test; // Para assertNotNull, assertEquals, assertThrows, assertFalse, etc.
 import org.junit.jupiter.api.extension.ExtendWith; // Para any(), anyLong()
 import org.mockito.ArgumentCaptor; // Para anyLong() especificamente
-import static org.mockito.ArgumentMatchers.any; // Para eq() - verificar valor exato
-import static org.mockito.ArgumentMatchers.anyLong; // Para when, verify, never, etc.
-import org.mockito.InjectMocks; // Para rodar algo antes de cada teste
-import org.mockito.Mock; // Opcional: Nome mais descritivo para o teste
-import static org.mockito.Mockito.doNothing; // Marca um método como um teste
-import static org.mockito.Mockito.never; // Necessário para habilitar Mockito
-import static org.mockito.Mockito.verify; // Para capturar argumentos passados aos mocks
-import static org.mockito.Mockito.when; // Cria a instância real da classe que queremos testar (ProdutoService)
-import org.mockito.junit.jupiter.MockitoExtension; // Cria instâncias "falsas" (mocks) das dependências
+import static org.mockito.ArgumentMatchers.any; // Para rodar algo antes de cada teste
+import static org.mockito.ArgumentMatchers.anyLong; // Opcional: Nome mais descritivo para o teste
+import static org.mockito.ArgumentMatchers.eq;
+import org.mockito.InjectMocks; // Marca um método como um teste
+import org.mockito.Mock; // Necessário para habilitar Mockito
+import static org.mockito.Mockito.doNothing; // Para capturar argumentos passados aos mocks
+import static org.mockito.Mockito.never; // Cria a instância real da classe que queremos testar (ProdutoService)
+import static org.mockito.Mockito.verify; // Cria instâncias "falsas" (mocks) das dependências
+import static org.mockito.Mockito.when; // Integra Mockito com JUnit 5
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import br.com.king.flick_business.dto.ProdutoRequestDTO; // Integra Mockito com JUnit 5
-import br.com.king.flick_business.dto.ProdutoResponseDTO;
-import br.com.king.flick_business.entity.Categoria; // Se seus DTOs/Entidades usarem
-import br.com.king.flick_business.entity.Fornecedor; // Para listas vazias
-import br.com.king.flick_business.entity.Produto; // Para testes de listagem
-import br.com.king.flick_business.enums.TipoPessoa; // Necessário para findById
+import br.com.king.flick_business.dto.ProdutoRequestDTO; // Se seus DTOs/Entidades usarem
+import br.com.king.flick_business.dto.ProdutoResponseDTO; // Para listas vazias
+import br.com.king.flick_business.entity.Categoria; // Para testes de listagem
+import br.com.king.flick_business.entity.Fornecedor; // Necessário para findById
+import br.com.king.flick_business.entity.Produto;
+import br.com.king.flick_business.enums.TipoPessoa;
 import br.com.king.flick_business.enums.TipoUnidadeVenda;
 import br.com.king.flick_business.exception.RecursoNaoEncontrado;
 import br.com.king.flick_business.mapper.ProdutoMapper;
@@ -97,11 +98,6 @@ class ProdutoServiceTest {
         BigDecimal.valueOf(7.25),
         TipoUnidadeVenda.UNIDADE, true, categoriaId, fornecedorId);
 
-    // Inicializa mock do DTO de resposta (baseado no mockProduto)
-    // Assume que seu ProdutoResponseDTO tem um construtor ou lógica para pegar
-    // esses dados
-    // É crucial que este mock corresponda EXATAMENTE ao que o
-    // produtoMapperMock.toResponseDTO retornaria
     mockResponseDTO = new ProdutoResponseDTO(
         mockProduto.getId(),
         mockProduto.getNome(),
@@ -179,12 +175,18 @@ class ProdutoServiceTest {
     when(produtoMapperMock.toEntity(mockRequestDTO, mockCategoria, mockFornecedor)).thenReturn(produtoParaSalvar);
 
     // 3. Simular repositório salvando e retornando entidade COM ID e timestamps
-    Produto produtoSalvoComId = Produto.builder() /* Copia campos do produtoParaSalvar + ID + Datas */
-        .id(2L).nome(produtoParaSalvar.getNome()).descricao(produtoParaSalvar.getDescricao())
-        .codigoBarras(produtoParaSalvar.getCodigoBarras()).quantidadeEstoque(produtoParaSalvar.getQuantidadeEstoque())
-        .precoVenda(produtoParaSalvar.getPrecoVenda()).precoCustoUnitario(produtoParaSalvar.getPrecoCustoUnitario())
+    Produto produtoSalvoComId = Produto.builder()
+        .id(2L)
+        .nome(produtoParaSalvar.getNome())
+        .descricao(produtoParaSalvar.getDescricao())
+        .codigoBarras(produtoParaSalvar.getCodigoBarras())
+        .quantidadeEstoque(produtoParaSalvar.getQuantidadeEstoque())
+        .precoVenda(produtoParaSalvar.getPrecoVenda())
+        .precoCustoUnitario(produtoParaSalvar.getPrecoCustoUnitario())
         .tipoUnidadeVenda(produtoParaSalvar.getTipoUnidadeVenda()).ativo(produtoParaSalvar.isAtivo())
-        .categoria(mockCategoria).fornecedor(mockFornecedor).criadoEm(LocalDateTime.now())
+        .categoria(mockCategoria)
+        .fornecedor(mockFornecedor)
+        .criadoEm(LocalDateTime.now())
         .atualizadoEm(LocalDateTime.now()).build();
     when(produtoRepositoryMock.save(produtoParaSalvar)).thenReturn(produtoSalvoComId);
 
@@ -457,13 +459,14 @@ class ProdutoServiceTest {
     Produto outroProduto = Produto.builder().id(2L).nome("Outro Produto").ativo(true).categoria(mockCategoria)
         .fornecedor(mockFornecedor).build();
     List<Produto> listaProdutos = List.of(mockProduto, outroProduto);
-    when(produtoRepositoryMock.findAll()).thenReturn(listaProdutos);
+    when(produtoRepositoryMock.findAllWithCategoriaAndFornecedor()).thenReturn(listaProdutos);
 
     // Mock do mapper para a lista inteira (assumindo que seu mapper tem
     // toResponseDTOList ou você mocka individualmente)
     ProdutoResponseDTO dto1 = new ProdutoResponseDTO(mockProduto); // Usa construtor real do DTO
     ProdutoResponseDTO dto2 = new ProdutoResponseDTO(outroProduto);
-    when(produtoMapperMock.toResponseDTOList(listaProdutos)).thenReturn(List.of(dto1, dto2)); // Mock do método de lista
+    when(produtoMapperMock.toResponseDTOList(eq(listaProdutos))).thenReturn(List.of(dto1, dto2)); // Mock do método de
+                                                                                                  // lista
 
     // Act
     List<ProdutoResponseDTO> resultado = produtoService.listarTodos(null);
@@ -475,15 +478,15 @@ class ProdutoServiceTest {
     assertEquals(dto2.id(), resultado.get(1).id());
 
     // Verify
-    verify(produtoRepositoryMock).findAll();
-    verify(produtoMapperMock).toResponseDTOList(listaProdutos);
+    verify(produtoRepositoryMock).findAllWithCategoriaAndFornecedor();
+    verify(produtoMapperMock).toResponseDTOList(eq(listaProdutos));
   }
 
   @Test
   @DisplayName("Deve retornar lista vazia ao listar todos quando não há produtos")
   void listarTodos_quandoNaoHaProdutos_deveRetornarListaVazia() {
     // Arrange
-    when(produtoRepositoryMock.findAll()).thenReturn(Collections.emptyList());
+    when(produtoRepositoryMock.findAllWithCategoriaAndFornecedor()).thenReturn(Collections.emptyList());
     when(produtoMapperMock.toResponseDTOList(Collections.emptyList())).thenReturn(Collections.emptyList());
 
     // Act
@@ -494,8 +497,10 @@ class ProdutoServiceTest {
     assertTrue(resultado.isEmpty(), "A lista deveria estar vazia");
 
     // Verify
-    verify(produtoRepositoryMock).findAll();
+    verify(produtoRepositoryMock).findAllWithCategoriaAndFornecedor();
     verify(produtoMapperMock).toResponseDTOList(Collections.emptyList());
+    verify(produtoRepositoryMock, never()).findByCategoriaId(anyLong());
+    verify(produtoRepositoryMock, never()).findByCategoriaIdWithFornecedor(anyLong());
   }
 
   @Test
@@ -504,10 +509,10 @@ class ProdutoServiceTest {
     // Arrange
     // mockProduto já tem categoriaId = 1L
     List<Produto> listaFiltrada = List.of(mockProduto);
-    when(produtoRepositoryMock.findByCategoriaId(categoriaId)).thenReturn(listaFiltrada);
+    when(produtoRepositoryMock.findByCategoriaIdWithFornecedor(categoriaId)).thenReturn(listaFiltrada);
 
     ProdutoResponseDTO dtoEsperado = new ProdutoResponseDTO(mockProduto);
-    when(produtoMapperMock.toResponseDTOList(listaFiltrada)).thenReturn(List.of(dtoEsperado));
+    when(produtoMapperMock.toResponseDTOList(eq(listaFiltrada))).thenReturn(List.of(dtoEsperado));
 
     // Act
     List<ProdutoResponseDTO> resultado = produtoService.listarTodos(categoriaId);
@@ -520,8 +525,8 @@ class ProdutoServiceTest {
     assertEquals(mockCategoria.getNome(), resultado.get(0).categoria().getNome()); // Verifica o nome da categoria
 
     // Verify
-    verify(produtoRepositoryMock).findByCategoriaId(categoriaId);
-    verify(produtoMapperMock).toResponseDTOList(listaFiltrada);
-    verify(produtoRepositoryMock, never()).findAll(); // Não deve chamar findAll
+    verify(produtoRepositoryMock).findByCategoriaIdWithFornecedor(categoriaId);
+    verify(produtoMapperMock).toResponseDTOList(eq(listaFiltrada));
+    verify(produtoRepositoryMock, never()).findAllWithCategoriaAndFornecedor(); // Não deve chamar findAll
   }
 }

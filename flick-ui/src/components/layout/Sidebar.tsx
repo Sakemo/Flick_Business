@@ -1,9 +1,16 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React from 'react';
+import { NavLink } from 'react-router-dom';
 import {
-  LuLayoutDashboard, LuShoppingCart, LuPackage, LuUsers, LuDollarSign, LuSettings, LuSun, LuMoon
+  LuLayoutDashboard,
+  LuShoppingCart,
+  LuPackage,
+  LuUsers,
+  LuDollarSign,
+  LuSettings,
+  LuSun,
+  LuMoon,
 } from 'react-icons/lu';
-import clsx from "clsx";
+import clsx from 'clsx';
 import { useDarkMode } from '../../hooks/useDarkMode';
 
 interface SidebarItem {
@@ -17,17 +24,23 @@ const Sidebar: React.FC = () => {
   const [theme, toggleTheme] = useDarkMode();
 
   const navItems: SidebarItem[] = [
-    { path: '/', name: 'Dashboard', icon: LuLayoutDashboard, end:true },
-    { path: '/vendas', name:'Vendas', icon:LuShoppingCart },
-    { path: '/produtos', name:'Produtos', icon:LuPackage },
-    { path: '/clientes', name:'Clientes', icon:LuUsers },
-    { path: '/despesas', name:'Despesas', icon:LuDollarSign }
+    { path: '/', name: 'Dashboard', icon: LuLayoutDashboard, end: true },
+    { path: '/vendas', name: 'Vendas', icon: LuShoppingCart },
+    { path: '/produtos', name: 'Produtos', icon: LuPackage },
+    { path: '/clientes', name: 'Clientes', icon: LuUsers },
+    { path: '/despesas', name: 'Despesas', icon: LuDollarSign },
   ];
 
-  const settingsItem: SidebarItem = { path: '/configuracoes', name:'Configurações', icon:LuSettings };
+  const settingsItem: SidebarItem = {
+    path: '/configuracoes',
+    name: 'Configurações',
+    icon: LuSettings,
+  };
 
-  const linkClasses = 'flex items-center px-4 py-3 text-sm font-medium text-text-secondary dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-btn transition-colors duration-200 group';
-  const activeLinkClasses = 'bg-brand-muted dark:bg-gray-700 text-brand-primary dark:text-white font-semibold shadow-sm';
+  const linkClasses =
+    'flex items-center px-4 py-3 text-sm font-medium text-text-secondary dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-btn transition-colors duration-200 group';
+  const activeLinkClasses =
+    'bg-brand-muted/30 dark:bg-gray-700/50 text-brand-primary dark:text-white font-semibold border-l-2 border-brand-primary';
 
   return (
     <aside>
@@ -58,27 +71,26 @@ const Sidebar: React.FC = () => {
 
       {/** Rodapé da Sidebar */}
       <div className="mt-auto space-y-2 border-t border-gray-200 dark:border-gray-700/50 pt-4">
-        <NavLink 
+        <NavLink
           to={settingsItem.path}
-          className={({ isActive }) => clsx(linkClasses, isActive && activeLinkClasses)}>
-
-          <settingsItem.icon className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-text-primary dark:group-hover:text-gray-300 transition-colors" aria-hidden="true" 
+          className={({ isActive }) => clsx(linkClasses, isActive && activeLinkClasses)}
+        >
+          <settingsItem.icon
+            className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-text-primary dark:group-hover:text-gray-300 transition-colors"
+            aria-hidden="true"
           />
           {settingsItem.name}
         </NavLink>
       </div>
-        <button
-          onClick={toggleTheme}
-          className={clsx(linkClasses, 'w-full justify-start')}
-        >
-          {theme === 'light' ? (
-            <LuMoon className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-text-primary dark:group-hover:text-gray-300 transition-colors" />
-          ) : (
-            <LuSun className="mr-3 h-5 flex-shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-text-primary dark:group-hover:text-gray-300 transition-colors"/>
-          )}
-          {theme === 'light' ? 'Modo Escuro' : 'Modo Claro'}
-        </button>
-        {/* TODO: Adicionar link/botão de Logout aqui no futuro */}
+      <button onClick={toggleTheme} className={clsx(linkClasses, 'w-full justify-start')}>
+        {theme === 'light' ? (
+          <LuMoon className="mr-3 h-5 w-5 flex-shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-text-primary dark:group-hover:text-gray-300 transition-colors" />
+        ) : (
+          <LuSun className="mr-3 h-5 flex-shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-text-primary dark:group-hover:text-gray-300 transition-colors" />
+        )}
+        {theme === 'light' ? 'Modo Escuro' : 'Modo Claro'}
+      </button>
+      {/* TODO: Adicionar link/botão de Logout aqui no futuro */}
     </aside>
   );
 };

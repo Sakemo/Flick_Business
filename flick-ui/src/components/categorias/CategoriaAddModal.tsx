@@ -54,7 +54,7 @@ const CategoriaAddModal: React.FC<CategoriaAddModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Adicionar categoria">
       <form onSubmit={handleSubmit}>
-        <div className="p-6">
+        <div className="p-2">
           <Input
             label="Nome da Categoria"
             value={nomeCategoria}

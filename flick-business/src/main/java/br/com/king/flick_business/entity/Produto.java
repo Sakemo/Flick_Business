@@ -54,7 +54,7 @@ public class Produto {
 
     @DecimalMin(value = "0.0", inclusive = true, message = "A quantidade não pode ser negativa")
     @Digits(integer = 10, fraction = 3, message = "Formato inválido")
-    @Column(name = "quantidade_estoque", precision = 13, scale = 3)
+    @Column(name = "quantidade_estoque", precision = 13, scale = 3, nullable = false)
     private BigDecimal quantidadeEstoque;
 
     @NotNull(message = "Preço de venda é obrigatório")

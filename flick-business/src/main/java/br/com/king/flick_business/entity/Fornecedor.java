@@ -1,12 +1,22 @@
 package br.com.king.flick_business.entity;
+
 import br.com.king.flick_business.enums.TipoPessoa;
-
-// JAKARTA SETUP
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-
-// LOMBOK SETUP
-import lombok.Data; import lombok.NoArgsConstructor; import lombok.AllArgsConstructor; import lombok.Builder;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "fornecedores")
@@ -28,33 +38,29 @@ public class Fornecedor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "O nome é obrigatório")    @Size(min = 2, max = 60, message = "Nome deve ter entre 2 e 60 caracteres")
+    @NotBlank(message = "O nome é obrigatório")
+    @Size(min = 2, max = 60, message = "Nome deve ter entre 2 e 60 caracteres")
     @Column(nullable = false, length = 60)
     private String nome;
 
-    @NotNull(message = "Tipo de pessoa é obrigatório")    
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
+    @Column(nullable = true, length = 10)
     private TipoPessoa tipoPessoa;
 
-    @Pattern(
-        regexp = "^(\\d{11}|\\d{14})$",
-        message = "Informe um CPF ou CNPJ válido, apenas números"
-    )
+    @Pattern(regexp = "^(\\d{11}|\\d{14})$", message = "Informe um CPF ou CNPJ válido, apenas números")
     @Column(nullable = true, length = 14, unique = true) // Opcional
     private String cnpjCpf;
 
-    @Pattern(
-        regexp = "^\\d{10,11}$"
-    )
-    @Column(length = 11)
+    @Pattern(regexp = "^\\d{10,11}$")
+    @Column(length = 11, nullable = true)
     private String telefone;
 
     @Email(message = "E-mail inválido")
     @Size(max = 100)
-    @Column(length = 100)
+    @Column(length = 100, unique = true, nullable = true)
     private String email;
 
     @Size(max = 300)
+    @Column(length = 500, nullable = true)
     private String notas;
 }

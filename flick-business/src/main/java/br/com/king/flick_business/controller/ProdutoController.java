@@ -71,4 +71,10 @@ public class ProdutoController {
     produtoService.deletarLogicamente(id);
     return ResponseEntity.noContent().build();
   }
+
+  @DeleteMapping("/{id}/permanente")
+  public ResponseEntity<Void> deletarProdutoFisicamente(@PathVariable Long id) {
+    produtoService.deletarFisicamente(id);
+    return ResponseEntity.noContent().build();
+  }
 }

@@ -2,7 +2,6 @@ package br.com.king.flick_business.service;
 
 import java.util.List;
 
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,7 +99,22 @@ public class ProdutoService {
   public void deletarLogicamente(Long id) {
     Produto produto = produtoRepository.findById(id)
         .orElseThrow(() -> new RecursoNaoEncontrado("Produto não encontrado com ID: " + id));
-    produto.setAtivo(false);
+    if (produto.isAtivo()) {
+      produto.setAtivo(false);
+    } else {
+      produto.setAtivo(true);
+    }
     produtoRepository.save(produto);
   }
+
+  @Transactional
+  public void deletarFisicamente(Long id) {
+    if (!produtoRepository.existsById(id)) {
+      throw new RecursoNaoEncontrado("Produto não encontrado com ID: " + id + "para deleção física");
+      // TODO: Adicionar validações ANTES de deletar caso ele esteja associado a uma
+      // venda. Considere Desativalo.
+    }
+    produtoRepository.deleteById(id);
+  }
+
 }

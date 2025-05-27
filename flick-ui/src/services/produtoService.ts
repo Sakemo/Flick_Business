@@ -58,3 +58,12 @@ export const deleteProduto = async (id:number) : Promise<void> => {
     throw error;
   }
 }
+
+export const deleteProdutoFisicamente = async (id:number): Promise<void> =>{
+  try{
+    await apiClient.delete(`/api/produtos/${id}/permanente`);
+  }catch(error){
+    console.error(`Erro ao deletear fisicamente produto ${id}: `, error);
+    throw error;
+  }
+}

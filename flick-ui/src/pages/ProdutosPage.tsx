@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/pages/ProdutosPage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { LuPlus, LuX } from 'react-icons/lu';
-import { getProdutos, deleteProduto } from '../services/produtoService';
+import { getProdutos, deleteProduto, deleteProdutoFisicamente } from '../services/produtoService';
 import { getCategorias } from '../services/categoriaService';
 import { ProdutoResponse, CategoriaResponse } from '../types/domain';
 import ProdutosTable from '../components/produtos/ProdutosTable'; // Criaremos depois
@@ -80,9 +81,10 @@ const ProdutosPage: React.FC = () => {
     // TODO: Adicionar notificação de sucesso (toast)
   };
 
-  const handleDelete = async (id: number) => {
-    // Simples confirmação, idealmente usar um modal de confirmação
-    if (window.confirm('Tem certeza que deseja deletar este produto?')) {
+  //TODO: Modal de confirmação
+  const handleDelete = async (id: number, nomeProduto: string, status: boolean) => {
+    const action = status ? 'INATIVAR' : 'ATIVAR';
+    if (window.confirm(`Tem certeza que deseja ${action} o produto "${nomeProduto}"?`)) {
       try {
         setLoading(true); // Pode ter um loading específico para delete
         await deleteProduto(id);
@@ -92,6 +94,28 @@ const ProdutosPage: React.FC = () => {
         setError('Falha ao deletar produto.');
         console.error(err);
         // TODO: Adicionar notificação de erro (toast)
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleDeletarFisicamente = async (id: number, nomeProduto: string) => {
+    if (
+      window.confirm(
+        `ATENÇÃO: Esta ação é IRREVERSÍVEL. Tem certeza que deseja DELETAR PERMANENTEMENTE o produto ${nomeProduto}?`
+      )
+    ) {
+      try {
+        setLoading(true);
+        await deleteProdutoFisicamente(id);
+        fetchProdutos();
+        setProdutoSelecionadoDetalhes(null);
+      } catch (err: any) {
+        const errorMsg =
+          err.response?.data?.message || 'Falha ao deletar permanentemente o produto';
+        setError(errorMsg);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -169,7 +193,7 @@ const ProdutosPage: React.FC = () => {
         <div
           className={clsx(
             'transition-all duration-300 ease-in-out',
-            produtoSelecionadoDetalhes ? 'lg:w-2/3 mr-4' : 'lg:w-full'
+            produtoSelecionadoDetalhes ? 'lg:w-2/3 lg:mr-4' : 'lg:w-full'
           )}
         >
           {/* Conteúdo Principal: Tabela ou Mensagens */}
@@ -180,6 +204,7 @@ const ProdutosPage: React.FC = () => {
               produtos={produtos}
               onEdit={handleOpenEditModal}
               onDelete={handleDelete}
+              onDeletePerm={handleDeletarFisicamente}
               onRowClick={handleVerDetalhesProduto}
               selectedRowId={produtoSelecionadoDetalhes?.id}
             />

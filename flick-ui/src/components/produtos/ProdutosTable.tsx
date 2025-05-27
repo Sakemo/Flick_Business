@@ -3,14 +3,15 @@ import { ProdutoResponse } from '../../types/domain';
 import Table, { TableColumn } from '../common/Table';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
-import { LuPencil, LuTrash2 } from 'react-icons/lu';
+import { LuCheck, LuDelete, LuPencil, LuTrash2 } from 'react-icons/lu';
 import { format } from 'date-fns';
 import { formatCurrency } from '../../utils/formatters';
 
 interface ProdutosTableProps {
   produtos: ProdutoResponse[];
   onEdit: (produto: ProdutoResponse) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: number, nomeProduto: string, status: boolean) => void;
+  onDeletePerm: (id: number, nomeProduto: string) => void;
   isLoading?: boolean;
   onRowClick: (produto: ProdutoResponse) => void;
   selectedRowId: number | undefined;
@@ -20,6 +21,7 @@ const ProdutosTable: React.FC<ProdutosTableProps> = ({
   produtos,
   onEdit,
   onDelete,
+  onDeletePerm,
   isLoading,
   onRowClick,
   selectedRowId,
@@ -78,9 +80,20 @@ const ProdutosTable: React.FC<ProdutosTableProps> = ({
             size="icon"
             onClick={(e) => {
               e.stopPropagation();
-              onDelete(row.id);
+              onDelete(row.id, row.nome, row.ativo);
             }}
             className="text-red-500 hover:bg-red-100 dark:hover:gb-red-700/50"
+            title={row.ativo ? 'Desativar' : 'Ativar'}
+          >
+            {row.ativo ? <LuDelete className="h-4 w-4" /> : <LuCheck className="h-4 w-4" />}
+          </Button>
+          <Button
+            variant="danger"
+            size="icon"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeletePerm(row.id, row.nome);
+            }}
             title="Deletar"
           >
             <LuTrash2 className="h-4 w-4" />

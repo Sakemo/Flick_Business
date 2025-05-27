@@ -39,7 +39,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       secondary:
         'bg-transparent border border-brand-muted dark:border-gray-600 text-text-primary dark:text-gray-200 hover:bg-brand-muted/30 dark:hover:bg-gray-700 focus:ring-brand-primary focus:ring-opacity-50',
       danger:
-        'br-red-600 text-white hover:bg-red-700 focus:ring-red-500 focus:ring-opacity-50 shadow-soft hover:shadow-md',
+        'br-red-600 text-text-secondary hover:bg-red-700 hover:text-white focus:ring-red-500 focus:ring-opacity-50 shadow-soft hover:shadow-md',
+      check:
+        'br-green-600 text-text-secondary hover:bg-green-700 hover:text-white focus:ring-red-500 focus:ring-opacity-50 shadow-soft hover:shadow-md',
       ghost:
         'bg-transparent text-text-secondary dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 focus:ring-brand-primary focus:ring-opacity-50',
       link: 'bg-transparent text-brand-primary dark:text-brand-accent hover:underline focus:ring-0 focus:outline-none focus:underline p-0 h-auto',

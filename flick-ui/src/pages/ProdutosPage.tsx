@@ -1,6 +1,6 @@
 // src/pages/ProdutosPage.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { LuFilter, LuPlus, LuX } from 'react-icons/lu';
+import { LuPlus, LuX } from 'react-icons/lu';
 import { getProdutos, deleteProduto } from '../services/produtoService';
 import { getCategorias } from '../services/categoriaService';
 import { ProdutoResponse, CategoriaResponse } from '../types/domain';
@@ -9,6 +9,8 @@ import ProdutosFormModal from '../components/produtos/ProdutosFormModal'; // Cri
 import Button from '../components/ui/Button';
 import Select from '../components/ui/Select'; // Usaremos para filtro
 import Card from '../components/ui/Card'; // Para envolver a tabela/filtros
+import clsx from 'clsx';
+import ProdutoDetalhesDrawer from '../components/produtos/ProdutoDetalhesDrawer';
 
 const ProdutosPage: React.FC = () => {
   // --- Estados ---
@@ -104,6 +106,21 @@ const ProdutosPage: React.FC = () => {
     setFiltroCategoriaId('');
   };
 
+  const [produtoSelecionadoDetalhes, setProdutoSelecionadoDetalhes] =
+    useState<ProdutoResponse | null>(null);
+
+  const handleVerDetalhesProduto = (produto: ProdutoResponse) => {
+    if (produtoSelecionadoDetalhes && produtoSelecionadoDetalhes.id === produto.id) {
+      setProdutoSelecionadoDetalhes(null);
+    } else {
+      setProdutoSelecionadoDetalhes(produto);
+    }
+  };
+
+  const handleFecharDetalhes = () => {
+    setProdutoSelecionadoDetalhes(null);
+  };
+
   // --- Renderização ---
   return (
     <div>
@@ -148,12 +165,44 @@ const ProdutosPage: React.FC = () => {
         </div>
       </Card>
 
-      {/* Conteúdo Principal: Tabela ou Mensagens */}
-      {loading && <p className="p-6 text-center text-text-secondary">Carregando produtos...</p>}
-      {error && <p className="p-6 text-center text-red-500">{error}</p>}
-      {!loading && !error && (
-        <ProdutosTable produtos={produtos} onEdit={handleOpenEditModal} onDelete={handleDelete} />
-      )}
+      <div className="flex flex-col lg:flex-row">
+        <div
+          className={clsx(
+            'transition-all duration-300 ease-in-out',
+            produtoSelecionadoDetalhes ? 'lg:w-2/3 mr-4' : 'lg:w-full'
+          )}
+        >
+          {/* Conteúdo Principal: Tabela ou Mensagens */}
+          {loading && <p className="p-6 text-center text-text-secondary">Carregando produtos...</p>}
+          {error && <p className="p-6 text-center text-red-500">{error}</p>}
+          {!loading && !error && (
+            <ProdutosTable
+              produtos={produtos}
+              onEdit={handleOpenEditModal}
+              onDelete={handleDelete}
+              onRowClick={handleVerDetalhesProduto}
+              selectedRowId={produtoSelecionadoDetalhes?.id}
+            />
+          )}
+        </div>
+
+        <div
+          className={clsx(
+            'transition-all duration-300 ease-in-out mt-6 lg:mt-0',
+            produtoSelecionadoDetalhes
+              ? 'lg:w-1/3 opacity-100'
+              : 'lg-w-0 opacity-0 lg:overflow-hidden'
+          )}
+        >
+          {produtoSelecionadoDetalhes && (
+            <ProdutoDetalhesDrawer
+              produto={produtoSelecionadoDetalhes}
+              onClose={handleFecharDetalhes}
+              onEdit={handleOpenEditModal}
+            />
+          )}
+        </div>
+      </div>
 
       {/* Modal de Formulário (renderizado condicionalmente) */}
       {isModalOpen && (
@@ -161,7 +210,7 @@ const ProdutosPage: React.FC = () => {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           onSaveSuccess={handleSaveSuccess}
-          produtoInicial={produtoParaEditar} // Passa null para adicionar, ou produto para editar
+          produtoInicial={produtoParaEditar}
         />
       )}
     </div>

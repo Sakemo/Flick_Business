@@ -12,9 +12,18 @@ interface ProdutosTableProps {
   onEdit: (produto: ProdutoResponse) => void;
   onDelete: (id: number) => void;
   isLoading?: boolean;
+  onRowClick: (produto: ProdutoResponse) => void;
+  selectedRowId: number | undefined;
 }
 
-const ProdutosTable: React.FC<ProdutosTableProps> = ({ produtos, onEdit, onDelete, isLoading }) => {
+const ProdutosTable: React.FC<ProdutosTableProps> = ({
+  produtos,
+  onEdit,
+  onDelete,
+  isLoading,
+  onRowClick,
+  selectedRowId,
+}) => {
   const columns: TableColumn<ProdutoResponse>[] = [
     {
       header: 'Nome',
@@ -88,7 +97,8 @@ const ProdutosTable: React.FC<ProdutosTableProps> = ({ produtos, onEdit, onDelet
       data={produtos}
       isLoading={isLoading}
       emptyMessage="Nenhum produto registrado"
-      onRowClick={onEdit}
+      onRowClick={onRowClick}
+      selectedRowId={selectedRowId}
     />
   );
 };

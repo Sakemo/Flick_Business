@@ -16,6 +16,7 @@ interface TableProps<T> {
   emptyMessage?: string;
   className?: string;
   onRowClick?: (row: T) => void;
+  selectedRowId: number | undefined;
 }
 function Table<T extends { id: number | string }>({
   columns,
@@ -24,6 +25,7 @@ function Table<T extends { id: number | string }>({
   emptyMessage = 'Nenhum dado encontrado',
   className,
   onRowClick,
+  selectedRowId,
 }: TableProps<T>) {
   const renderCellContent = (row: T, column: TableColumn<T>) => {
     if (typeof column.accessor === 'function') {
@@ -82,8 +84,10 @@ function Table<T extends { id: number | string }>({
                 key={row.id}
                 className={clsx(
                   'hover:=bg-gray-50 dark:hover:bg-gray-700/40 transition-colors',
-                  onRowClick && 'cursor-pointer'
+                  onRowClick && 'cursor-pointer',
+                  selectedRowId === row.id && 'bg-brand-muted/50 dark:bg-gray-700'
                 )}
+                onClick={() => onRowClick?.(row)}
               >
                 {columns.map((col, index) => (
                   <td

@@ -4,10 +4,10 @@ import Sidebar from './Sidebar';
 
 const AppLayout: React.FC = () => {
   return (
-    <div className='flex h-screen bg-bg-light dark:bg-bg-dark overflow-hidden'>
+    <div className="flex h-screen bg-bg-light dark:bg-bg-dark overflow-hidden">
       <Sidebar />
 
-      <div className="flex=1 flex-col overflow-y-auto">
+      <div className="flex=1 flex-col overflow-y-auto w-full">
         <main className="flex-1 p-6 md:p-8 lg:p-10">
           <Outlet />
         </main>

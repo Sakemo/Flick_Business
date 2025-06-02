@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/pages/ProdutosPage.tsx
+//TODO: FILTRO DE APENAS ATIVOS
 import React, { useState, useEffect, useCallback } from 'react';
 import { LuPlus, LuX } from 'react-icons/lu';
 import { getProdutos, deleteProduto, deleteProdutoFisicamente } from '../services/produtoService';

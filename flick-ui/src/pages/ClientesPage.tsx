@@ -1,15 +1,214 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ClienteResponse, ConfiguracaoGeralResponse } from '../types/domain';
+import {
+  deleteClienteFisicamente,
+  getClientes,
+  GetClientesParams,
+  toggleAtividadeCliente,
+} from '../services/clienteService';
+import { getConfiguracaoGeral } from '../services/configuracaoService';
+import Button from '../components/ui/Button';
+import { LuPlus, LuSearch } from 'react-icons/lu';
+import Card from '../components/ui/Card';
+import Input from '../components/ui/Input';
+import Select from '../components/ui/Select';
+import ClienteCard from '../components/clientes/ClienteCard';
+import ClienteFormModal from '../components/clientes/ClienteFormModal';
+
+type OrdemCliente =
+  | 'nomeAsc'
+  | 'nomeDesc'
+  | 'saldoDesc'
+  | 'saldoAsc'
+  | 'cadastroRecente'
+  | 'cadastroAntigo';
+type FiltroDevedores = 'todos' | 'devedores' | 'naoDevedores';
+// type FiltroStatusFiado = 'todos' | 'emDia' | 'aVencer' | 'atrasado';
 
 const ClientesPage: React.FC = () => {
+  const [clientes, setClientes] = useState<ClienteResponse[]>([]);
+  const [configGeral, setConfigGeral] = useState<ConfiguracaoGeralResponse | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [termoBuscaNome, setTermoBuscaNome] = useState('');
+  const [ordem, setOrdem] = useState<OrdemCliente>('nomeAsc');
+  const [filtroDevedor, setFiltroDevedor] = useState<FiltroDevedores>('todos');
+  // const [filtroStatusFiado, setFiltroStatusFiado] = useState<FiltroStatusFiado>('todos');
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [clienteParaEditar, setClienteParaEditar] = useState<ClienteResponse | null>(null);
+
+  const fetchClientes = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      //TODO: Ajustar backend para aceitar esses params
+      const params: GetClientesParams = { apenasAtivos: true };
+      if (ordem) params.orderBy = ordem;
+      if (filtroDevedor === 'devedores') params.devedores = true;
+      if (filtroDevedor === 'naoDevedores') params.devedores = false;
+      // TODO: Fazer Backend suportar pesquisa por termo: if(termoBuscaNome) params.nomeContais = termoBuscaNome;
+
+      const data = await getClientes(params);
+      //TODO: Se o filtro de status fiado for no frontend, aplicar aqui sobre 'data'
+      setClientes(data);
+    } catch (err) {
+      setError('Falha ao carregar clientes');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [ordem, filtroDevedor /*termoBuscaNome*/]);
+
+  const fetchConfig = useCallback(async () => {
+    try {
+      const data = await getConfiguracaoGeral();
+      setConfigGeral(data);
+    } catch (error) {
+      console.error('Erro ao buscar configurações: ', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchConfig();
+  }, [fetchConfig]);
+
+  useEffect(() => {
+    fetchClientes();
+  }, [fetchClientes]);
+
+  const handleOpenAddModal = () => {
+    setClienteParaEditar(null);
+    setIsModalOpen(true);
+  };
+  const handleOpenEditModal = (cliente: ClienteResponse) => {
+    setClienteParaEditar(cliente);
+    setIsModalOpen(true);
+  };
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setClienteParaEditar(null);
+  };
+  const handleSaveSucess = () => {
+    handleCloseModal();
+    fetchClientes();
+  };
+
+  const handdleToggleAtivo = async (id: number, nomeCliente: string, estadoAtual: boolean) => {
+    const acao = estadoAtual ? 'INATIVAR' : 'ATIVAR';
+    //TODO: Modal de confirmação
+    if (window.confirm(`Tem certeza que deseja ${acao} o cliente "${nomeCliente}"`)) {
+      try {
+        setLoading(true);
+        await toggleAtividadeCliente(id, !estadoAtual);
+        fetchClientes();
+      } catch (err) {
+        const axiosError = err as import('axios').AxiosError<{ message?: string }>;
+        setError(axiosError.response?.data?.message || `Falha ao ${acao.toLowerCase()} cliente`);
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleDeletarFisicamente = async (id: number, nomeCliente: string) => {
+    //TODO: Modal de confirmacao
+    if (
+      window.confirm(
+        `ATENÇÃO: Deletar PEMANENTEMENTE o cliente ${nomeCliente}? Esta ação é IRREVERSÍVEL`
+      )
+    ) {
+      try {
+        setLoading(true);
+        await deleteClienteFisicamente(id);
+        fetchClientes();
+      } catch (err) {
+        const axiosError = err as import('axios').AxiosError<{ message?: string }>;
+        setError(axiosError.response?.data?.message || `Falha ao deletar cliente.`);
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   return (
     <div>
-      <h1 className='text-2xl font-bold text-text-primary dark:text-white mb-6'>
-        Clientes
-      </h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl lg:text-3xl font-semibold text-text-primary dark:text-white">
+          Gerenciamento de Clientes
+        </h1>
+        <Button onClick={handleOpenAddModal} iconLeft={<LuPlus className="mr-1" />}>
+          Novo Cliente
+        </Button>
+      </div>
 
-      <p className='text-text-secondary dark:text-gray-400'>
-        Gerenciamento de clientes
-      </p>
+      <Card className="mb-6 p-card-padding">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+          <Input
+            label="Buscar por Nome"
+            placeholder="Digite o nome..."
+            value={termoBuscaNome}
+            onChange={(e) => setTermoBuscaNome(e.target.value)}
+            iconLeft={<LuSearch className="mr-1" />}
+          />
+          <Select
+            label="Ordernar por"
+            value={ordem}
+            onChange={(e) => setOrdem(e.target.value as OrdemCliente)}
+          >
+            <option value="nomeAsc">Nome (A-Z)</option>
+            <option value="nomeDesc">Nome (Z-A)</option>
+            <option value="saldoDesc">Maior Fiado</option>
+            <option value="saldoAsc">Menor Fiado</option>
+            <option value="cadastroRecente">Mais Recente</option>
+            <option value="cadastroAntigo"> Mais Antigo</option>
+          </Select>
+          <Select
+            label="Filtrar Devedores"
+            name="filtroDevedor"
+            value={filtroDevedor}
+            onChange={(e) => setFiltroDevedor(e.target.value as FiltroDevedores)}
+          >
+            <option value="todos">Todos</option>
+            <option value="devedores">Apenas Fiado</option>
+            <option value="naoDevedores">Apenas Em Dia</option>
+          </Select>
+        </div>
+      </Card>
+
+      {loading && <p className="p-6 text-center">Carregando clientes...</p>}
+      {error && <p className="p-6 text-center text-red-500">{error}</p>}
+      {!loading && !error && clientes.length === 0 && (
+        <Card>
+          <p className="p-6 text-center text-text-secondary">Nenhum cliente cadastrado</p>
+        </Card>
+      )}
+      {!loading && !error && clientes.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {clientes.map((cliente) => (
+            <ClienteCard
+              key={cliente.id}
+              cliente={cliente}
+              configFiado={configGeral}
+              onEdit={() => handleOpenEditModal(cliente)}
+              onToggleAtivo={() => handdleToggleAtivo(cliente.id, cliente.nome, cliente.ativo)}
+              onDeletePermanente={() => handleDeletarFisicamente(cliente.id, cliente.nome)}
+            />
+          ))}
+        </div>
+      )}
+
+      {isModalOpen && (
+        <ClienteFormModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSaveSucess={handleSaveSucess}
+          clienteInicial={clienteParaEditar}
+        />
+      )}
     </div>
   );
 };

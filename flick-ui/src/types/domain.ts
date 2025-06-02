@@ -7,7 +7,7 @@ export enum TipoUnidadeVenda{
 export enum TipoPessoa {
   FISICA = 'FISICA',
   JURIDICA = 'JURIDICA',
-}
+} 
 
 export interface FornecedorResponse {
   id: number;
@@ -73,4 +73,36 @@ export interface ProdutoRequest{
   ativo: boolean;
   categoriaId: number | undefined;
   fornecedorId:number | null;
+}
+
+export interface ClienteResponse {
+  id:number;
+  nome: string;
+  cpf?: string | null;
+  telefone?: string | null;
+  endereco?: string | null;
+  controleFiado: boolean;
+  limiteFiado?: number | null;
+  saldoDevedor: number;
+  dataUltimaCompraFiado?: string | null;
+  dataCadastro: string;
+  dataAtualizacao: string;
+  ativo: boolean;
+}
+
+export interface ClienteRequest {
+  nome: string;
+  cpf?: string | null;
+  telefone?: string | null;
+  endereco?: string | null;
+  controleFiado: boolean;
+  limiteFiado?: number;
+  ativo?: boolean | null;
+}
+
+export interface ConfiguracaoGeralResponse {
+  taxaJurosAtraso?: number | null;
+  prazoPagamentoFiado?: number | null;
+  nomeNegocio?: string | null;
+  dataAtualizacao: string | null;
 }

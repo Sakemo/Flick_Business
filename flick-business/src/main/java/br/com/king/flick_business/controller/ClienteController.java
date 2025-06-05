@@ -1,6 +1,7 @@
 package br.com.king.flick_business.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +20,8 @@ import br.com.king.flick_business.dto.ClienteResponseDTO;
 import br.com.king.flick_business.service.ClienteService;
 import jakarta.validation.Valid;
 
+import org.springframework.web.bind.annotation.RequestParam;
+
 @RestController
 @RequestMapping("/api/clientes")
 public class ClienteController {
@@ -35,6 +38,22 @@ public class ClienteController {
     ClienteResponseDTO clienteSalvo = clienteService.salvar(requestDTO);
     URI uri = uriBuilder.path("/api/clientes/{id}").buildAndExpand(clienteSalvo.id()).toUri();
     return ResponseEntity.created(uri).body(clienteSalvo);
+  }
+
+  @GetMapping
+  public ResponseEntity<List<ClienteResponseDTO>> listarTodosOsClientes(
+      @RequestParam(name = "apenasAtivos", required = false) Boolean apenasAtivos,
+      @RequestParam(name = "devedores", required = false) Boolean devedores,
+      @RequestParam(name = "orderBy", required = false) String orderBy,
+      @RequestParam(name = "nomeContains", required = false) String nomeContains) {
+    System.out.println("LOG: ClienteController - apenasAtivos: " + apenasAtivos + ", devedores: " + devedores
+        + ", orderBy: " + orderBy + ", nomeContains: " + nomeContains);
+    List<ClienteResponseDTO> clientes = clienteService.listarTodos(
+        apenasAtivos != null ? apenasAtivos : true,
+        devedores,
+        orderBy,
+        nomeContains);
+    return ResponseEntity.ok(clientes);
   }
 
   @GetMapping("/{id}")

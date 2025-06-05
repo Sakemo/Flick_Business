@@ -12,7 +12,7 @@ import br.com.king.flick_business.service.ConfiguracaoGeralService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/configuraces")
+@RequestMapping("/api/configuracoes")
 public class ConfiguracaoGeralController {
   private final ConfiguracaoGeralService configuracaoGeralService;
 

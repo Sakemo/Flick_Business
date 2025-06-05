@@ -8,13 +8,14 @@ import {
 } from '../services/clienteService';
 import { getConfiguracaoGeral } from '../services/configuracaoService';
 import Button from '../components/ui/Button';
-import { LuPlus, LuSearch } from 'react-icons/lu';
+import { LuPlus, LuSearch, LuX } from 'react-icons/lu';
 import Card from '../components/ui/Card';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
 import ClienteCard from '../components/clientes/ClienteCard';
 import ClienteFormModal from '../components/clientes/ClienteFormModal';
 
+type FiltroAtivos = 'todos' | 'ativos' | 'inativos';
 type OrdemCliente =
   | 'nomeAsc'
   | 'nomeDesc'
@@ -34,6 +35,7 @@ const ClientesPage: React.FC = () => {
   const [termoBuscaNome, setTermoBuscaNome] = useState('');
   const [ordem, setOrdem] = useState<OrdemCliente>('nomeAsc');
   const [filtroDevedor, setFiltroDevedor] = useState<FiltroDevedores>('todos');
+  const [filtroAtividade, setFiltroAtividade] = useState<FiltroAtivos>('ativos');
   // const [filtroStatusFiado, setFiltroStatusFiado] = useState<FiltroStatusFiado>('todos');
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -44,11 +46,16 @@ const ClientesPage: React.FC = () => {
     setError(null);
     try {
       //TODO: Ajustar backend para aceitar esses params
-      const params: GetClientesParams = { apenasAtivos: true };
+      const params: GetClientesParams = {};
+      if (filtroAtividade === 'ativos') {
+        params.apenasAtivos = true;
+      } else if (filtroAtividade === 'inativos') {
+        params.apenasAtivos = false;
+      }
       if (ordem) params.orderBy = ordem;
       if (filtroDevedor === 'devedores') params.devedores = true;
       if (filtroDevedor === 'naoDevedores') params.devedores = false;
-      // TODO: Fazer Backend suportar pesquisa por termo: if(termoBuscaNome) params.nomeContais = termoBuscaNome;
+      if (termoBuscaNome.trim() !== '') params.nomeContains = termoBuscaNome.trim();
 
       const data = await getClientes(params);
       //TODO: Se o filtro de status fiado for no frontend, aplicar aqui sobre 'data'
@@ -59,7 +66,7 @@ const ClientesPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [ordem, filtroDevedor /*termoBuscaNome*/]);
+  }, [ordem, filtroDevedor, termoBuscaNome, filtroAtividade]);
 
   const fetchConfig = useCallback(async () => {
     try {
@@ -71,8 +78,14 @@ const ClientesPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchConfig();
-  }, [fetchConfig]);
+    const handler = setTimeout(() => {
+      fetchClientes();
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [fetchClientes]);
 
   useEffect(() => {
     fetchClientes();
@@ -134,6 +147,10 @@ const ClientesPage: React.FC = () => {
     }
   };
 
+  const clearNomeFilter = () => {
+    setTermoBuscaNome('');
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
@@ -146,16 +163,38 @@ const ClientesPage: React.FC = () => {
       </div>
 
       <Card className="mb-6 p-card-padding">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
-          <Input
-            label="Buscar por Nome"
-            placeholder="Digite o nome..."
-            value={termoBuscaNome}
-            onChange={(e) => setTermoBuscaNome(e.target.value)}
-            iconLeft={<LuSearch className="mr-1" />}
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+          <div className="relative lg:col-span-1">
+            <Input
+              label="Buscar por Nome"
+              placeholder="Digite o nome..."
+              name={termoBuscaNome}
+              value={termoBuscaNome}
+              onChange={(e) => setTermoBuscaNome(e.target.value)}
+              iconLeft={<LuSearch className="mr-1" />}
+              className={termoBuscaNome ? 'pr-10' : ''}
+            />
+            {termoBuscaNome && (
+              <Button onClick={clearNomeFilter}>
+                <LuX />
+              </Button>
+            )}
+          </div>
+
+          <Select
+            label="Mostrar Clientes"
+            name="filtroAtividade"
+            value={filtroAtividade}
+            onChange={(e) => setFiltroAtividade(e.target.value as FiltroAtivos)}
+          >
+            <option value="ativos">Apenas Ativos</option>
+            <option value="inativos">Apenas Inativos</option>
+            <option value="todos">Todos</option>
+          </Select>
+
           <Select
             label="Ordernar por"
+            name="ordem"
             value={ordem}
             onChange={(e) => setOrdem(e.target.value as OrdemCliente)}
           >

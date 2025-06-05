@@ -38,7 +38,7 @@ public class Cliente {
   // Nome
   @NotBlank(message = "Obrigatório")
   @Size(min = 2, max = 100, message = "Deve ter entre 2 e 100 caracteres")
-  @Column(nullable = false, length = 100)
+  @Column(nullable = false, length = 100, columnDefinition = "VARCHAR(100)")
   private String nome;
 
   // CPF

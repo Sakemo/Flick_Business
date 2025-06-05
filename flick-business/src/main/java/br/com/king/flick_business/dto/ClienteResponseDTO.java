@@ -13,6 +13,7 @@ public record ClienteResponseDTO(
     String cpf,
     String telefone,
     String endereco,
+    Boolean controleFiado,
 
     // -- FIADO -- //
     BigDecimal limiteFiado,
@@ -32,6 +33,7 @@ public record ClienteResponseDTO(
         cliente.getCpf(),
         cliente.getTelefone(),
         cliente.getEndereco(),
+        cliente.getControleFiado(),
         cliente.getLimiteFiado(),
         cliente.getSaldoDevedor(),
         cliente.getDataUltimaCompraFiado(),

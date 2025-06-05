@@ -3,6 +3,7 @@ package br.com.king.flick_business.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,14 +47,38 @@ public class ClienteService {
   }
 
   @Transactional(readOnly = true)
-  public List<ClienteResponseDTO> listarTodos(boolean apenasAtivos) {
-    List<Cliente> clientes;
-    if (apenasAtivos) {
-      clientes = clienteRepository.findByAtivoTrue();
+  public List<ClienteResponseDTO> listarTodos(
+      Boolean apenasAtivosParam,
+      Boolean devedores,
+      String orderBy,
+      String nomeContains) {
+    System.out
+        .println("LOG: ClienteService.listarTodos - apenasAtivos: " + apenasAtivosParam + ", devedores: " + devedores
+            + ", orderBy: " + orderBy + ", nomeContains: " + nomeContains);
+    Sort sort;
+    if (orderBy != null && !orderBy.isBlank()) {
+      sort = switch (orderBy) {
+        case "nomeAsc" -> Sort.by(Sort.Direction.ASC, "nome");
+        case "nomeDesc" -> Sort.by(Sort.Direction.DESC, "nome");
+        case "saldoDesc" -> Sort.by(Sort.Direction.DESC, "saldoDevedor");
+        case "saldoAsc" -> Sort.by(Sort.Direction.ASC, "saldoDevedor");
+        case "cadastroRecente" -> Sort.by(Sort.Direction.DESC, "dataCadastro");
+        case "cadastroAntigo" -> Sort.by(Sort.Direction.ASC, "dataCadastro");
+        default -> Sort.by(Sort.Direction.DESC, "dataCadastro");
+      };
     } else {
-      clientes = clienteRepository.findAll();
+      sort = Sort.by(Sort.Direction.DESC, "dataCadastro");
     }
+
+    // Boolean filtrarPorAtivo = apenasAtivosParam;
+
+    String filtroNome = (nomeContains != null && !nomeContains.trim().isEmpty()) ? nomeContains.trim() : "";
+
+    List<Cliente> clientes = clienteRepository.findClienteComFiltros(
+        filtroNome, apenasAtivosParam, devedores, sort);
+    System.out.println("LOG: ClienteService.listarTodos - Clientes encontrados após filtros: " + clientes.size());
     return ClienteMapper.toDtoList(clientes);
+
   }
 
   @Transactional(readOnly = true)

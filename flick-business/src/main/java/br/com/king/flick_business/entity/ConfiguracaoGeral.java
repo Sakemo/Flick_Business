@@ -39,6 +39,6 @@ public class ConfiguracaoGeral {
   private LocalDateTime dataAtualizacao;
 
   // TODO: configurar resto do código para lidar com o nome do negócio
-  @Column(name = "nome_negocio", nullable = false, length = 100)
+  @Column(name = "nome_negocio", nullable = true, length = 100)
   private String nomeNegocio;
 }

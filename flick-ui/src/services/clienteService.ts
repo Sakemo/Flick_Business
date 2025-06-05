@@ -2,13 +2,15 @@ import apiClient from "../lib/axios";
 import { ClienteResponse, ClienteRequest } from "../types/domain";
 
 export interface GetClientesParams {
-  apenasAtivos?: boolean;
-  devedores?: boolean;
-  orderBy?: 'nomeAsc' | 'nomeDesc' | 'saldoDesc' | 'saldoAsc' | 'cadastroRecente' | 'cadastroAntigo';
+  apenasAtivos?: boolean | null;
+  devedores?: boolean | null;
+  orderBy?: 'nomeAsc' | 'nomeDesc' | 'saldoDesc' | 'saldoAsc' | 'cadastroRecente' | 'cadastroAntigo' | null;
+  nomeContains?: string | null;
 }
 
 export const getClientes = async (params?: GetClientesParams):Promise<ClienteResponse[]> => {
   try{
+    console.log("Frontend: Enviado para /api/clientes com params: ", params);
     const response = await apiClient.get<ClienteResponse[]>('/api/clientes', { params });
     return response.data;
   }catch(error){

@@ -164,19 +164,27 @@ const ClientesPage: React.FC = () => {
 
       <Card className="mb-6 p-card-padding">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-          <div className="relative lg:col-span-1">
-            <Input
-              label="Buscar por Nome"
-              placeholder="Digite o nome..."
-              name={termoBuscaNome}
-              value={termoBuscaNome}
-              onChange={(e) => setTermoBuscaNome(e.target.value)}
-              iconLeft={<LuSearch className="mr-1" />}
-              className={termoBuscaNome ? 'pr-10' : ''}
-            />
+          <div className="relative flex items-end">
+            <div
+              className={
+                termoBuscaNome
+                  ? 'flex-1 mr-2 transition-all duration-200'
+                  : 'w-full transition-all duration-200'
+              }
+            >
+              <Input
+                label="Buscar por Nome"
+                placeholder="Digite o nome..."
+                name={termoBuscaNome}
+                value={termoBuscaNome}
+                onChange={(e) => setTermoBuscaNome(e.target.value)}
+                iconLeft={<LuSearch className="mr-1" />}
+                className={termoBuscaNome ? '' : ''}
+              />
+            </div>
             {termoBuscaNome && (
-              <Button onClick={clearNomeFilter}>
-                <LuX />
+              <Button variant="ghost" onClick={clearNomeFilter}>
+                <LuX className="" />
               </Button>
             )}
           </div>

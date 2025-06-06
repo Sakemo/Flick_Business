@@ -101,6 +101,16 @@ public class ClienteService {
     clienteRepository.save(cliente);
   }
 
+  @Transactional
+  public void deletarFisicamente(Long id) {
+    if (!clienteRepository.existsById(id)) {
+      throw new RecursoNaoEncontrado("Produto não encontrado com ID: " + id + "para deleção física");
+    }
+    clienteRepository.deleteById(id);
+    // TODO: Adicionar validações ANTES de deletar caso ele esteja associado a uma
+    // venda
+  }
+
   private void validarCpf(String cpf, Long id) {
     if (cpf != null && !cpf.isBlank()) {
       Optional<Cliente> clienteExistente = clienteRepository.findByCpf(cpf);

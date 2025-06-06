@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -19,8 +20,6 @@ import br.com.king.flick_business.dto.ClienteRequestDTO;
 import br.com.king.flick_business.dto.ClienteResponseDTO;
 import br.com.king.flick_business.service.ClienteService;
 import jakarta.validation.Valid;
-
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/clientes")
@@ -73,6 +72,12 @@ public class ClienteController {
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deletarCliente(@PathVariable Long id) {
     clienteService.deletar(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  @DeleteMapping("/{id}/permanente")
+  public ResponseEntity<Void> deletarClienteFisicamente(@PathVariable Long id) {
+    clienteService.deletarFisicamente(id);
     return ResponseEntity.noContent().build();
   }
 

@@ -68,6 +68,7 @@ const ClientesPage: React.FC = () => {
     }
   }, [ordem, filtroDevedor, termoBuscaNome, filtroAtividade]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fetchConfig = useCallback(async () => {
     try {
       const data = await getConfiguracaoGeral();

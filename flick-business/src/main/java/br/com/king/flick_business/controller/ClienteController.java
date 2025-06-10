@@ -48,7 +48,7 @@ public class ClienteController {
     System.out.println("LOG: ClienteController - apenasAtivos: " + apenasAtivos + ", devedores: " + devedores
         + ", orderBy: " + orderBy + ", nomeContains: " + nomeContains);
     List<ClienteResponseDTO> clientes = clienteService.listarTodos(
-        apenasAtivos != null ? apenasAtivos : true,
+        apenasAtivos,
         devedores,
         orderBy,
         nomeContains);

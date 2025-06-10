@@ -10,8 +10,12 @@ import br.com.king.flick_business.dto.DespesaRequestDTO;
 import br.com.king.flick_business.dto.DespesaResponseDTO;
 import br.com.king.flick_business.repository.DespesaRepository;
 import br.com.king.flick_business.entity.Despesa;
+import br.com.king.flick_business.exception.BusinessException;
 import br.com.king.flick_business.exception.RecursoNaoEncontrado;
+
 import org.springframework.transaction.annotation.Transactional;
+
+import br.com.king.flick_business.enums.TipoDespesa;
 
 @Service
 public class DespesaService {
@@ -42,19 +46,38 @@ public class DespesaService {
     return new DespesaResponseDTO(despesaAtualizada);
   }
 
-  // Listar despesas
-  @Transactional
-  public List<DespesaResponseDTO> listarDespesas(LocalDateTime inicio, LocalDateTime fim) {
+  @Transactional(readOnly = true)
+  public List<DespesaResponseDTO> listarDespesas(LocalDateTime inicio, LocalDateTime fim, String tipoDespesaString) {
     List<Despesa> despesas;
+    TipoDespesa tipoFiltro = null;
+
+    if (tipoDespesaString != null && !tipoDespesaString.isEmpty()) {
+      try {
+        tipoFiltro = TipoDespesa.valueOf(tipoDespesaString.toUpperCase());
+      } catch (IllegalArgumentException e) {
+        System.err.println("Tipo de despesa inválido recebido no filtro: " + tipoDespesaString);
+        throw new BusinessException("Tipo de despesa inválido: " + tipoDespesaString);
+      }
+    }
+
     if (inicio != null && fim != null) {
-      despesas = despesaRepository.findByDataDespesaBetweenOrderByDataDespesaDesc(inicio, fim);
+      if (tipoFiltro != null) {
+        System.out.println("Service: Filtrnado por TIPO e DATA");
+        despesas = despesaRepository.findByTipoDespesaAndDataDespesaBetweenOrderByDataDespesaDesc(tipoFiltro, inicio,
+            fim);
+      } else {
+        System.out.println("Service: Filtrnado APENAS pro DATA");
+        despesas = despesaRepository.findByDataDespesaBetweenOrderByDataDespesaDesc(inicio, fim);
+      }
+    } else if (tipoFiltro != null) {
+      System.out.println("Service: Filtrando APENAS por TIPO");
+      despesas = despesaRepository.findByTipoDespesa(tipoFiltro);
     } else {
-      // Se não foram passados os parâmetros de data, busca as despesas do dia de hoje
+      System.out.println("Service: Filtrando por DATA DE HOJE (default)");
       LocalDateTime inicioHoje = LocalDateTime.now().toLocalDate().atStartOfDay();
       LocalDateTime fimHoje = inicioHoje.plusDays(1).minusNanos(1);
       despesas = despesaRepository.findByDataDespesaBetweenOrderByDataDespesaDesc(inicioHoje, fimHoje);
     }
-
     return despesas.stream().map(DespesaResponseDTO::new).collect(Collectors.toList());
   }
 

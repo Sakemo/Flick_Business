@@ -106,3 +106,30 @@ export interface ConfiguracaoGeralResponse {
   nomeNegocio?: string | null;
   dataAtualizacao: string | null;
 }
+
+export enum TipoDespesa {
+  PESSOAL = 'PESSOAL',
+  EMPRESARIAL = 'EMPRESARIAL',
+  INVESTIMENTO = 'INVESTIMENTO',
+  OUTROS = 'OUTROS',
+}
+
+export interface DespesaResponse {
+  id: number;
+  nome: string;
+  valor: number;
+  dataDespesa: string;
+  tipoDespesa: TipoDespesa;
+  observacao?: string | null;
+  dataCriacao: string;
+  dataAtualizacao: string;
+}
+
+export interface DespesaRequest {
+  nome: string;
+  valor: number;
+  dataDespesa: string;
+  tipoDespesa: TipoDespesa;
+  observacao?: string | null;
+}
+

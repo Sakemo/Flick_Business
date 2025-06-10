@@ -47,9 +47,10 @@ public class DespesaController {
   @GetMapping
   public ResponseEntity<List<DespesaResponseDTO>> listarDespesas(
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
+      @RequestParam(name = "tipoDespesa", required = false) String tipoDespesa) {
 
-    List<DespesaResponseDTO> despesas = despesaService.listarDespesas(inicio, fim);
+    List<DespesaResponseDTO> despesas = despesaService.listarDespesas(inicio, fim, tipoDespesa);
 
     return ResponseEntity.ok(despesas);
   }

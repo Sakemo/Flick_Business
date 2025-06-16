@@ -1,17 +1,245 @@
-import React from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { FormaPagamento, VendaResponse } from '../types/domain';
+import { ClienteResponse } from '../types/domain';
+import { GetVendasParams, getVendas } from '../services/vendaService';
+import { getClientes } from '../services/clienteService';
+import Button from '../components/ui/Button';
+import { LuCalendarDays, LuCalendarX, LuPlus, LuX } from 'react-icons/lu';
+import Card from '../components/ui/Card';
+import Input from '../components/ui/Input';
+import Select from '../components/ui/Select';
+import VendasTable from '../components/vendas/VendasTable';
+import VendaFormModal from '../components/vendas/VendaFormModal';
+import VendaDetalhesModal from '../components/vendas/VendaDetalhesModal';
+import { format } from 'date-fns';
+import AutoCompleteInput from '../components/common/AutoCompleteInput';
+import { getProdutos as fetchAllProdutos } from '../services/produtoService';
 
 const VendasPage: React.FC = () => {
-  return (
-    <div>
-      <h1 className='text-2xl font-bold text-text-primary dark:text-white mb-6'>
-        Vendas
-      </h1>
+  const [vendas, setVendas] = useState<VendaResponse[]>([]);
+  const [clientes, setClientes] = useState<ClienteResponse[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-      <p className='text-text-secondary dark:text-gray-400'>
-        Registro de vendas
-      </p>
-    </div>
+  const [isNovaVendaModalOpen, setIsNovaVendaModalOpen] = useState<boolean>(false);
+  const [vendaSelecionadaDetalhes, setVendasSelecionadaDetalhes] = useState<VendaResponse | null>(
+    null
   );
+
+  const [filtroDataInicio, setFiltroDataInicio] = useState<string>('');
+  const [filtroDataFim, setFiltroDataFim] = useState<string>('');
+  const [filtroClienteId, setFiltroClienteId] = useState<string>('');
+  const [filtroFormaPagamento, setFiltroFormaPagamento] = useState<string>('');
+  const [filtroHojeAtivo, setFiltroHojeAtivo] = useState<boolean>(false);
+
+  const [filtroProduto, setFiltroProduto] = useState<{ value: number; label: string } | null>(null);
+  const [todosOsProdutos, setTodosOsProdutos] = useState<{ value: number; label: string }[]>([]);
+
+  const fetchVendas = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params: GetVendasParams = {};
+      if (filtroDataInicio) params.inicio = `${filtroDataInicio}T00:00:00`;
+      if (filtroDataFim) params.fim = `${filtroDataFim}T23:59:59`;
+      if (filtroClienteId) params.clienteId = parseInt(filtroClienteId);
+      if (filtroFormaPagamento) params.formaPagamento = filtroFormaPagamento;
+      if (filtroProduto) params.produtoId = filtroProduto.value;
+
+      const data = await getVendas(params);
+      setVendas(data);
+    } catch (err) {
+      setError('Erro ao buscar vendas');
+      console.error('Erro ao buscar vendas:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [filtroDataInicio, filtroDataFim, filtroClienteId, filtroFormaPagamento, filtroProduto]);
+
+  const fetchClientesParaFiltro = useCallback(async () => {
+    try {
+      const data = await getClientes({ apenasAtivos: true });
+      setClientes(data);
+    } catch (err) {
+      console.error('Erro ao buscar clientes:', err);
+    }
+  }, []);
+
+  const fetchProdutosParaAutoComplete = useCallback(async () => {
+    try {
+      const produtosData = await fetchAllProdutos();
+      setTodosOsProdutos(
+        produtosData.map((p) => ({ value: p.id, label: `${p.nome}(ID: ${p.id})` }))
+      );
+    } catch (error) {
+      console.error('Erro ao buscar produtos para autocomplete: ', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchClientesParaFiltro();
+    fetchProdutosParaAutoComplete();
+  }, [fetchClientesParaFiltro, fetchProdutosParaAutoComplete]);
+
+  useEffect(() => {
+    fetchVendas();
+  }, [fetchVendas]);
+
+  const handleOpenNovalVendaModal = () => setIsNovaVendaModalOpen(true);
+  const handleCloseNovaVendaModal = () => setIsNovaVendaModalOpen(false);
+  const handleNovaVendaSuccess = () => {
+    handleCloseNovaVendaModal();
+    fetchVendas();
+    //TODO: Toast
+  };
+
+  const handleVerDetalhesVenda = (venda: VendaResponse) => {
+    setVendasSelecionadaDetalhes(venda);
+  };
+
+  const handleFecharDetalhesVenda = () => {
+    setVendasSelecionadaDetalhes(null);
+  };
+
+  const handleToggleFiltroHoje = () => {
+    if (filtroHojeAtivo) {
+      setFiltroDataInicio('');
+      setFiltroDataFim('');
+      setFiltroHojeAtivo(false);
+    } else {
+      const hoje = new Date();
+      const hojeFormatado = format(hoje, 'yyyy-MM-dd');
+
+      setFiltroDataInicio(hojeFormatado);
+      setFiltroDataFim(hojeFormatado);
+
+      setFiltroHojeAtivo(true);
+    }
+  };
+
+  const clearFilters = () => {
+    setFiltroDataInicio('');
+    setFiltroDataFim('');
+    setFiltroClienteId('');
+    setFiltroFormaPagamento('');
+    setFiltroHojeAtivo(false);
+    setFiltroProduto(null);
+  };
+
+  return (
+    <>
+      <div className="flex flex-wrap justify-between item-center fap-4 mb-8">
+        <h1 className="text-2xl lg:text-3xl font-semibold text-text-primary dark:text-white">
+          Vendas
+        </h1>
+        <Button onClick={handleOpenNovalVendaModal} iconLeft={<LuPlus className="mr-1" />}>
+          Registrar Nova Venda
+        </Button>
+      </div>
+
+      <Card className="mb-6 p-card-padding">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_3fr_2fr_2fr_auto] gap-4 items-end">
+          <div className="flex flex-col h-full justify-end">
+            <Button
+              onClick={handleToggleFiltroHoje}
+              variant={filtroHojeAtivo ? 'secondary' : 'primary'}
+              iconLeft={
+                filtroHojeAtivo ? (
+                  <LuCalendarX className="mr-1 h-4 w-4" />
+                ) : (
+                  <LuCalendarDays className="mr-1 h-4 w-4" />
+                )
+              }
+            >
+              {filtroHojeAtivo ? 'Ver tudo' : 'Vendas do dia'}
+            </Button>
+          </div>
+          <Input
+            label="Data Início"
+            type="date"
+            value={filtroDataInicio}
+            onChange={(e) => {
+              setFiltroDataInicio(e.target.value);
+              setFiltroHojeAtivo(false);
+            }}
+            disabled={loading}
+          />
+          <Input
+            label="Data Fim"
+            type="date"
+            value={filtroDataFim}
+            onChange={(e) => {
+              setFiltroDataFim(e.target.value);
+              setFiltroHojeAtivo(false);
+            }}
+            disabled={loading}
+          />
+          <AutoCompleteInput
+            label="Filtrar por Produto"
+            placeholder="Digite para buscar produto..."
+            options={todosOsProdutos}
+            value={filtroProduto}
+            onChange={(selected) => {
+              setFiltroProduto(selected as { value: number; label: string } | null);
+              // fetchVendas() será chamado pelo useEffect que depende de filtroProduto
+            }}
+            // isLoading={loadingProdutosAutocomplete} // Se tiver loading separado
+          />
+          <Select
+            label="Cliente"
+            value={filtroClienteId}
+            onChange={(e) => setFiltroClienteId(e.target.value)}
+          >
+            <option value="">Todos os clientes</option>
+            {clientes.map((c) => (
+              <option key={c.id} value={c.id.toString()}>
+                {c.nome}
+              </option>
+            ))}
+          </Select>
+          <Select
+            label="Forma de Pagamento"
+            value={filtroFormaPagamento}
+            onChange={(e) => setFiltroFormaPagamento(e.target.value)}
+          >
+            <option value="">Todas as formas</option>
+            {Object.values(FormaPagamento).map((fp) => (
+              <option key={fp} value={fp}>
+                {fp.replace('_', ' ')}
+              </option>
+            ))}
+          </Select>
+          <Button variant="ghost" onClick={clearFilters} className="lg:mt-auto" size="icon">
+            <LuX />
+          </Button>
+        </div>
+      </Card>
+
+      <div className="flex justify-between items-center mb-4">
+        {/** TODO: card de produto mais vendido */}
+      </div>
+      {loading && <p className="p-6 text-center">Carregando vendas...</p>}
+      {error && <p className="p-6 text-center text-red-500">{error}</p>}
+      {!loading && !error && <VendasTable vendas={vendas} onViewDetails={handleVerDetalhesVenda} />}
+
+      {isNovaVendaModalOpen && (
+        <VendaFormModal
+          isOpen={isNovaVendaModalOpen}
+          onClose={handleCloseNovaVendaModal}
+          onSaveSuccess={handleNovaVendaSuccess}
+        />
+      )}
+
+      {vendaSelecionadaDetalhes && (
+        <VendaDetalhesModal
+          venda={vendaSelecionadaDetalhes}
+          isOpen={!!vendaSelecionadaDetalhes}
+          onClose={handleFecharDetalhesVenda}
+        />
+      )}
+    </>
+  );
+  // TODO: onDelete={handleDeleteVenda}
 };
 
 export default VendasPage;

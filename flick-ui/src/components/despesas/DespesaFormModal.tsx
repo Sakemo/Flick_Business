@@ -11,14 +11,14 @@ import Button from '../ui/Button';
 interface DespesaFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSaveSucess: () => void;
+  onSaveSuccess: () => void;
   despesaInicial?: DespesaResponse | null;
 }
 
 const DespesaFormModal: React.FC<DespesaFormModalProps> = ({
   isOpen,
   onClose,
-  onSaveSucess,
+  onSaveSuccess,
   despesaInicial,
 }) => {
   const isEditMode = !!despesaInicial;
@@ -93,7 +93,7 @@ const DespesaFormModal: React.FC<DespesaFormModalProps> = ({
       } else {
         await createDespesa(payload);
       }
-      onSaveSucess();
+      onSaveSuccess();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Erro ao salvar despesa: ', error);

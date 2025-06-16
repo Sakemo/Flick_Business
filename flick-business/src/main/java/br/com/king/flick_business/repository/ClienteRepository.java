@@ -16,18 +16,15 @@ import br.com.king.flick_business.entity.Cliente;
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
         Optional<Cliente> findByCpf(String cpf);
 
-        // Filtro 'Apenas Ativos'
         List<Cliente> findByAtivoTrue(Sort sort);
 
         @Override
         List<Cliente> findAll(Sort sort);
 
-        // 'Devedores'
         List<Cliente> findBySaldoDevedorGreaterThan(BigDecimal valor, Sort sort);
 
         List<Cliente> findBySaldoDevedorLessThanEqual(BigDecimal valor, Sort sort);
 
-        // Combos
         List<Cliente> findByNomeContainingIgnoreCaseAndAtivoTrue(String nome, Sort sort);
 
         List<Cliente> findByNomeContainingIgnoreCaseAndAtivoFalse(String nome, Sort sort);

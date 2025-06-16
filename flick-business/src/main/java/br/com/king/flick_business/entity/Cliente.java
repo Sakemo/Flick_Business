@@ -34,51 +34,50 @@ public class Cliente {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
   // Nome
-  @NotBlank(message = "Obrigatório")
-  @Size(min = 2, max = 100, message = "Deve ter entre 2 e 100 caracteres")
+  @NotBlank(message = "O nome é obrigatório.")
+  @Size(min = 2, max = 100, message = "O nome deve ter entre 2 e 100 caracteres.")
   @Column(nullable = false, length = 100, columnDefinition = "VARCHAR(100)")
   private String nome;
 
   // CPF
-  @Size(max = 11, message = "Deve ter 11 caracteres")
+  @Size(max = 11, message = "O CPF deve conter exatamente 11 dígitos numéricos.")
   @Column(length = 11, unique = true)
   private String cpf;
 
   // Telefone
-  @Size(max = 11, message = "Deve ter 11 caracteres")
+  @Size(max = 11, message = "O telefone deve conter até 11 dígitos, incluindo o DDD.")
   @Column(length = 11)
   private String telefone;
 
   // Endereço
-  @Size(max = 150, message = "Deve ter no máximo 100 caracteres")
+  @Size(max = 150, message = "O endereço deve ter no máximo 150 caracteres.")
   @Column(length = 150)
   private String endereco;
 
   // Controle de Fiado
-  @NotNull(message = "Obrigatório")
+  @NotNull(message = "O campo 'Controle de Fiado' é obrigatório.")
   @Column(name = "controle_fiado", nullable = false)
   @Builder.Default
   private Boolean controleFiado = false;
 
   // Limite de Fiado
-  @DecimalMin(value = "0.00", message = "Deve ser maior ou igual a 0")
-  @Digits(integer = 8, fraction = 2, message = "Formato inválido")
+  @DecimalMin(value = "0.00", message = "O limite de fiado deve ser maior ou igual a 0.")
+  @Digits(integer = 8, fraction = 2, message = "Formato inválido: máximo de 8 dígitos inteiros e 2 decimais.")
   @Column(name = "limite_fiado", precision = 10, scale = 2)
   private BigDecimal limiteFiado;
 
   // Saldo Devedor
-  @Digits(integer = 8, fraction = 2, message = "Formato inválido")
+  @Digits(integer = 8, fraction = 2, message = "Formato inválido: máximo de 8 dígitos inteiros e 2 decimais.")
   @Column(name = "saldo_devedor", precision = 10, scale = 2, nullable = false)
   @Builder.Default
   private BigDecimal saldoDevedor = BigDecimal.ZERO;
 
-  // Data de Ultima Compra Fiado //
+  // Data de Última Compra Fiado
   @Column(name = "data_ultima_compra_fiado")
   private LocalDateTime dataUltimaCompraFiado;
 
-  // -- METADADOS -- //
+  // Metadados
   @CreationTimestamp
   @Column(name = "data_cadastro", updatable = false)
   private LocalDateTime dataCadastro;

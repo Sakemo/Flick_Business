@@ -253,7 +253,7 @@ const ClientesPage: React.FC = () => {
         <ClienteFormModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          onSaveSucess={handleSaveSucess}
+          onSaveSuccess={handleSaveSucess}
           clienteInicial={clienteParaEditar}
         />
       )}

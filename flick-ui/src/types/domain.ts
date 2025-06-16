@@ -32,6 +32,38 @@ export enum FormaPagamento {
   PIX = 'PIX',
 }
 
+// REGISTRAR UMA VENDA
+export interface ItemVendaRequest {
+  idProduto: number;
+  quantidade: number;
+}
+
+export interface VendaRequest {
+  clienteId?: number | null;
+  itens: ItemVendaRequest[];
+  formaPagamento: FormaPagamento;
+  observacoes?: string | null;
+}
+
+// EXIBIR uma Venda
+export interface ItemVendaResponse {
+  id: number;
+  produto: ProdutoResponse;
+  quantidade: number;
+  precoUnitarioVenda: number;
+  valorTotalItem: number;
+}
+
+export interface VendaResponse {
+  id: number;
+  dataVenda: string;
+  valorTotal: number;
+  cliente?: ClienteResponse | null;
+  itens: ItemVendaResponse[];
+  formaPagamento: FormaPagamento;
+  observacoes?: string | null;
+}
+
 export interface CategoriaResponse {
   id: number;
   nome: string;

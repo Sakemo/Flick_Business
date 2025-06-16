@@ -10,14 +10,14 @@ import Button from '../ui/Button';
 interface ClienteFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSaveSucess: () => void;
+  onSaveSuccess: () => void;
   clienteInicial?: ClienteResponse | null;
 }
 
 const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
   isOpen,
   onClose,
-  onSaveSucess,
+  onSaveSuccess,
   clienteInicial,
 }) => {
   const isEditMode = !!clienteInicial;
@@ -111,7 +111,7 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
       } else {
         await createCliente(payload);
       }
-      onSaveSucess();
+      onSaveSuccess();
     } catch (error: any) {
       console.error('Erro ao salvar cliente: ', error);
       const errorMsg =

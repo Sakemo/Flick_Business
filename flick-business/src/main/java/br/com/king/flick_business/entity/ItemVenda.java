@@ -27,30 +27,33 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ItemVenda {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   // -- INFORMADO -- //
-  @NotNull(message = "Obrigatório")
-  @DecimalMin(value = "0.01", message = "Deve ser maior que 0")
-  @Digits(integer = 8, fraction = 2, message = "Inválido")
+  @NotNull(message = "A quantidade é obrigatória.")
+  @DecimalMin(value = "0.01", message = "A quantidade deve ser maior que zero.")
+  @Digits(integer = 8, fraction = 2, message = "Quantidade inválida: máximo de 8 dígitos inteiros e 2 decimais.")
   @Column(nullable = false, precision = 11, scale = 3)
   private BigDecimal quantidade;
 
   // -- CALCULADO -- //
-  @NotNull(message = "Obrigatório")
-  @DecimalMin(value = "0.01", message = "Deve ser maior que 0")
-  @Digits(integer = 8, fraction = 2, message = "Inválido")
+  @NotNull(message = "O preço unitário de venda é obrigatório.")
+  @DecimalMin(value = "0.01", message = "O preço unitário deve ser maior que zero.")
+  @Digits(integer = 8, fraction = 2, message = "Preço inválido: máximo de 8 dígitos inteiros e 2 decimais.")
   @Column(name = "preco_unitario_venda", nullable = false, precision = 12, scale = 2)
   private BigDecimal precoUnitarioVenda;
 
-  @NotNull(message = "Obrigatório")
+  // Venda associada
+  @NotNull(message = "A venda é obrigatória.")
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "venda_id", nullable = false)
   private Venda venda;
 
-  @NotNull(message = "Obrigatório")
+  // Produto associado
+  @NotNull(message = "O produto é obrigatório.")
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "produto_id", nullable = false)
   private Produto produto;
@@ -63,4 +66,5 @@ public class ItemVenda {
     }
     return BigDecimal.ZERO;
   }
+
 }

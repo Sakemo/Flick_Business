@@ -1,31 +1,38 @@
 package br.com.king.flick_business.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals; // JUnit Assertions
+import static org.junit.jupiter.api.Assertions.assertNotNull; // Mockito static functions
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock; // Para criar início/fim do dia
+import static org.mockito.Mockito.doNothing; // Para lista vazia
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import br.com.king.flick_business.dto.DespesaRequestDTO;
 import br.com.king.flick_business.dto.DespesaResponseDTO;
 import br.com.king.flick_business.entity.Despesa;
 import br.com.king.flick_business.enums.TipoDespesa;
 import br.com.king.flick_business.exception.RecursoNaoEncontrado;
 import br.com.king.flick_business.repository.DespesaRepository;
-
-import static org.junit.jupiter.api.Assertions.*; // JUnit Assertions
-import static org.mockito.Mockito.*; // Mockito static functions
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.LocalTime; // Para criar início/fim do dia
-import java.util.Collections; // Para lista vazia
-import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class) // Habilita Mockito com JUnit 5
 class DespesaServiceTest {
@@ -66,14 +73,16 @@ class DespesaServiceTest {
         "Café da Manhã",
         new BigDecimal("15.80"),
         dataRef, // Hoje
-        TipoDespesa.PESSOAL);
+        TipoDespesa.PESSOAL,
+        "observacao");
 
     // DTO para atualizar a despesa existente
     despesaRequestAtualizacaoDTO = new DespesaRequestDTO(
         "Almoço Reunião C/ Cliente", // Nome atualizado
         new BigDecimal("82.00"), // Valor atualizado
         dataRef.minusDays(1), // Data mantida
-        TipoDespesa.EMPRESARIAL // Tipo mantido
+        TipoDespesa.EMPRESARIAL,
+        "observacao" // Tipo mantido
     );
   }
 
@@ -185,26 +194,32 @@ class DespesaServiceTest {
   // --- Testes listarDespesas ---
 
   @Test
-  @DisplayName("Deve retornar lista filtrada por data quando início e fim são fornecidos")
-  void listarDespesas_comFiltroData_deveChamarFindByDataDespesaBetween() {
+  @DisplayName("Deve retornar lista filtrada por tipo E data quando todos os filtros são fornecidos")
+  void listarDespesas_comFiltroDataETipo_deveChamarMetodoCorretoDoRepo() {
     // Arrange
-    LocalDateTime inicio = dataRef.minusDays(2).with(LocalTime.MIN); // Dois dias atrás
-    LocalDateTime fim = dataRef.minusDays(1).with(LocalTime.MAX); // Ontem até fim do dia
-    // Simula o repositório retornando a despesaExistente (que ocorreu ontem)
-    when(despesaRepositoryMock.findByDataDespesaBetweenOrderByDataDespesaDesc(inicio, fim))
+    LocalDateTime inicio = dataRef.minusDays(2).with(LocalTime.MIN);
+    LocalDateTime fim = dataRef.minusDays(1).with(LocalTime.MAX);
+    TipoDespesa tipoFiltroTeste = TipoDespesa.EMPRESARIAL;
+
+    when(despesaRepositoryMock.findByTipoDespesaAndDataDespesaBetweenOrderByDataDespesaDesc(eq(tipoFiltroTeste),
+        eq(inicio), eq(fim)))
         .thenReturn(List.of(despesaExistente));
 
     // Act
-    List<DespesaResponseDTO> resultado = despesaService.listarDespesas(inicio, fim);
+    List<DespesaResponseDTO> resultado = despesaService.listarDespesas(inicio, fim, tipoFiltroTeste.toString());
 
     // Assert
     assertNotNull(resultado);
-    assertEquals(1, resultado.size());
+    assertEquals(1, resultado.size(), "Deveria encontrar uma despesa com os filtros combinados.");
     assertEquals(despesaExistente.getId(), resultado.get(0).id());
+    assertEquals(tipoFiltroTeste, resultado.get(0).tipoDespesa());
 
     // Verify
-    verify(despesaRepositoryMock).findByDataDespesaBetweenOrderByDataDespesaDesc(inicio, fim);
-    verify(despesaRepositoryMock, never()).findAll(); // Não deve chamar findAll
+    verify(despesaRepositoryMock).findByTipoDespesaAndDataDespesaBetweenOrderByDataDespesaDesc(eq(tipoFiltroTeste),
+        eq(inicio), eq(fim));
+    verify(despesaRepositoryMock, never()).findByDataDespesaBetweenOrderByDataDespesaDesc(any(), any());
+    verify(despesaRepositoryMock, never()).findByTipoDespesa(any());
+    verify(despesaRepositoryMock, never()).findAll();
   }
 
   @Test
@@ -222,7 +237,7 @@ class DespesaServiceTest {
         .thenReturn(Collections.emptyList());
 
     // Act
-    List<DespesaResponseDTO> resultado = despesaService.listarDespesas(null, null);
+    List<DespesaResponseDTO> resultado = despesaService.listarDespesas(null, null, null);
 
     // Assert
     assertNotNull(resultado);

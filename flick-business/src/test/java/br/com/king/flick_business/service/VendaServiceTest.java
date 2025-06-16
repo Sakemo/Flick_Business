@@ -1,32 +1,47 @@
 package br.com.king.flick_business.service;
 
-import br.com.king.flick_business.dto.*; // Importar DTOs
-import br.com.king.flick_business.entity.*; // Importar Entidades
-import br.com.king.flick_business.enums.FormaPagamento; // Importar Enum
-import br.com.king.flick_business.exception.*; // Importar Exceções
-import br.com.king.flick_business.repository.ClienteRepository;
-import br.com.king.flick_business.repository.ProdutoRepository;
-import br.com.king.flick_business.repository.VendaRepository;
-import br.com.king.flick_business.service.ConfiguracaoGeralService;
-import br.com.king.flick_business.exception.BusinessException;
+import java.math.BigDecimal; // Importar DTOs
+import java.time.LocalDateTime; // Importar Entidades
+import java.util.List; // Importar Enum
+import java.util.Optional; // Importar Exceções
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor; // Usar @Captor para simplificar
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList; // Usar @Captor para simplificar
+import static org.mockito.ArgumentMatchers.isNull;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import br.com.king.flick_business.dto.ItemVendaRequestDTO;
+import br.com.king.flick_business.dto.VendaRequestDTO;
+import br.com.king.flick_business.dto.VendaResponseDTO;
+import br.com.king.flick_business.entity.Cliente;
+import br.com.king.flick_business.entity.ItemVenda;
+import br.com.king.flick_business.entity.Produto;
+import br.com.king.flick_business.entity.Venda;
+import br.com.king.flick_business.enums.FormaPagamento;
+import br.com.king.flick_business.exception.BusinessException;
+import br.com.king.flick_business.exception.RecursoNaoEncontrado;
+import br.com.king.flick_business.repository.ClienteRepository;
+import br.com.king.flick_business.repository.ProdutoRepository;
+import br.com.king.flick_business.repository.VendaRepository;
 
 @ExtendWith(MockitoExtension.class)
 class VendaServiceTest {
@@ -391,20 +406,27 @@ class VendaServiceTest {
     // retornado)
 
     @Test
-    @DisplayName("Deve listar vendas chamando findAllComCliente")
-    void listarVendas_DeveRetornarListaDto() {
+    @DisplayName("Deve listar vendas chamando")
+    void listarVendas_semFiltros_DeveRetornarListaDto() {
         // Arrange
-        Venda v1 = Venda.builder().id(1L).cliente(clienteAtivoFiadoPermitido).valorTotal(BigDecimal.TEN).build();
-        Venda v2 = Venda.builder().id(2L).cliente(null).valorTotal(BigDecimal.ONE).build(); // Venda sem cliente
-        when(vendaRepositoryMock.FindAllComCliente()).thenReturn(List.of(v1, v2)); // Mock o método correto
+        Venda v1 = Venda.builder().id(1L).cliente(clienteAtivoFiadoPermitido).valorTotal(BigDecimal.TEN)
+                .dataVenda(LocalDateTime.now().minusDays(1)).formaPagamento(FormaPagamento.FIADO).build();
 
-        // Act
-        List<VendaResponseDTO> resultado = vendaService.listarVendas();
+        Venda v2 = Venda.builder().id(2L).cliente(null).valorTotal(BigDecimal.ONE).dataVenda(LocalDateTime.now())
+                .formaPagamento(FormaPagamento.DINHEIRO).build();
 
-        // Assert
+        List<Venda> listaDeVendasMock = List.of(v1, v2);
+
+        when(vendaRepositoryMock.findVendasComFiltros(any(), any(), any(), any(), any(), any(Sort.class)))
+                .thenReturn(listaDeVendasMock);
+
+        List<VendaResponseDTO> resultado = vendaService.listarVendas(null, null, null, null, null);
+
         assertNotNull(resultado);
-        assertEquals(2, resultado.size());
-        verify(vendaRepositoryMock).FindAllComCliente();
+        assertEquals(2, resultado.size(), "Deveria encontrar 2 vendas");
+        assertEquals(v1.getId(), resultado.get(0).id());
+        assertEquals(v2.getId(), resultado.get(1).id());
+        verify(vendaRepositoryMock).findVendasComFiltros(any(), any(), isNull(), isNull(), isNull(), any(Sort.class));
     }
 
     @Test

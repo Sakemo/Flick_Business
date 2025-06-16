@@ -38,9 +38,8 @@ public class Venda {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
   // -- CALCULADO -- //
-  @NotNull(message = "Obrigatório")
+  @NotNull(message = "O valor total é obrigatório")
   @Column(name = "valor_total", nullable = false, precision = 10, scale = 2)
   private BigDecimal valorTotal;
 
@@ -53,13 +52,12 @@ public class Venda {
   private List<ItemVenda> itens = new ArrayList<>();
 
   // -- INFORMADO -- //
-  @NotNull(message = "Obrigatório")
+  @NotNull(message = "A forma de pagamento é obrigatória")
   @Enumerated(EnumType.STRING)
   @Column(name = "forma_pagamento", nullable = false, length = 20)
   private FormaPagamento formaPagamento;
 
   @Column(name = "observacoes", length = 500)
-  
   private String observacoes;
 
   // -- AUXILIAR -- //
@@ -74,8 +72,8 @@ public class Venda {
   }
 
   // -- METADADOS -- //
-  @NotNull(message = "Obrigatório")
-  @PastOrPresent(message = "Data não pode ser futura")
+  @NotNull(message = "A data da venda é obrigatória")
+  @PastOrPresent(message = "A data da venda não pode ser futura")
   @Column(name = "data_venda", nullable = false, updatable = false)
   @CreationTimestamp
   private LocalDateTime dataVenda;

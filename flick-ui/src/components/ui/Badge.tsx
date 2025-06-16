@@ -1,11 +1,12 @@
 import React from 'react';
 import clsx from 'clsx';
 
-type BadgeColorScheme =
+export type BadgeColorScheme =
   | 'green'
   | 'red'
   | 'yellow'
   | 'blue'
+  | 'pix'
   | 'purple'
   | 'gray'
   | 'primary'
@@ -35,6 +36,7 @@ const Badge: React.FC<BadgeProps> = ({
       red: 'bg-red-100 text-red-800',
       yellow: 'bg-yellow-100 text-yellow-800',
       blue: 'bg-blue-100 text-blue-800',
+      pix: 'bg-blue-200 text-blue-800',
       purple: 'bg-purple-100 text-purple-800',
       primary: 'bg-brand-muted text-brand-primary',
       accent: 'bg-yellow-100 text-yellow-800',
@@ -45,6 +47,7 @@ const Badge: React.FC<BadgeProps> = ({
       red: 'bg-red-600 text-white',
       yellow: 'bg-yellow-500 text-gray-900',
       blue: 'bg-blue-500 text-white',
+      pix: 'bg-blue-600 text-white',
       purple: 'bg-purple-500 text-white',
       primary: 'bg-brand-primary text-white',
       accent: 'bg-brand-accent text-gray-900',
@@ -57,6 +60,7 @@ const Badge: React.FC<BadgeProps> = ({
       yellow:
         'text-yellow-800 dark:text-yellow-200 ring-1 ring-inset ring-yellow-600/40 dark:ring-yellow-700',
       blue: 'text-blue-800 dark:text-yellow-200 ring-1 ring-inset ring-yellow-600/40 dark:ring-blue-700',
+      pix: 'text-blue-800 dark:text-yellow-200 ring-1 ring-inset ring-yellow-600/40 dark:ring-blue-700',
       purple:
         'text-purple-800 dark:text-purple-300 ring-1 ring-inset ring-brand-primary/60 dark:ring-purple-700',
       primary:

@@ -132,7 +132,7 @@ const DespesaPage: React.FC = () => {
         <DespesaFormModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
-          onSaveSucess={handleSaveSucess}
+          onSaveSuccess={handleSaveSucess}
           despesaInicial={despesaParaEditar}
         />
       )}

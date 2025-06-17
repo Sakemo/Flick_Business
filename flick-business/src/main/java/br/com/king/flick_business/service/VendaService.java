@@ -218,9 +218,8 @@ public class VendaService {
       LocalDateTime fim,
       Long clienteId,
       String formaPagamentoString,
-      Long produtoId
-  // TODO: String orderBy
-  ) {
+      Long produtoId,
+      String orderBy) {
     System.out.println("LOG: VendaService.listarVendas - inicio: " + inicio + ", fim" + fim + ", clienteId: "
         + clienteId + ", formaPagamentoString: " + formaPagamentoString);
 
@@ -236,12 +235,35 @@ public class VendaService {
       }
     }
 
-    Sort sort = Sort.by(Sort.Direction.DESC, "dataVenda");
+    Sort sort;
+    if (orderBy != null && !orderBy.isBlank()) {
+      String[] parts = orderBy.split(",");
+      String property = parts[0];
+      Sort.Direction direction = (parts.length > 1 && parts[1].equalsIgnoreCase("desc")) ? Sort.Direction.DESC
+          : Sort.Direction.ASC;
 
+      switch (property) {
+        case "dataVenda" -> property = "dataVenda";
+        case "valorTotal" -> property = "valorTotal";
+        case "cliente.nome" -> property = "cliente.nome";
+        default -> {
+          System.out.println("SERVICE LOG: orderBy não reconhecida: " + property + "Usando default");
+          property = "dataVenda";
+          direction = Sort.Direction.DESC;
+        }
+      }
+      sort = Sort.by(direction, property);
+    } else {
+      sort = Sort.by(Sort.Direction.DESC, "dataVenda");
+    }
+    System.out.println("SERVICE: VendaService.listarVendas - Usando sort: " + sort);
     LocalDateTime inicioQuery;
     LocalDateTime fimQuery;
 
-    if (inicio != null || fim != null || clienteId != null || formaPagamentoFiltro != null) {
+    boolean algumFiltrodeConteudoAplicado = (inicio != null || fim != null || clienteId != null
+        || formaPagamentoFiltro != null || produtoId != null);
+
+    if (algumFiltrodeConteudoAplicado) {
       inicioQuery = (inicio != null) ? inicio : LocalDateTime.of(1900, 1, 1, 0, 0);
       fimQuery = (fim != null) ? fim : LocalDateTime.of(9999, 12, 31, 23, 59, 59);
       System.out.println("SERVICE: Filtros aplicados. Usando para query - Inicio: " + inicioQuery + ", Fim: " + fimQuery

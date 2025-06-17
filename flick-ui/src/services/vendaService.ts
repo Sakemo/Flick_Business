@@ -7,7 +7,7 @@ export interface GetVendasParams {
   clienteId?: number | null;
   formaPagamento?: string | null;
   produtoId?: number | null;
-  //TODO:  orderBy: 'dataDesc' | 'dataAsc' | 'valorDesc' | 'valorDesc';
+  orderBy?: string | null | 'dataVenda,desc' | 'dataVenda,Asc' | 'valorTotal,asc' | 'valorTotal,desc';
 }
 
 export const getVendas = async (params?: GetVendasParams):Promise<VendaResponse[]> => {

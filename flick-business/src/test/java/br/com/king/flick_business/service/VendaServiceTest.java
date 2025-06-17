@@ -420,7 +420,7 @@ class VendaServiceTest {
         when(vendaRepositoryMock.findVendasComFiltros(any(), any(), any(), any(), any(), any(Sort.class)))
                 .thenReturn(listaDeVendasMock);
 
-        List<VendaResponseDTO> resultado = vendaService.listarVendas(null, null, null, null, null);
+        List<VendaResponseDTO> resultado = vendaService.listarVendas(null, null, null, null, null, null);
 
         assertNotNull(resultado);
         assertEquals(2, resultado.size(), "Deveria encontrar 2 vendas");

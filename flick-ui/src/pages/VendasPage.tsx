@@ -35,6 +35,17 @@ const VendasPage: React.FC = () => {
   const [filtroProduto, setFiltroProduto] = useState<{ value: number; label: string } | null>(null);
   const [todosOsProdutos, setTodosOsProdutos] = useState<{ value: number; label: string }[]>([]);
 
+  const opcoesOrdenacaoVendas = [
+    { value: 'dataVenda,desc', label: 'Mais Recentes' },
+    { value: 'dataVenda,asc', label: 'Mais Antigo' },
+    { value: 'valorTotal,desc', label: 'Maior Valor' },
+    { value: 'valorTotal,asc', label: 'Menor Valor' },
+    { value: 'cliente.nome,asc', label: 'Cliente (A-Z)' },
+    { value: 'cliente.nome,desc', label: 'Cliente (Z-A)' },
+  ];
+
+  const [ordemVendas, setOrdemVendas] = useState<string>(opcoesOrdenacaoVendas[0].value);
+
   const fetchVendas = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -45,6 +56,7 @@ const VendasPage: React.FC = () => {
       if (filtroClienteId) params.clienteId = parseInt(filtroClienteId);
       if (filtroFormaPagamento) params.formaPagamento = filtroFormaPagamento;
       if (filtroProduto) params.produtoId = filtroProduto.value;
+      if (ordemVendas) params.orderBy = ordemVendas;
 
       const data = await getVendas(params);
       setVendas(data);
@@ -54,7 +66,14 @@ const VendasPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [filtroDataInicio, filtroDataFim, filtroClienteId, filtroFormaPagamento, filtroProduto]);
+  }, [
+    filtroDataInicio,
+    filtroDataFim,
+    filtroClienteId,
+    filtroFormaPagamento,
+    filtroProduto,
+    ordemVendas,
+  ]);
 
   const fetchClientesParaFiltro = useCallback(async () => {
     try {
@@ -124,6 +143,7 @@ const VendasPage: React.FC = () => {
     setFiltroFormaPagamento('');
     setFiltroHojeAtivo(false);
     setFiltroProduto(null);
+    /**setOrdemVendas(opcoesOrdenacaoVendas[0].value); Reseta ordenação padrão */
   };
 
   return (
@@ -138,7 +158,7 @@ const VendasPage: React.FC = () => {
       </div>
 
       <Card className="mb-6 p-card-padding">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_3fr_2fr_2fr_auto] gap-4 items-end">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_3fr_2fr_2fr_auto_auto] gap-4 items-end">
           <div className="flex flex-col h-full justify-end">
             <Button
               onClick={handleToggleFiltroHoje}
@@ -212,6 +232,17 @@ const VendasPage: React.FC = () => {
           <Button variant="ghost" onClick={clearFilters} className="lg:mt-auto" size="icon">
             <LuX />
           </Button>
+          <Select
+            label="Ordenar Por"
+            value={ordemVendas}
+            onChange={(e) => setOrdemVendas(e.target.value)}
+          >
+            {opcoesOrdenacaoVendas.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </Select>
         </div>
       </Card>
 

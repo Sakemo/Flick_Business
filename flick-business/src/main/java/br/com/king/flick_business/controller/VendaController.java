@@ -58,6 +58,7 @@ public class VendaController {
    * @param fim            Data/hora final do filtro.
    * @param clienteId      ID do cliente para filtrar.
    * @param formaPagamento Forma de pagamento para filtrar.
+   * @param orderBy        Ordenação de itens
    * @return Lista de vendas encontradas.
    */
   @GetMapping
@@ -66,9 +67,8 @@ public class VendaController {
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
       @RequestParam(required = false) Long clienteId,
       @RequestParam(required = false) String formaPagamento,
-      @RequestParam(required = false) Long produtoId
-  // TODO: @RequestParam(required = false) String oderBy
-  ) {
+      @RequestParam(required = false) Long produtoId,
+      @RequestParam(required = false) String orderBy) {
     System.out.println("LOG: VendaController.listarVendas - Listando vendas com filtros - inicio: " + inicio + ", fim: "
         + fim + ", clienteId: " + clienteId + ", formaPagamento: " + formaPagamento);
     List<VendaResponseDTO> vendas = vendaService.listarVendas(
@@ -76,8 +76,8 @@ public class VendaController {
         fim,
         clienteId,
         formaPagamento,
-        produtoId
-    /* , orderBy */);
+        produtoId,
+        orderBy);
     System.out.println("LOG: VendaController.listarVendas - Quantidade de vendas encontradas: " + vendas.size());
     return ResponseEntity.ok(vendas);
   }

@@ -45,4 +45,13 @@ export const registrarVenda = async (data: VendaRequest): Promise<VendaResponse>
   }
 };
 
+export const deleteVendaFisicamente = async (id: number): Promise<void> => {
+  try {
+    await apiClient.delete(`/api/vendas/${id}/permanente`);
+  } catch (error){
+    console.error(`Erro ao deletar venda ${id} : `, error);
+    throw error;
+  }
+};
+
 //TODO: Funções para cancelar, atualizar e deletar

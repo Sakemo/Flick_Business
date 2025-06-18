@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { FormaPagamento, VendaResponse } from '../types/domain';
 import { ClienteResponse } from '../types/domain';
-import { GetVendasParams, getVendas } from '../services/vendaService';
+import { GetVendasParams, deleteVendaFisicamente, getVendas } from '../services/vendaService';
 import { getClientes } from '../services/clienteService';
 import Button from '../components/ui/Button';
 import { LuCalendarDays, LuCalendarX, LuPlus, LuX } from 'react-icons/lu';
@@ -14,6 +14,7 @@ import VendaDetalhesModal from '../components/vendas/VendaDetalhesModal';
 import { format } from 'date-fns';
 import AutoCompleteInput from '../components/common/AutoCompleteInput';
 import { getProdutos as fetchAllProdutos } from '../services/produtoService';
+import { AxiosError } from 'axios';
 
 const VendasPage: React.FC = () => {
   const [vendas, setVendas] = useState<VendaResponse[]>([]);
@@ -136,6 +137,31 @@ const VendasPage: React.FC = () => {
     }
   };
 
+  const handleDeleteVendaFisicamente = async (id: number, vendaDisplayInfo: string) => {
+    if (
+      window.confirm(
+        `ATENÇÃO: Deletar permanentemente a Venda ${vendaDisplayInfo} e todos os seus itens? ESTA AÇÃO É IRREVERSÍVEL e afetará estoque e saldos mas não excluirá os produtos da tabela de PRODUTOS.`
+      )
+    ) {
+      try {
+        setLoading(true);
+        await deleteVendaFisicamente(id);
+        fetchVendas();
+        if (vendaSelecionadaDetalhes && vendaSelecionadaDetalhes.id === id) {
+          setVendasSelecionadaDetalhes(null);
+        }
+        //TODO: Toast
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
+        const axiosError = err as AxiosError<{ message?: string }>;
+        setError(axiosError.response?.data?.message || 'Falha ao deletar venda permanentemente');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const clearFilters = () => {
     setFiltroDataInicio('');
     setFiltroDataFim('');
@@ -251,7 +277,13 @@ const VendasPage: React.FC = () => {
       </div>
       {loading && <p className="p-6 text-center">Carregando vendas...</p>}
       {error && <p className="p-6 text-center text-red-500">{error}</p>}
-      {!loading && !error && <VendasTable vendas={vendas} onViewDetails={handleVerDetalhesVenda} />}
+      {!loading && !error && (
+        <VendasTable
+          vendas={vendas}
+          onViewDetails={handleVerDetalhesVenda}
+          onDelete={handleDeleteVendaFisicamente}
+        />
+      )}
 
       {isNovaVendaModalOpen && (
         <VendaFormModal
@@ -270,7 +302,6 @@ const VendasPage: React.FC = () => {
       )}
     </>
   );
-  // TODO: onDelete={handleDeleteVenda}
 };
 
 export default VendasPage;

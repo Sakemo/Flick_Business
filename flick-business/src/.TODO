@@ -1,17 +1,21 @@
 - Página de vendas: botão de filtro "filtro de hoje" [X]
 - Página de vendas: filtro de produtos [Input Text com "lista de sugestão" que se adapta enquanto o usuario digita, com a lista de produtos] [X]
 - Badge colors diferentes para cada forma de pagamento [X]
-- Página de vendas: Ordernar Por (Produtos, Clientes, Preço, Data: DESC OU ASC)
-- Página de vendas: adicionar opção de deletar venda (APENAS FISICAMENTE)
+- Página de vendas: Ordernar Por (Produtos, Clientes, Preço, Data: DESC OU ASC) [X]
+- Página de vendas: adicionar opção de deletar venda (APENAS FISICAMENTE) [X]
 - Data das venda: adicionar "Hoje" quando a data for hoje ao inves dela completa, e Ontem quando for Ontem ao inves da data
 - Páginação de vendas: no maximo 8 por pagina e escolha de paginas
 - Tabela de Vendas: Linha com um "card" com texto simples e pouco chamativo com "Total de Vendas" com o somatorio das vendas abaixo dela a depender do order by. (ex: se a ordenação for por mais recente ou mais antigo, ou seja, por data, o somatorio vai ser "Total das vendas do dia {insira o dia que listará a vendas abaixo da linha}", caso ordene por cliente: "Total das vendas para {insira cliente}" e embaixo as vendas ordenadas dele. O texto não vai ser intereferido pelos filtros mas a soma sim, se o order by for por cliente e tiver um filtro de data, a soma só vai pegar as vendas daquele cliente entre as datas do filtro.")
+- Vendas: Scroll no modal de detalhes
 - Clientes: Adicionar validações antes de deletar caso esteja associado a uma venda
 - Produto: Adicionar pesquisa por nome
 - Produto: Filtro de apenas ativos
 - Produto: Ordenar por (A-Z, Mais Caro, Mais Barato, Mais Vendido, Menos Vendido, Mais Recente, Mais Antigo)
 - Produto: Adiconar função de copiar produto rapidamente
+- Despesas: Card de detalhes
+- Despesas: Input de pesquisa por nome
 - Páginação de Produtos: no maximo 8 por pagina e escolha de paginas
 - Páginação de Despesas: no maximo 8 por pagina e escolha de paginas
 - Paginação de Clientes: no maximo 6 por pagina e escolha de paginas
+- Cards de vendas: Soma total das vendas que aparecem na tabela considerando os filtros aplicados. card deve ficar acima da tabela e embaixo dos filtros.
 - Geral: Lidar com configurações de negócio gerais (Nome do negócio)

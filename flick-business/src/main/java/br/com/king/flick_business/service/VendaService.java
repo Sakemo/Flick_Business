@@ -302,21 +302,88 @@ public class VendaService {
         .orElseThrow(() -> new RecursoNaoEncontrado("Venda não encontrada com ID: " + id));
     return new VendaResponseDTO(venda);
   }
+
+  /**
+   * Lógica para buscar a venda, estornar estoque, estornar saldo fiado e deletar
+   * a venda.
+   * 
+   * @param id Identificador da venda
+   */
+  @Transactional
+  public void deletarVendaFisicamente(Long vendaId) {
+    System.out
+        .println("DELETE_START: VendaService.deletarVendaFisicamente - Buscando venda para deleção... - " + vendaId);
+
+    Venda vendaParaDeletar = vendaRepository.findByIdComItensECliente(vendaId)
+        .orElseThrow(() -> {
+          System.err.println("ERROR: VendaService.deletarVendaFisicamente - Venda não encontrada: " + vendaId);
+          return new RecursoNaoEncontrado("Venda não encontrada: " + vendaId);
+        });
+
+    System.out.println("DELETE_LOG_01: VendaService.deletarVendaFisicamente - Venda " + vendaId + " encontrada.");
+    System.out.println("DELETE_LOG_02: VendaService.deletarVendaFisicamente - Estornando itens ao estoque... ");
+    List<Produto> produtosParaAtualizarEstoque = new ArrayList<>();
+    if (vendaParaDeletar.getItens() != null) {
+      for (ItemVenda item : vendaParaDeletar.getItens()) {
+        Produto produtoDoItem = item.getProduto();
+        if (produtoDoItem != null) {
+          Produto produtoParaEstornar = produtoRepository.findById(produtoDoItem.getId())
+              .orElseThrow(() -> new RecursoNaoEncontrado(
+                  "Produo associado ao item da venda não encontrado: ID " + produtoDoItem.getId()));
+          if (produtoParaEstornar.getQuantidadeEstoque() != null) {
+            System.out.println("DELETE_LOG_03: VendaService.deletarVendaFisicamente - Processando estoque do item "
+                + produtoParaEstornar.getNome() + " de ID " + produtoParaEstornar.getId()
+                + ". Quantia a ser processada: " + item.getQuantidade());
+            BigDecimal novoEstoque = produtoParaEstornar.getQuantidadeEstoque().add(item.getQuantidade());
+            produtoParaEstornar.setQuantidadeEstoque(novoEstoque);
+            produtosParaAtualizarEstoque.add(produtoParaEstornar);
+            System.out.println("DELETE_LOG_04: VendaService.deletarVendaFisicamente. SUCESSO ao PROCESSAR ESTOQUE de "
+                + produtoDoItem.getNome() + ". Novo Estoque: " + novoEstoque);
+          } else {
+            System.out.println("DELETE_LOG_03_S/ESTOQUE - VendaService.deletarVendaFisicamente - Produto "
+                + produtoParaEstornar.getNome() + "de ID: " + produtoParaEstornar.getId()
+                + ", não possui controle de estoque. SUCESSO AO PROCESSAR.");
+          }
+        }
+      }
+    }
+    if (!produtosParaAtualizarEstoque.isEmpty()) {
+      produtoRepository.saveAll(produtosParaAtualizarEstoque);
+      System.out.println("DELETE_LOG: VendaService.deletarVendaFisicamente. SUCESSO ao PROCESSAR ESTOQUE");
+    }
+
+    if (vendaParaDeletar.getFormaPagamento() == FormaPagamento.FIADO && vendaParaDeletar.getCliente() != null) {
+      Cliente clienteDaVenda = clienteRepository.findById(vendaParaDeletar.getCliente().getId())
+          .orElse(null);
+      System.out
+          .println("DELETE_LOG_FIADO: VendaService.deletarVendaFisicamente. Estornando crédito de fiado ao cliente"
+              + clienteDaVenda.getNome() + "...");
+      BigDecimal saldoAtual = clienteDaVenda.getSaldoDevedor();
+      BigDecimal valorVenda = vendaParaDeletar.getValorTotal();
+
+      if (clienteDaVenda != null) {
+        clienteDaVenda.setSaldoDevedor(saldoAtual.subtract(valorVenda));
+
+        System.out.println("DELETE_LOG_FIADO: SUCESSO ao estornar R$" + valorVenda + " para o cliente "
+            + clienteDaVenda.getNome() + " totalizando no SALDO ATUAL: R$" + clienteDaVenda.getSaldoDevedor());
+
+        if (clienteDaVenda.getSaldoDevedor().compareTo(BigDecimal.ZERO) <= 0
+            && vendaParaDeletar.getDataVenda().equals(clienteDaVenda.getDataUltimaCompraFiado())) {
+          System.out.println(
+              "LOG: VendaService.deletarVendaFisicamente - Saldo do cliente zerado ou negativo. Data da última compra fiado pode precisar de reavaliação.");
+        }
+        clienteRepository.save(clienteDaVenda);
+        System.out.println("LOG: VendaService.deletarVendaFisicamente - Saldo devedor do cliente ID " +
+            clienteDaVenda.getId() + " estornado. Novo saldo: " + clienteDaVenda.getSaldoDevedor());
+      } else {
+        System.err.println("WARN: Cliente com ID " + vendaParaDeletar.getCliente().getId() +
+            " associado à venda FIADO " + vendaId + " não foi encontrado para estorno de saldo.");
+      }
+    }
+    System.out.println("DELETE_LOG: Deletando Venda...");
+    vendaRepository.delete(vendaParaDeletar);
+    System.out
+        .println("LOG: VendaService.deletarVendaFisicamente - Venda ID " + vendaId + " deletada permanentemente.");
+    System.out.println("DELETE_LOG: VENDA DELETADA COM SUCESSO");
+  }
 }
-/*
- * Fix(VendaService): Ensure all sales are displayed when no filters are applied
- * 
- * Adjusted the default date range in `listarVendas` method to use
- * extreme dates (e.g., 1900-9999) when no date, client, or payment method
- * filters are provided by the user. This ensures that theSim. initial view
- * of the sales history shows all sales by default, instead of only
- * today's sales. Filtering logic for applied filters remains active.
- * 
- * Fix(VendaService): Ensure all sales are displayed when no filters are applied
- * 
- * Adjusted the default date range in `listarVendas` method to use
- * extreme dates (e.g., 1900-9999) when no date, client, or payment method
- * filters are provided by the user. This ensures that theSim. initial view
- * of the sales history shows all sales by default, instead of only
- * today's sales. Filtering logic for applied filters remains active.
- */

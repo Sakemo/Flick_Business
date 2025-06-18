@@ -1,16 +1,14 @@
-import { format } from 'date-fns';
 import { FormaPagamento, VendaResponse } from '../../types/domain';
 import Table, { TableColumn } from '../common/Table';
-import { ptBR } from 'date-fns/locale';
 import Badge, { BadgeColorScheme } from '../ui/Badge';
-import { formatCurrency } from '../../utils/formatters';
+import { formatCurrency, formatVendaDate } from '../../utils/formatters';
 import Button from '../ui/Button';
-import { LuEye } from 'react-icons/lu';
+import { LuEye, LuTrash2 } from 'react-icons/lu';
 
 interface VendasTableProps {
   vendas: VendaResponse[];
   onViewDetails: (venda: VendaResponse) => void;
-  onDelete?: (id: number) => void; //TODO: Implementar deleção de venda
+  onDelete: (id: number, vendaDisplayInfo: string) => void;
   selectedRowId?: number | undefined; //TODO: Implementar seleção de linha
 }
 
@@ -22,12 +20,17 @@ const BadgeColorByFormaPagamento: Record<FormaPagamento, BadgeColorScheme> = {
   [FormaPagamento.FIADO]: 'yellow',
 };
 
-const VendasTable: React.FC<VendasTableProps> = ({ vendas, onViewDetails, selectedRowId }) => {
+const VendasTable: React.FC<VendasTableProps> = ({
+  vendas,
+  onViewDetails,
+  selectedRowId,
+  onDelete,
+}) => {
   const columns: TableColumn<VendaResponse>[] = [
     { header: 'ID', accessor: 'id', width: 'w-16' },
     {
       header: 'Data',
-      accessor: (row) => format(new Date(row.dataVenda), 'dd/MM/yyyy HH:mm', { locale: ptBR }),
+      accessor: (row) => formatVendaDate(row.dataVenda),
     },
     { header: 'Cliente', accessor: (row) => row.cliente?.nome || 'N/A' },
     {
@@ -61,6 +64,15 @@ const VendasTable: React.FC<VendasTableProps> = ({ vendas, onViewDetails, select
             title="Ver detalhes"
           >
             <LuEye className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDelete(row.id, `#${row.id} de ${formatCurrency(row.valorTotal)}`)}
+            className="text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover-bg-red-700/50"
+            title="Deletar Venda"
+          >
+            <LuTrash2 className="h-4 w-4" />
           </Button>
         </div>
       ),

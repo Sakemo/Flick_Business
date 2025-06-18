@@ -1,9 +1,7 @@
-import { format } from 'date-fns';
 import { FormaPagamento, VendaResponse } from '../../types/domain';
 import Modal from '../common/Modal';
-import { ptBR } from 'date-fns/locale';
 import Badge from '../ui/Badge';
-import { formatCurrency } from '../../utils/formatters';
+import { formatCurrency, formatVendaDate } from '../../utils/formatters';
 import Button from '../ui/Button';
 
 interface VendaDetalhesModalProps {
@@ -30,9 +28,7 @@ const VendaDetalhesModal: React.FC<VendaDetalhesModalProps> = ({ isOpen, onClose
           </div>
           <div>
             <p className="text-sm font-medium text-text-secondary">Data da Venda:</p>
-            <p className="text-text-primary dark:text-white">
-              {format(new Date(venda.dataVenda), 'dd/MM/yyyy HH:mm:ss', { locale: ptBR })}
-            </p>
+            <p className="text-text-primary dark:text-white">{formatVendaDate(venda.dataVenda)}</p>
           </div>
           <div>
             <p className="text-sm font-medium text-text-secondary">Forma de Pagamento:</p>

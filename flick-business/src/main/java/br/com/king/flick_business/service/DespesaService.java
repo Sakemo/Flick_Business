@@ -100,9 +100,9 @@ public class DespesaService {
       System.out.println("LOG: DespesaService.listarDespesas - Filtrando apenas por TIPO");
       despesas = despesaRepository.findByTipoDespesa(tipoFiltro);
     } else {
-      System.out.println("LOG: DespesaService.listarDespesas - Filtrando por DATA DE HOJE (default)");
-      LocalDateTime inicioHoje = LocalDateTime.now().toLocalDate().atStartOfDay();
-      LocalDateTime fimHoje = inicioHoje.plusDays(1).minusNanos(1);
+      System.out.println("LOG: DespesaService.listarDespesas - Mostrando todas as despesas");
+      LocalDateTime inicioHoje = LocalDateTime.of(1900, 1, 1, 0, 0);
+      LocalDateTime fimHoje = LocalDateTime.of(9999, 12, 31, 23, 59);
       despesas = despesaRepository.findByDataDespesaBetweenOrderByDataDespesaDesc(inicioHoje, fimHoje);
     }
     System.out.println("LOG: DespesaService.listarDespesas - Total de despesas encontradas: " + despesas.size());

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -94,5 +95,12 @@ public class VendaController {
     VendaResponseDTO venda = vendaService.buscarVendaPorId(id);
     System.out.println("LOG: VendaController.buscarVendaPorId - Venda encontrada: " + venda);
     return ResponseEntity.ok(venda);
+  }
+
+  @DeleteMapping("/{id}/permanente")
+  public ResponseEntity<Void> deletarVendaFisicamente(@PathVariable Long id) {
+    System.out.println("LOG: VendaController.deletarVendaFisicamente - Recebida requisição de deleção de ID: " + id);
+    vendaService.deletarVendaFisicamente(id);
+    return ResponseEntity.noContent().build();
   }
 }

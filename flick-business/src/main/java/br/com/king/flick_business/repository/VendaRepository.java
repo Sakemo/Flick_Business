@@ -22,7 +22,8 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
 
         // Busca uma venda pelo ID, incluindo seus itens e o cliente associado (fetch
         // join)
-        @Query("SELECT DISTINCT v FROM Venda v JOIN FETCH v.itens i JOIN FETCH v.cliente c WHERE v.id = :id")
+        @Query("SELECT DISTINCT v FROM Venda v " + "LEFT JOIN FETCH v.itens i " + "LEFT JOIN FETCH v.cliente c "
+                        + "WHERE v.id = :id")
         Optional<Venda> findByIdComItensECliente(Long id);
 
         // Busca todas as vendas, incluindo cliente e itens associados, com ordenação

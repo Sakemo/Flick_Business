@@ -5,13 +5,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.king.flick_business.dto.ItemVendaRequestDTO;
+import br.com.king.flick_business.dto.PageResponse;
 import br.com.king.flick_business.dto.VendaRequestDTO;
 import br.com.king.flick_business.dto.VendaResponseDTO;
 import br.com.king.flick_business.entity.Cliente;
@@ -213,13 +216,15 @@ public class VendaService {
    * @return Lista de VendaResponseDTO correspondentes aos filtros
    */
   @Transactional(readOnly = true)
-  public List<VendaResponseDTO> listarVendas(
+  public PageResponse<VendaResponseDTO> listarVendas(
       LocalDateTime inicio,
       LocalDateTime fim,
       Long clienteId,
       String formaPagamentoString,
       Long produtoId,
-      String orderBy) {
+      String orderBy,
+      int page,
+      int size) {
     System.out.println("LOG: VendaService.listarVendas - inicio: " + inicio + ", fim" + fim + ", clienteId: "
         + clienteId + ", formaPagamentoString: " + formaPagamentoString);
 
@@ -256,6 +261,9 @@ public class VendaService {
     } else {
       sort = Sort.by(Sort.Direction.DESC, "dataVenda");
     }
+
+    Pageable pageable = PageRequest.of(page, size, sort);
+
     System.out.println("SERVICE: VendaService.listarVendas - Usando sort: " + sort);
     LocalDateTime inicioQuery;
     LocalDateTime fimQuery;
@@ -276,18 +284,18 @@ public class VendaService {
               + ", ClienteId: " + clienteId + ", FormaPagamento: " + formaPagamentoFiltro + ", Produto: " + produtoId);
     }
 
-    List<Venda> vendas = vendaRepository.findVendasComFiltros(
+    Page<Venda> vendasPage = vendaRepository.findVendasComFiltros(
         inicioQuery,
         fimQuery,
         clienteId,
         formaPagamentoFiltro,
         produtoId,
-        sort);
+        pageable);
 
-    System.out.println("LOG: VendaService.listarVendas - Vendas encontradas após filtros: " + vendas.size());
-    return vendas.stream()
-        .map(VendaResponseDTO::new)
-        .collect(Collectors.toList());
+    Page<VendaResponseDTO> dtoPage = vendasPage.map(VendaResponseDTO::new);
+
+    System.out.println("LOG: VendaService.listarVendas - Vendas encontradas após filtros: " + vendasPage);
+    return new PageResponse<>(dtoPage);
   }
 
   /**

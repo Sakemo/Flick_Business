@@ -15,12 +15,16 @@ import { format } from 'date-fns';
 import AutoCompleteInput from '../components/common/AutoCompleteInput';
 import { getProdutos as fetchAllProdutos } from '../services/produtoService';
 import { AxiosError } from 'axios';
+import Pagination from '../components/common/Pagination';
 
 const VendasPage: React.FC = () => {
   const [vendas, setVendas] = useState<VendaResponse[]>([]);
   const [clientes, setClientes] = useState<ClienteResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
 
   const [isNovaVendaModalOpen, setIsNovaVendaModalOpen] = useState<boolean>(false);
   const [vendaSelecionadaDetalhes, setVendasSelecionadaDetalhes] = useState<VendaResponse | null>(
@@ -51,7 +55,7 @@ const VendasPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const params: GetVendasParams = {};
+      const params: GetVendasParams = { page: currentPage, size: 8 };
       if (filtroDataInicio) params.inicio = `${filtroDataInicio}T00:00:00`;
       if (filtroDataFim) params.fim = `${filtroDataFim}T23:59:59`;
       if (filtroClienteId) params.clienteId = parseInt(filtroClienteId);
@@ -59,8 +63,9 @@ const VendasPage: React.FC = () => {
       if (filtroProduto) params.produtoId = filtroProduto.value;
       if (ordemVendas) params.orderBy = ordemVendas;
 
-      const data = await getVendas(params);
-      setVendas(data);
+      const pageResponse = await getVendas(params);
+      setVendas(pageResponse.content);
+      setTotalPages(pageResponse.totalPages);
     } catch (err) {
       setError('Erro ao buscar vendas');
       console.error('Erro ao buscar vendas:', err);
@@ -68,6 +73,7 @@ const VendasPage: React.FC = () => {
       setLoading(false);
     }
   }, [
+    currentPage,
     filtroDataInicio,
     filtroDataFim,
     filtroClienteId,
@@ -162,6 +168,10 @@ const VendasPage: React.FC = () => {
     }
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   const clearFilters = () => {
     setFiltroDataInicio('');
     setFiltroDataFim('');
@@ -170,6 +180,7 @@ const VendasPage: React.FC = () => {
     setFiltroHojeAtivo(false);
     setFiltroProduto(null);
     /**setOrdemVendas(opcoesOrdenacaoVendas[0].value); Reseta ordenação padrão */
+    /**setCurrentPage(0) reseta a */
   };
 
   return (
@@ -275,14 +286,22 @@ const VendasPage: React.FC = () => {
       <div className="flex justify-between items-center mb-4">
         {/** TODO: card de produto mais vendido */}
       </div>
+
       {loading && <p className="p-6 text-center">Carregando vendas...</p>}
       {error && <p className="p-6 text-center text-red-500">{error}</p>}
       {!loading && !error && (
-        <VendasTable
-          vendas={vendas}
-          onViewDetails={handleVerDetalhesVenda}
-          onDelete={handleDeleteVendaFisicamente}
-        />
+        <>
+          <VendasTable
+            vendas={vendas}
+            onViewDetails={handleVerDetalhesVenda}
+            onDelete={handleDeleteVendaFisicamente}
+          />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
       )}
 
       {isNovaVendaModalOpen && (

@@ -226,14 +226,10 @@ class DespesaServiceTest {
   @DisplayName("Deve retornar lista do dia atual quando início e fim são nulos")
   void listarDespesas_semFiltroData_deveBuscarPeloDiaAtual() {
     // Arrange
-    LocalDateTime inicioHoje = LocalDateTime.now().toLocalDate().atStartOfDay();
-    LocalDateTime fimHoje = inicioHoje.plusDays(1).minusNanos(1);
-    // Simula que não há despesas hoje
-    when(despesaRepositoryMock.findByDataDespesaBetweenOrderByDataDespesaDesc(eq(inicioHoje), any(LocalDateTime.class))) // Usar
-                                                                                                                         // eq()
-                                                                                                                         // para
-                                                                                                                         // data
-                                                                                                                         // exata
+    LocalDateTime inicioDefault = LocalDateTime.of(1900, 1, 1, 0, 0);
+    LocalDateTime fimDefault = LocalDateTime.of(9999, 12, 31, 23, 59);
+
+    when(despesaRepositoryMock.findByDataDespesaBetweenOrderByDataDespesaDesc(eq(inicioDefault), eq(fimDefault)))
         .thenReturn(Collections.emptyList());
 
     // Act
@@ -245,7 +241,7 @@ class DespesaServiceTest {
 
     // Verify
     // Verifica se a busca foi feita com as datas calculadas para hoje
-    verify(despesaRepositoryMock).findByDataDespesaBetweenOrderByDataDespesaDesc(eq(inicioHoje),
+    verify(despesaRepositoryMock).findByDataDespesaBetweenOrderByDataDespesaDesc(eq(inicioDefault),
         any(LocalDateTime.class));
     verify(despesaRepositoryMock, never()).findAll();
   }

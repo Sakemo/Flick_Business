@@ -27,9 +27,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import br.com.king.flick_business.dto.ItemVendaRequestDTO;
+import br.com.king.flick_business.dto.PageResponse;
 import br.com.king.flick_business.dto.VendaRequestDTO;
 import br.com.king.flick_business.dto.VendaResponseDTO;
 import br.com.king.flick_business.entity.Cliente;
@@ -407,26 +411,40 @@ class VendaServiceTest {
 
     @Test
     @DisplayName("Deve listar vendas chamando")
-    void listarVendas_semFiltros_DeveRetornarListaDto() {
+    void listarVendas_semFiltros_DeveRetornarPageResponse() {
         // Arrange
-        Venda v1 = Venda.builder().id(1L).cliente(clienteAtivoFiadoPermitido).valorTotal(BigDecimal.TEN)
-                .dataVenda(LocalDateTime.now().minusDays(1)).formaPagamento(FormaPagamento.FIADO).build();
+        Venda v1 = Venda.builder()
+                .id(1L)
+                .cliente(clienteAtivoFiadoPermitido)
+                .valorTotal(BigDecimal.TEN)
+                .dataVenda(LocalDateTime.now().minusDays(1))
+                .formaPagamento(FormaPagamento.FIADO)
+                .build();
 
-        Venda v2 = Venda.builder().id(2L).cliente(null).valorTotal(BigDecimal.ONE).dataVenda(LocalDateTime.now())
-                .formaPagamento(FormaPagamento.DINHEIRO).build();
+        Venda v2 = Venda.builder()
+                .id(2L)
+                .cliente(null)
+                .valorTotal(BigDecimal.ONE)
+                .dataVenda(LocalDateTime.now())
+                .formaPagamento(FormaPagamento.DINHEIRO)
+                .build();
 
-        List<Venda> listaDeVendasMock = List.of(v1, v2);
+        List<Venda> vendas = List.of(v1, v2);
+        Pageable pageable = PageRequest.of(0, 8);
+        Page<Venda> vendasPageMock = new PageImpl<>(vendas, pageable, vendas.size());
 
-        when(vendaRepositoryMock.findVendasComFiltros(any(), any(), any(), any(), any(), any(Sort.class)))
-                .thenReturn(listaDeVendasMock);
+        when(vendaRepositoryMock.findVendasComFiltros(any(LocalDateTime.class), any(LocalDateTime.class), any(), any(),
+                any(), any(Pageable.class)))
+                .thenReturn(vendasPageMock);
 
-        List<VendaResponseDTO> resultado = vendaService.listarVendas(null, null, null, null, null, null);
+        PageResponse<VendaResponseDTO> resultado = vendaService.listarVendas(null, null, null, null, null, null, 0, 8);
 
         assertNotNull(resultado);
-        assertEquals(2, resultado.size(), "Deveria encontrar 2 vendas");
-        assertEquals(v1.getId(), resultado.get(0).id());
-        assertEquals(v2.getId(), resultado.get(1).id());
-        verify(vendaRepositoryMock).findVendasComFiltros(any(), any(), isNull(), isNull(), isNull(), any(Sort.class));
+        assertEquals(2, resultado.getContent().size(), "Deveria encontrar 2 vendas");
+        assertEquals(v1.getId(), resultado.getContent().get(0).id());
+        assertEquals(v2.getId(), resultado.getContent().get(1).id());
+        verify(vendaRepositoryMock).findVendasComFiltros(any(), any(), isNull(), isNull(), isNull(),
+                any(Pageable.class));
     }
 
     @Test

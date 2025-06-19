@@ -2,7 +2,6 @@ package br.com.king.flick_business.controller;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import br.com.king.flick_business.dto.PageResponse;
 import br.com.king.flick_business.dto.VendaRequestDTO;
 import br.com.king.flick_business.dto.VendaResponseDTO;
 import br.com.king.flick_business.service.VendaService;
@@ -63,24 +63,30 @@ public class VendaController {
    * @return Lista de vendas encontradas.
    */
   @GetMapping
-  public ResponseEntity<List<VendaResponseDTO>> listarVendas(
+  public ResponseEntity<PageResponse<VendaResponseDTO>> listarVendas(
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
       @RequestParam(required = false) Long clienteId,
       @RequestParam(required = false) String formaPagamento,
       @RequestParam(required = false) Long produtoId,
-      @RequestParam(required = false) String orderBy) {
+      @RequestParam(required = false) String orderBy,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "8") int size) {
     System.out.println("LOG: VendaController.listarVendas - Listando vendas com filtros - inicio: " + inicio + ", fim: "
         + fim + ", clienteId: " + clienteId + ", formaPagamento: " + formaPagamento);
-    List<VendaResponseDTO> vendas = vendaService.listarVendas(
+    System.out.println("PAGINATION: VendaController.listarVendas - " + page + " : " + size);
+    PageResponse<VendaResponseDTO> paginatedResponse = vendaService.listarVendas(
         inicio,
         fim,
         clienteId,
         formaPagamento,
         produtoId,
-        orderBy);
-    System.out.println("LOG: VendaController.listarVendas - Quantidade de vendas encontradas: " + vendas.size());
-    return ResponseEntity.ok(vendas);
+        orderBy,
+        page,
+        size);
+    System.out.println(
+        "LOG: VendaController.listarVendas - Quantidade de vendas encontradas: " + paginatedResponse.getSize());
+    return ResponseEntity.ok(paginatedResponse);
   }
 
   /**

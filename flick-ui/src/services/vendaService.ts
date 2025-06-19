@@ -1,6 +1,13 @@
 import apiClient from "../lib/axios";
 import { VendaRequest, VendaResponse } from "../types/domain";
 
+
+export interface PageResponse<T> {
+  content: T[];
+  number: number;
+  totalPages: number;
+  totalElements: number;
+}
 export interface GetVendasParams {
   inicio?: string | null;
   fim?: string | null;
@@ -8,12 +15,15 @@ export interface GetVendasParams {
   formaPagamento?: string | null;
   produtoId?: number | null;
   orderBy?: string | null | 'dataVenda,desc' | 'dataVenda,Asc' | 'valorTotal,asc' | 'valorTotal,desc';
+  page?: number;
+  size?: number;
 }
 
-export const getVendas = async (params?: GetVendasParams):Promise<VendaResponse[]> => {
+export const getVendas = async (params?: GetVendasParams):Promise<PageResponse<VendaResponse>> => {
   try {
-    console.log("Frontend: Enviando para /api/vendas (GET) com params: ", params);
-    const response = await apiClient.get<VendaResponse[]>('/api/vendas', { params });
+    const queryParams = { ...params, size: params?.size || 8 };
+    console.log("Frontend: Enviando para /api/vendas (GET) com params: ", queryParams);
+    const response = await apiClient.get<PageResponse<VendaResponse>>('/api/vendas', { params: queryParams });
     console.log("Frontend: Recebendo resposta de /api/vendas (GET): ", response.data);
     return response.data;
   } catch (error) {
@@ -53,5 +63,3 @@ export const deleteVendaFisicamente = async (id: number): Promise<void> => {
     throw error;
   }
 };
-
-//TODO: Funções para cancelar, atualizar e deletar

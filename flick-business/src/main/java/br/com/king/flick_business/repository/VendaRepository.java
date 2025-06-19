@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -38,13 +40,13 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
                         + "(:clienteId IS NULL OR c.id = :clienteId) AND "
                         + "(:formaPagamento IS NULL OR v.formaPagamento = :formaPagamento) AND "
                         + "(:produtoId IS NULL OR i.produto.id = :produtoId)")
-        List<Venda> findVendasComFiltros(
+        Page<Venda> findVendasComFiltros(
                         @Param("inicio") LocalDateTime inicio,
                         @Param("fim") LocalDateTime fim,
                         @Param("clienteId") Long clienteId,
                         @Param("formaPagamento") FormaPagamento formaPagamento,
                         @Param("produtoId") Long produtoId,
-                        Sort sort);
+                        Pageable pageable);
 
         // =========================
         // MÉTODOS PARA RELATÓRIOS

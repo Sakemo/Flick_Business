@@ -4,12 +4,14 @@ import Badge, { BadgeColorScheme } from '../ui/Badge';
 import { formatCurrency, formatVendaDate } from '../../utils/formatters';
 import Button from '../ui/Button';
 import { LuEye, LuTrash2 } from 'react-icons/lu';
+import { TableRow } from '../../hooks/GroupHeader';
+import clsx from 'clsx';
 
 interface VendasTableProps {
-  vendas: VendaResponse[];
+  vendas: TableRow[];
   onViewDetails: (venda: VendaResponse) => void;
   onDelete: (id: number, vendaDisplayInfo: string) => void;
-  selectedRowId?: number | undefined; //TODO: Implementar seleção de linha
+  selectedRowId?: number | undefined;
 }
 
 const BadgeColorByFormaPagamento: Record<FormaPagamento, BadgeColorScheme> = {
@@ -30,7 +32,7 @@ const VendasTable: React.FC<VendasTableProps> = ({
     { header: 'ID', accessor: 'id', width: 'w-16' },
     {
       header: 'Data',
-      accessor: (row) => formatVendaDate(row.dataVenda),
+      accessor: (row) => formatVendaDate(row.dataVenda, true),
     },
     { header: 'Cliente', accessor: (row) => row.cliente?.nome || 'N/A' },
     {
@@ -80,12 +82,37 @@ const VendasTable: React.FC<VendasTableProps> = ({
     },
   ];
   return (
-    <Table<VendaResponse>
+    <Table<TableRow>
       columns={columns}
       data={vendas}
       emptyMessage="Nenhuma venda encontrada"
-      onRowClick={onViewDetails}
       selectedRowId={selectedRowId}
+      renderRow={(item, cols) => {
+        if ('isGroupHeader' in item){
+          return (
+            <tr key={item.groupKey} className='bg-gray-100 dark:bg-gray-800 border-y border-gray-300 dark:border-gray-600 sticky top-0 z-10'>
+              <td colSpan={cols.length} className="px-4 py-2 font-semibold text-text-secondary dark:text-gray-200">
+                <div className='flex justify-between'>
+                <span className='text-sm'>{item.title}</span>
+                <span className='text-base text-brand-primary dark:text-brand-accent'>{formatCurrency(item.value)}</span>
+                </div>
+              </td>
+            </tr>
+          );
+        }
+
+        const venda = item;
+        return (
+          <tr key={venda.id} onClick={() => onViewDetails(venda)} className={clsx('hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors cursor-pointer', selectedRowId === venda.id && 'bg-brand-muted/50 dark:bg-gray-700')}>
+            {cols.map((col, index) => (
+              <td key={index} className={clsx(
+                'px-4 py-3 whitespace-nowrap text-sm text-text-primary dark:text-gray-200', col.className)}>
+                {typeof col.accessor === 'function' ? col.accessor(venda) : String(venda[col.accessor as keyof VendaResponse] ?? '')}
+              </td>
+            ))}
+          </tr>
+        )
+      }}
     />
   );
 };

@@ -28,7 +28,7 @@ const VendaDetalhesModal: React.FC<VendaDetalhesModalProps> = ({ isOpen, onClose
           </div>
           <div>
             <p className="text-sm font-medium text-text-secondary">Data da Venda:</p>
-            <p className="text-text-primary dark:text-white">{formatVendaDate(venda.dataVenda)}</p>
+            <p className="text-text-primary dark:text-white">{formatVendaDate(venda.dataVenda, true)}</p>
           </div>
           <div>
             <p className="text-sm font-medium text-text-secondary">Forma de Pagamento:</p>

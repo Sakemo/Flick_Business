@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormaPagamento, VendaResponse } from '../types/domain';
 import { ClienteResponse } from '../types/domain';
 import { GetVendasParams, deleteVendaFisicamente, getVendas } from '../services/vendaService';
@@ -16,6 +16,8 @@ import AutoCompleteInput from '../components/common/AutoCompleteInput';
 import { getProdutos as fetchAllProdutos } from '../services/produtoService';
 import { AxiosError } from 'axios';
 import Pagination from '../components/common/Pagination';
+import { TableRow } from '../hooks/GroupHeader';
+import { formatVendaDate } from '../utils/formatters';
 
 const VendasPage: React.FC = () => {
   const [vendas, setVendas] = useState<VendaResponse[]>([]);
@@ -50,6 +52,80 @@ const VendasPage: React.FC = () => {
   ];
 
   const [ordemVendas, setOrdemVendas] = useState<string>(opcoesOrdenacaoVendas[0].value);
+
+  const processedVendas: TableRow[] = useMemo(() => {
+    console.log('processedVendas: vendas:', vendas, 'ordemVendas:', ordemVendas);
+    if (!vendas || vendas.length === 0){
+      console.log('processedVendas: vendas vazias');
+      return [];
+    }
+
+    const orderProperty = ordemVendas.split(',')[0];
+    console.log('processedVendas: orderProperty:', orderProperty);
+
+    if (orderProperty !== "dataVenda" && orderProperty !== 'cliente.nome') {
+      console.log('processedVendas: ordem não é dataVenda nem cliente.nome, retornando vendas');
+      return vendas;
+    }
+
+    const newRows: TableRow[] = [];
+    let currentGroupKey: string | null = null;
+    let currentGroupItems: VendaResponse[] = [];
+
+    const finalizeGroup = () => {
+      if (currentGroupItems.length > 0 && currentGroupKey){
+        const groupTotal = currentGroupItems.reduce((sum, item) => sum + item.valorTotal, 0);
+
+        let groupTitle = '';
+        if (orderProperty === 'dataVenda'){
+          const originalDateString = currentGroupItems[0].dataVenda;
+          groupTitle = `Total de ${formatVendaDate(originalDateString, false)}`
+
+          console.log('finalizeGroup: dataVenda group', { originalDateString, groupTitle, groupTotal, currentGroupItems });
+        } else if (orderProperty === 'cliente.nome') {
+          const clientName = currentGroupItems[0].cliente?.nome || 'Não identificado';
+          groupTitle = `Total de ${clientName}`;
+          console.log('finalizeGroup: cliente.nome group', { clientName, groupTitle, groupTotal, currentGroupItems });
+        } else {
+          groupTitle = `Total`;
+          console.log('finalizeGroup: outro group', { groupTitle, groupTotal, currentGroupItems });
+        }
+
+        newRows.push ({
+          isGroupHeader: true,
+          groupKey:currentGroupKey,
+          title: groupTitle,
+          value: groupTotal,
+          itemCount: currentGroupItems.length
+        });
+
+        newRows.push(...currentGroupItems);
+
+        currentGroupItems = [];
+      }
+    };
+
+    for (const venda of vendas){
+      let itemGroupKey = '';
+      if (orderProperty === 'dataVenda'){
+        itemGroupKey = venda.dataVenda.split('T')[0];
+      } else if (orderProperty === 'cliente.nome'){
+        itemGroupKey = venda.cliente?.id.toString() || 'no-client';
+      }
+
+      if (itemGroupKey !== currentGroupKey){
+        console.log('processedVendas: mudando de grupo', { de: currentGroupKey, para: itemGroupKey });
+        finalizeGroup();
+        currentGroupKey = itemGroupKey;
+      }
+
+      currentGroupItems.push(venda);
+    }
+    finalizeGroup();
+
+    console.log('processedVendas: newRows final', newRows);
+    return newRows;
+  }, [vendas, ordemVendas])
 
   const fetchVendas = useCallback(async () => {
     setLoading(true);
@@ -292,7 +368,7 @@ const VendasPage: React.FC = () => {
       {!loading && !error && (
         <>
           <VendasTable
-            vendas={vendas}
+            vendas={processedVendas}
             onViewDetails={handleVerDetalhesVenda}
             onDelete={handleDeleteVendaFisicamente}
           />

@@ -10,15 +10,17 @@ export interface TableColumn<T> {
 }
 
 interface TableProps<T> {
-  columns: TableColumn<T>[];
+  columns: TableColumn<any>[];
   data: T[];
   isLoading?: boolean;
   emptyMessage?: string;
   className?: string;
   onRowClick?: (row: T) => void;
   selectedRowId: number | undefined;
+  renderRow?: (row: T, columns: TableColumn<T>[]) => React.ReactNode;
 }
-function Table<T extends { id: number | string }>({
+
+function Table<T>({
   columns,
   data,
   isLoading = false,
@@ -26,12 +28,14 @@ function Table<T extends { id: number | string }>({
   className,
   onRowClick,
   selectedRowId,
+  renderRow,
 }: TableProps<T>) {
   const renderCellContent = (row: T, column: TableColumn<T>) => {
     if (typeof column.accessor === 'function') {
       return column.accessor(row);
     }
-    return String(row[column.accessor] ?? '');
+    const accessorKey = column.accessor as keyof T;
+    return String(row[accessorKey] ?? '');
   };
 
   return (
@@ -79,13 +83,18 @@ function Table<T extends { id: number | string }>({
               </td>
             </tr>
           ) : (
-            data.map((row) => (
+            data.map((row, index) => {
+              if (renderRow) {
+                return (<React.Fragment key={index}>{renderRow(row, columns)}</React.Fragment>)
+              }
+              const rowId = (row as any).id ?? `row-${index}`;
+              return (
               <tr
-                key={row.id}
+                key={rowId}
                 className={clsx(
                   'hover:=bg-gray-50 dark:hover:bg-gray-700/40 transition-colors',
                   onRowClick && 'cursor-pointer',
-                  selectedRowId === row.id && 'bg-brand-muted/50 dark:bg-gray-700'
+                  selectedRowId === rowId && 'bg-brand-muted/50 dark:bg-gray-700'
                 )}
                 onClick={() => onRowClick?.(row)}
               >
@@ -101,8 +110,9 @@ function Table<T extends { id: number | string }>({
                   </td>
                 ))}
               </tr>
-            ))
-          )}
+            );
+          })
+        )}
         </tbody>
       </table>
     </div>

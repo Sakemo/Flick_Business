@@ -3,8 +3,10 @@ package br.com.king.flick_business.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,10 +15,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.king.flick_business.dto.ItemVendaRequestDTO;
-import br.com.king.flick_business.dto.PageResponse;
 import br.com.king.flick_business.dto.VendaRequestDTO;
 import br.com.king.flick_business.dto.VendaResponseDTO;
+import br.com.king.flick_business.dto.request.ItemVendaRequestDTO;
+import br.com.king.flick_business.dto.response.GroupsummaryDTO;
+import br.com.king.flick_business.dto.response.PageResponse;
 import br.com.king.flick_business.entity.Cliente;
 import br.com.king.flick_business.entity.ConfiguracaoGeral;
 import br.com.king.flick_business.entity.ItemVenda;
@@ -28,6 +31,7 @@ import br.com.king.flick_business.exception.RecursoNaoEncontrado;
 import br.com.king.flick_business.repository.ClienteRepository;
 import br.com.king.flick_business.repository.ProdutoRepository;
 import br.com.king.flick_business.repository.VendaRepository;
+import br.com.king.flick_business.mapper.VendaMapper;
 
 @Service
 public class VendaService {
@@ -215,6 +219,7 @@ public class VendaService {
    * @param formaPagamentoString Forma de pagamento para filtro (opcional)
    * @return Lista de VendaResponseDTO correspondentes aos filtros
    */
+
   @Transactional(readOnly = true)
   public PageResponse<VendaResponseDTO> listarVendas(
       LocalDateTime inicio,
@@ -225,76 +230,31 @@ public class VendaService {
       String orderBy,
       int page,
       int size) {
-    System.out.println("LOG: VendaService.listarVendas - inicio: " + inicio + ", fim" + fim + ", clienteId: "
-        + clienteId + ", formaPagamentoString: " + formaPagamentoString);
+    System.out.println("LOG: VendaService.listarVendas - inicio: " + inicio + ", fim: " + fim
+        + ", clienteId: " + clienteId + ", formaPagamentoString: " + formaPagamentoString);
 
-    FormaPagamento formaPagamentoFiltro = null;
-    if (formaPagamentoString != null && !formaPagamentoString.isEmpty()) {
-      try {
-        formaPagamentoFiltro = FormaPagamento.valueOf(formaPagamentoString.toUpperCase());
-        System.out.println("LOG: VendaService.listarVendas - Filtro de forma de pagamento bem sucedido");
-      } catch (IllegalArgumentException e) {
-        System.err.println(
-            "LOG: VendaService.listarVendas - Forma de pagamento inválida recebida no filtro: " + formaPagamentoString
-                + ". Ignorando filtro de forma de pagamento.");
-      }
-    }
+    // Extrai lógica de conversão e datas padrão
+    FormaPagamento formaPagamentoFiltro = VendaMapper.parseFormaPagamento(formaPagamentoString);
+    LocalDateTime[] range = VendaMapper.buildDataRange(inicio, fim);
 
-    Sort sort;
-    if (orderBy != null && !orderBy.isBlank()) {
-      String[] parts = orderBy.split(",");
-      String property = parts[0];
-      Sort.Direction direction = (parts.length > 1 && parts[1].equalsIgnoreCase("desc")) ? Sort.Direction.DESC
-          : Sort.Direction.ASC;
-
-      switch (property) {
-        case "dataVenda" -> property = "dataVenda";
-        case "valorTotal" -> property = "valorTotal";
-        case "cliente.nome" -> property = "cliente.nome";
-        default -> {
-          System.out.println("SERVICE LOG: orderBy não reconhecida: " + property + "Usando default");
-          property = "dataVenda";
-          direction = Sort.Direction.DESC;
-        }
-      }
-      sort = Sort.by(direction, property);
-    } else {
-      sort = Sort.by(Sort.Direction.DESC, "dataVenda");
-    }
-
+    Sort sort = VendaMapper.buildSort(orderBy);
     Pageable pageable = PageRequest.of(page, size, sort);
 
     System.out.println("SERVICE: VendaService.listarVendas - Usando sort: " + sort);
-    LocalDateTime inicioQuery;
-    LocalDateTime fimQuery;
-
-    boolean algumFiltrodeConteudoAplicado = (inicio != null || fim != null || clienteId != null
-        || formaPagamentoFiltro != null || produtoId != null);
-
-    if (algumFiltrodeConteudoAplicado) {
-      inicioQuery = (inicio != null) ? inicio : LocalDateTime.of(1900, 1, 1, 0, 0);
-      fimQuery = (fim != null) ? fim : LocalDateTime.of(9999, 12, 31, 23, 59, 59);
-      System.out.println("SERVICE: Filtros aplicados. Usando para query - Inicio: " + inicioQuery + ", Fim: " + fimQuery
-          + ", ClienteId: " + clienteId + ", FormaPagamento: " + formaPagamentoFiltro);
-    } else {
-      inicioQuery = (inicio != null) ? inicio : LocalDateTime.of(1900, 1, 1, 0, 0);
-      fimQuery = (fim != null) ? fim : LocalDateTime.of(9999, 12, 31, 23, 59, 59);
-      System.out
-          .println("SERVICE: Nenhum filtro aplicado. Usando para query - Inicio: " + inicioQuery + ", Fim: " + fimQuery
-              + ", ClienteId: " + clienteId + ", FormaPagamento: " + formaPagamentoFiltro + ", Produto: " + produtoId);
-    }
+    System.out.println("SERVICE: Query - Inicio: " + range[0] + ", Fim: " + range[1]
+        + ", ClienteId: " + clienteId + ", FormaPagamento: " + formaPagamentoFiltro
+        + ", Produto: " + produtoId);
 
     Page<Venda> vendasPage = vendaRepository.findVendasComFiltros(
-        inicioQuery,
-        fimQuery,
+        range[0],
+        range[1],
         clienteId,
         formaPagamentoFiltro,
         produtoId,
         pageable);
 
     Page<VendaResponseDTO> dtoPage = vendasPage.map(VendaResponseDTO::new);
-
-    System.out.println("LOG: VendaService.listarVendas - Vendas encontradas após filtros: " + vendasPage);
+    System.out.println("LOG: VendaService.listarVendas - Vendas encontradas: " + vendasPage.getTotalElements());
     return new PageResponse<>(dtoPage);
   }
 
@@ -383,9 +343,6 @@ public class VendaService {
         clienteRepository.save(clienteDaVenda);
         System.out.println("LOG: VendaService.deletarVendaFisicamente - Saldo devedor do cliente ID " +
             clienteDaVenda.getId() + " estornado. Novo saldo: " + clienteDaVenda.getSaldoDevedor());
-      } else {
-        System.err.println("WARN: Cliente com ID " + vendaParaDeletar.getCliente().getId() +
-            " associado à venda FIADO " + vendaId + " não foi encontrado para estorno de saldo.");
       }
     }
     System.out.println("DELETE_LOG: Deletando Venda...");
@@ -394,4 +351,36 @@ public class VendaService {
         .println("LOG: VendaService.deletarVendaFisicamente - Venda ID " + vendaId + " deletada permanentemente.");
     System.out.println("DELETE_LOG: VENDA DELETADA COM SUCESSO");
   }
+
+  public List<GroupsummaryDTO> getVendassummary(
+      LocalDateTime inicio, LocalDateTime fim, Long clienteId,
+      String formaPagamentoString, Long produtoId, String groupBy) {
+    System.out.println("LOG: VendaService.getVendassummary - Iniciando resumo de vendas com filtros: "
+        + "Inicio: " + inicio + ", Fim: " + fim + ", ClienteId: " + clienteId
+        + ", FormaPagamento: " + formaPagamentoString + ", ProdutoId: " + produtoId
+        + ", GroupBy: " + groupBy);
+
+    FormaPagamento formaPagamentoFiltro = VendaMapper.parseFormaPagamento(formaPagamentoString);
+    LocalDateTime incioQuery = (inicio != null) ? inicio : LocalDateTime.of(1900, 1, 1, 0, 0, 0, 0);
+    LocalDateTime fimQuery = (fim != null) ? fim : LocalDateTime.of(9999, 12, 31, 23, 59, 59);
+
+    if ("dataVenda".equalsIgnoreCase(groupBy)) {
+      List<Object[]> results = vendaRepository.sumTotalGroupByDay(incioQuery, fimQuery, clienteId, formaPagamentoFiltro,
+          produtoId);
+      return results.stream()
+          .map(res -> new GroupsummaryDTO((String) res[0], (String) res[0], (BigDecimal) res[1]))
+          .collect(Collectors.toList());
+    }
+
+    if ("cliente.nome".equalsIgnoreCase(groupBy)) {
+      List<Object[]> results = vendaRepository.sumTotalGroupByCliente(incioQuery, fimQuery, clienteId,
+          formaPagamentoFiltro, produtoId);
+      return results.stream()
+          .map(res -> new GroupsummaryDTO(String.valueOf(res[0]), (String) res[1], (BigDecimal) res[2]))
+          .collect(Collectors.toList());
+    }
+
+    return Collections.emptyList();
+  }
+
 }

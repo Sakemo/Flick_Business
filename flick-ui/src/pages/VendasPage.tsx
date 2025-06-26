@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormaPagamento, VendaResponse } from '../types/domain';
 import { ClienteResponse } from '../types/domain';
-import { GetVendasParams, deleteVendaFisicamente, getVendas } from '../services/vendaService';
+import { GetVendasParams, GroupSummary, deleteVendaFisicamente, getVendas, getVendasSummary } from '../services/vendaService';
 import { getClientes } from '../services/clienteService';
 import Button from '../components/ui/Button';
 import { LuCalendarDays, LuCalendarX, LuPlus, LuX } from 'react-icons/lu';
@@ -32,6 +32,8 @@ const VendasPage: React.FC = () => {
   const [vendaSelecionadaDetalhes, setVendasSelecionadaDetalhes] = useState<VendaResponse | null>(
     null
   );
+
+  const [groupSummaries, setGroupSummaries] = useState<Record<string, GroupSummary>>({});
 
   const [filtroDataInicio, setFiltroDataInicio] = useState<string>('');
   const [filtroDataFim, setFiltroDataFim] = useState<string>('');
@@ -69,63 +71,41 @@ const VendasPage: React.FC = () => {
     }
 
     const newRows: TableRow[] = [];
-    let currentGroupKey: string | null = null;
-    let currentGroupItems: VendaResponse[] = [];
-
-    const finalizeGroup = () => {
-      if (currentGroupItems.length > 0 && currentGroupKey){
-        const groupTotal = currentGroupItems.reduce((sum, item) => sum + item.valorTotal, 0);
-
-        let groupTitle = '';
-        if (orderProperty === 'dataVenda'){
-          const originalDateString = currentGroupItems[0].dataVenda;
-          groupTitle = `Total de ${formatVendaDate(originalDateString, false)}`
-
-          console.log('finalizeGroup: dataVenda group', { originalDateString, groupTitle, groupTotal, currentGroupItems });
-        } else if (orderProperty === 'cliente.nome') {
-          const clientName = currentGroupItems[0].cliente?.nome || 'Não identificado';
-          groupTitle = `Total de ${clientName}`;
-          console.log('finalizeGroup: cliente.nome group', { clientName, groupTitle, groupTotal, currentGroupItems });
-        } else {
-          groupTitle = `Total`;
-          console.log('finalizeGroup: outro group', { groupTitle, groupTotal, currentGroupItems });
-        }
-
-        newRows.push ({
-          isGroupHeader: true,
-          groupKey:currentGroupKey,
-          title: groupTitle,
-          value: groupTotal,
-          itemCount: currentGroupItems.length
-        });
-
-        newRows.push(...currentGroupItems);
-
-        currentGroupItems = [];
-      }
-    };
+    const addedHeaders = new Set<string>();
 
     for (const venda of vendas){
       let itemGroupKey = '';
-      if (orderProperty === 'dataVenda'){
+      if (orderProperty === 'dataVenda') {
         itemGroupKey = venda.dataVenda.split('T')[0];
       } else if (orderProperty === 'cliente.nome'){
         itemGroupKey = venda.cliente?.id.toString() || 'no-client';
       }
 
-      if (itemGroupKey !== currentGroupKey){
-        console.log('processedVendas: mudando de grupo', { de: currentGroupKey, para: itemGroupKey });
-        finalizeGroup();
-        currentGroupKey = itemGroupKey;
+      if(itemGroupKey && !addedHeaders.has(itemGroupKey)){
+        const summary = groupSummaries[itemGroupKey];
+        if(summary){
+          let headerTitle = '';
+          if (orderProperty === 'dataVenda'){
+            headerTitle = `Total de ${formatVendaDate(summary.groupTitle, false)}`;
+          }  else if (orderProperty === 'cliente.nome'){
+            headerTitle =  `Total de ${summary.groupTitle}`;
+          }
+          
+          newRows.push({
+            isGroupHeader: true,
+            groupKey: summary.groupKey,
+            title: headerTitle,
+            value: summary.totalValue,
+            itemCount: 0
+          });
+          addedHeaders.add(itemGroupKey);
+        }
       }
-
-      currentGroupItems.push(venda);
+      newRows.push(venda);
     }
-    finalizeGroup();
 
-    console.log('processedVendas: newRows final', newRows);
     return newRows;
-  }, [vendas, ordemVendas])
+  }, [vendas, ordemVendas, groupSummaries])
 
   const fetchVendas = useCallback(async () => {
     setLoading(true);
@@ -137,11 +117,21 @@ const VendasPage: React.FC = () => {
       if (filtroClienteId) params.clienteId = parseInt(filtroClienteId);
       if (filtroFormaPagamento) params.formaPagamento = filtroFormaPagamento;
       if (filtroProduto) params.produtoId = filtroProduto.value;
+      params.page = currentPage; params.size = 8;
       if (ordemVendas) params.orderBy = ordemVendas;
 
-      const pageResponse = await getVendas(params);
+      const [pageResponse, summaryResponse] = await Promise.all([
+        getVendas(params),
+        getVendasSummary(params)
+      ]);
       setVendas(pageResponse.content);
       setTotalPages(pageResponse.totalPages);
+
+      const summaryMap = summaryResponse.reduce((acc, summary) => {
+        acc[summary.groupKey] = summary;
+        return acc;
+      }, {} as Record<string, GroupSummary>);
+      setGroupSummaries(summaryMap);
     } catch (err) {
       setError('Erro ao buscar vendas');
       console.error('Erro ao buscar vendas:', err);

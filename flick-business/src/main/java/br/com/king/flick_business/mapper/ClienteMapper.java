@@ -1,7 +1,7 @@
 package br.com.king.flick_business.mapper;
 
-import br.com.king.flick_business.dto.ClienteRequestDTO;
-import br.com.king.flick_business.dto.ClienteResponseDTO;
+import br.com.king.flick_business.dto.request.ClienteRequestDTO;
+import br.com.king.flick_business.dto.response.ClienteResponseDTO;
 import br.com.king.flick_business.entity.Cliente;
 
 import java.util.List;

@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import br.com.king.flick_business.dto.ClienteRequestDTO;
-import br.com.king.flick_business.dto.ClienteResponseDTO;
+import br.com.king.flick_business.dto.request.ClienteRequestDTO;
+import br.com.king.flick_business.dto.response.ClienteResponseDTO;
 import br.com.king.flick_business.service.ClienteService;
 import jakarta.validation.Valid;
 

@@ -18,6 +18,11 @@ export interface GetVendasParams {
   page?: number;
   size?: number;
 }
+export interface GroupSummary {
+  groupKey: string;
+  groupTitle: string;
+  totalValue: number;
+}
 
 export const getVendas = async (params?: GetVendasParams):Promise<PageResponse<VendaResponse>> => {
   try {
@@ -28,6 +33,24 @@ export const getVendas = async (params?: GetVendasParams):Promise<PageResponse<V
     return response.data;
   } catch (error) {
     console.error("Frontend: Erro ao buscar vendas: ", error);
+    throw error;
+  }
+};
+
+export const getVendasSummary = async (params:GetVendasParams):Promise<GroupSummary[]> => {
+  const groupBy = params.orderBy?.split(',')[0];
+  if (!groupBy) return [];
+
+  const queryParams = { ...params, groupBy };
+  delete (queryParams as any).orderBy;
+  delete (queryParams as any).page;
+  delete (queryParams as any).size;
+
+  try {
+    const response = await apiClient.get<GroupSummary[]>('/api/vendas/summary-by-group', { params: queryParams });
+    return response.data;
+  } catch (error){
+    console.error("Erro ao buscar resumo de vendas: ", error);
     throw error;
   }
 };

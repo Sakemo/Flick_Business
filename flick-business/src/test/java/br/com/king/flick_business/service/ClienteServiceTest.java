@@ -27,8 +27,8 @@ import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 
-import br.com.king.flick_business.dto.ClienteRequestDTO;
-import br.com.king.flick_business.dto.ClienteResponseDTO;
+import br.com.king.flick_business.dto.request.ClienteRequestDTO;
+import br.com.king.flick_business.dto.response.ClienteResponseDTO;
 import br.com.king.flick_business.entity.Cliente;
 import br.com.king.flick_business.exception.RecursoJaCadastrado;
 import br.com.king.flick_business.repository.ClienteRepository;

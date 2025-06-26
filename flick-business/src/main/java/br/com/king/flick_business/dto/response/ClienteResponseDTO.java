@@ -1,4 +1,4 @@
-package br.com.king.flick_business.dto;
+package br.com.king.flick_business.dto.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

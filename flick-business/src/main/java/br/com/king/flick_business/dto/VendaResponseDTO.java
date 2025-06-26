@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import br.com.king.flick_business.dto.response.ClienteResponseDTO;
+import br.com.king.flick_business.dto.response.ItemVendaResponseDTO;
 import br.com.king.flick_business.entity.Venda;
 import br.com.king.flick_business.enums.FormaPagamento;
 

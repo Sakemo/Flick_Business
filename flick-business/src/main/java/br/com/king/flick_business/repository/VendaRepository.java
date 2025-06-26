@@ -48,6 +48,32 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
                         @Param("produtoId") Long produtoId,
                         Pageable pageable);
 
+        // Retorna uma lista de Object[], onde cada array é [Data (como String), Total
+        // (BigDecimal)]
+        @Query("SELECT FUNCTION('TO_CHAR', v.dataVenda, 'YYYY-MM-DD'), SUM(v.valorTotal) " +
+                        "FROM Venda v WHERE     " + "v.dataVenda BETWEEN :inicio AND :fim AND "
+                        + "(:clienteId IS NULL OR v.cliente.id = :clienteId) AND "
+                        + "(:formaPagamento IS NULL OR v.formaPagamento = :formaPagamento) AND "
+                        + "(:produtoId IS NULL OR EXISTS (SELECT 1 FROM ItemVenda i WHERE i.venda = v AND i.produto.id = :produtoId)) "
+                        + "GROUP BY FUNCTION('TO_CHAR', v.dataVenda, 'YYYY-MM-DD')")
+        List<Object[]> sumTotalGroupByDay(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim,
+                        @Param("clienteId") Long clienteId, @Param("formaPagamento") FormaPagamento formaPagamento,
+                        @Param("produtoId") Long produtoId);
+
+        // Retorna uma lista de Object[], onde cada array é [ID do Cliente (Long), Nome
+        // do Cliente (String), Total (BigDecimal)]
+        @Query("SELECT v.cliente.id, v.cliente.nome, SUM(v.valorTotal) " +
+                        "FROM Venda v WHERE " +
+                        "v.dataVenda BETWEEN :inicio AND :fim AND " +
+                        "(:clienteId IS NULL OR v.cliente.id = :clienteId) AND " +
+                        "(:formaPagamento IS NULL OR v.formaPagamento = :formaPagamento) AND " +
+                        "(:produtoId IS NULL OR EXISTS (SELECT 1 FROM ItemVenda i WHERE i.venda = v AND i.produto.id = :produtoId)) "
+                        +
+                        "GROUP BY v.cliente.id, v.cliente.nome")
+        List<Object[]> sumTotalGroupByCliente(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim,
+                        @Param("clienteId") Long clienteId, @Param("formaPagamento") FormaPagamento formaPagamento,
+                        @Param("produtoId") Long produtoId);
+
         // =========================
         // MÉTODOS PARA RELATÓRIOS
         // =========================

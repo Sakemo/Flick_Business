@@ -27,8 +27,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import br.com.king.flick_business.dto.DespesaRequestDTO;
-import br.com.king.flick_business.dto.DespesaResponseDTO;
+import br.com.king.flick_business.dto.request.DespesaRequestDTO;
+import br.com.king.flick_business.dto.response.DespesaResponseDTO;
 import br.com.king.flick_business.entity.Despesa;
 import br.com.king.flick_business.enums.TipoDespesa;
 import br.com.king.flick_business.exception.RecursoNaoEncontrado;

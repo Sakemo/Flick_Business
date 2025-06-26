@@ -2,6 +2,7 @@ package br.com.king.flick_business.controller;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import br.com.king.flick_business.dto.PageResponse;
 import br.com.king.flick_business.dto.VendaRequestDTO;
 import br.com.king.flick_business.dto.VendaResponseDTO;
+import br.com.king.flick_business.dto.response.PageResponse;
 import br.com.king.flick_business.service.VendaService;
+import br.com.king.flick_business.dto.response.GroupsummaryDTO;
 import jakarta.validation.Valid;
 
 @RestController
@@ -87,6 +89,19 @@ public class VendaController {
     System.out.println(
         "LOG: VendaController.listarVendas - Quantidade de vendas encontradas: " + paginatedResponse.getSize());
     return ResponseEntity.ok(paginatedResponse);
+  }
+
+  @GetMapping("/summary-by-group")
+  public ResponseEntity<List<GroupsummaryDTO>> getVendassummary(
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
+      @RequestParam(required = false) Long clienteId,
+      @RequestParam(required = false) String formaPagamento,
+      @RequestParam(required = false) Long produtoId,
+      @RequestParam(required = true) String groupBy) {
+    List<GroupsummaryDTO> summary = vendaService.getVendassummary(inicio, fim, clienteId, formaPagamento, produtoId,
+        groupBy);
+    return ResponseEntity.ok(summary);
   }
 
   /**

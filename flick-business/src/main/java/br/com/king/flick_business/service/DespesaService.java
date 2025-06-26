@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.king.flick_business.dto.DespesaRequestDTO;
-import br.com.king.flick_business.dto.DespesaResponseDTO;
+import br.com.king.flick_business.dto.request.DespesaRequestDTO;
+import br.com.king.flick_business.dto.response.DespesaResponseDTO;
 import br.com.king.flick_business.entity.Despesa;
 import br.com.king.flick_business.enums.TipoDespesa;
 import br.com.king.flick_business.exception.BusinessException;

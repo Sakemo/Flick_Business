@@ -32,10 +32,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import br.com.king.flick_business.dto.ItemVendaRequestDTO;
-import br.com.king.flick_business.dto.PageResponse;
 import br.com.king.flick_business.dto.VendaRequestDTO;
 import br.com.king.flick_business.dto.VendaResponseDTO;
+import br.com.king.flick_business.dto.request.ItemVendaRequestDTO;
+import br.com.king.flick_business.dto.response.PageResponse;
 import br.com.king.flick_business.entity.Cliente;
 import br.com.king.flick_business.entity.ItemVenda;
 import br.com.king.flick_business.entity.Produto;

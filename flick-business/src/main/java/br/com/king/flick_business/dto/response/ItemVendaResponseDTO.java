@@ -1,7 +1,8 @@
-package br.com.king.flick_business.dto;
+package br.com.king.flick_business.dto.response;
 
 import java.math.BigDecimal;
 
+import br.com.king.flick_business.dto.ProdutoResponseDTO;
 import br.com.king.flick_business.entity.ItemVenda;
 
 public record ItemVendaResponseDTO(

@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 
-import br.com.king.flick_business.dto.DespesaRequestDTO;
-import br.com.king.flick_business.dto.DespesaResponseDTO;
+import br.com.king.flick_business.dto.request.DespesaRequestDTO;
+import br.com.king.flick_business.dto.response.DespesaResponseDTO;
 import br.com.king.flick_business.service.DespesaService;
 import jakarta.validation.Valid;
 

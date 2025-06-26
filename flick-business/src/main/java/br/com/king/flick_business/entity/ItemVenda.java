@@ -34,8 +34,8 @@ public class ItemVenda {
 
   // -- INFORMADO -- //
   @NotNull(message = "A quantidade é obrigatória.")
-  @DecimalMin(value = "0.01", message = "A quantidade deve ser maior que zero.")
-  @Digits(integer = 8, fraction = 2, message = "Quantidade inválida: máximo de 8 dígitos inteiros e 2 decimais.")
+  @DecimalMin(value = "0.001", message = "A quantidade deve ser maior que zero.")
+  @Digits(integer = 8, fraction = 3, message = "Quantidade inválida: máximo de 8 dígitos inteiros e 3 decimais.")
   @Column(nullable = false, precision = 11, scale = 3)
   private BigDecimal quantidade;
 

@@ -40,7 +40,7 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
   const [itensVenda, setItensVenda] = useState<ItemFormState[]>([]);
 
   const [produtoSelecionadoId, setProdutoSelecionadoId] = useState<string>('');
-  const [quantidadeProduto, setQuantidadeProduto] = useState<number | string>(1);
+  const [quantidadeProduto, setQuantidadeProduto] = useState<string>('1');
 
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -66,19 +66,19 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
   useEffect(() => {
     if (isOpen) {
       fetchData();
-      // Restar form
       setClienteId('');
       setFormaPagamento(FormaPagamento.DINHEIRO);
       setObservacoes('');
       setItensVenda([]);
       setProdutoSelecionadoId('');
-      setQuantidadeProduto(1);
+      setQuantidadeProduto('1');
       setErrors({});
     }
   }, [isOpen, fetchData]);
 
   const handleAddItem = () => {
-    if (!produtoSelecionadoId || Number(quantidadeProduto) <= 0) {
+    const quantidadeProdutoNumber = parseFloat(quantidadeProduto);
+    if (!produtoSelecionadoId || isNaN(quantidadeProdutoNumber) || quantidadeProdutoNumber <= 0) {
       setErrors((prev) => ({ ...prev, item: 'Selecione um produto e quantidade válida.' }));
       return;
     }
@@ -106,7 +106,7 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
       ]);
     }
     setProdutoSelecionadoId('');
-    setQuantidadeProduto(1);
+    setQuantidadeProduto('1');
     setErrors((prev) => ({ ...prev, item: '' }));
   };
 
@@ -233,18 +233,18 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
               <Input
                 label="Quantidade"
                 type="number"
-                min="0.001"
-                step="any"
+                min="0"
+                step="1"
                 name="quantidadeProduto"
                 value={quantidadeProduto}
-                onChange={(e) => setQuantidadeProduto(parseFloat(e.target.value) || 0)}
+                onChange={(e) => setQuantidadeProduto(e.target.value)}
                 error={errors.item}
               />
               <Button
                 type="button"
                 onClick={handleAddItem}
                 iconLeft={<LuPlus />}
-                disabled={isLoading || !produtoSelecionadoId || Number(quantidadeProduto) <= 0}
+                disabled={isLoading || !produtoSelecionadoId || parseFloat(quantidadeProduto) <= 0}
               >
                 Adicionar
               </Button>

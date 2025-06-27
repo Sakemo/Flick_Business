@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   FormaPagamento,
   ItemVendaRequest,
   ProdutoResponse,
   VendaRequest,
+  TipoUnidadeVenda
 } from '../../types/domain';
 import { ClienteResponse } from '../../types/domain';
 import { getClientes } from '../../services/clienteService';
@@ -45,6 +46,12 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const produtoSelecionado = useMemo(() => {
+    if (!produtoSelecionadoId) return null;
+    return produtosDisponiveis.find(p => p.id === parseInt(produtoSelecionadoId));
+
+  }, [produtoSelecionadoId, produtosDisponiveis]);
+
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -76,20 +83,30 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
     }
   }, [isOpen, fetchData]);
 
+  const handleCountChange = (value: string) => {
+    if (produtoSelecionado != null && produtoSelecionado.tipoUnidadeVenda === TipoUnidadeVenda.UNIDADE){
+      const totalValue = value.replace(/[^0-9]/g, '');
+      setQuantidadeProduto(totalValue);
+    } else {
+      setQuantidadeProduto(value);
+    }
+  }
+
   const handleAddItem = () => {
     const quantidadeProdutoNumber = parseFloat(quantidadeProduto);
-    if (!produtoSelecionadoId || isNaN(quantidadeProdutoNumber) || quantidadeProdutoNumber <= 0) {
+
+    if (produtoSelecionado == null ||!produtoSelecionadoId || isNaN(quantidadeProdutoNumber) || quantidadeProdutoNumber <= 0) {
       setErrors((prev) => ({ ...prev, item: 'Selecione um produto e quantidade válida.' }));
+      return; 
+    }
+
+    if (produtoSelecionado?.tipoUnidadeVenda === TipoUnidadeVenda.UNIDADE && !Number.isInteger(quantidadeProdutoNumber)){
+      setErrors((prev) => ({ ...prev, item: 'Este produto só pode ser vendido em quantidades inteiras.' }));
       return;
     }
 
-    const produto = produtosDisponiveis.find((p) => p.id === parseInt(produtoSelecionadoId));
-    if (!produto) {
-      setErrors((prev) => ({ ...prev, item: 'Produto não encontrado.' }));
-      return;
-    }
+    const itemExistenteIndex = itensVenda.findIndex((item) => item.idProduto === produtoSelecionado?.id);
 
-    const itemExistenteIndex = itensVenda.findIndex((item) => item.idProduto === produto.id);
     if (itemExistenteIndex > -1) {
       const novosItens = [...itensVenda];
       novosItens[itemExistenteIndex].quantidade += Number(quantidadeProduto);
@@ -98,14 +115,13 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
       setItensVenda((prev) => [
         ...prev,
         {
-          idProduto: produto.id,
+          idProduto: produtoSelecionado.id,
           quantidade: Number(quantidadeProduto),
-          nomeProduto: produto.nome,
-          precoVendaProduto: produto.precoVenda,
+          nomeProduto: produtoSelecionado.nome,
+          precoVendaProduto: produtoSelecionado.precoVenda,
         },
       ]);
     }
-    setProdutoSelecionadoId('');
     setQuantidadeProduto('1');
     setErrors((prev) => ({ ...prev, item: '' }));
   };
@@ -234,10 +250,10 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
                 label="Quantidade"
                 type="number"
                 min="0"
-                step="1"
+                step={produtoSelecionado?.tipoUnidadeVenda === TipoUnidadeVenda.UNIDADE ? '1' : '0.001'}
                 name="quantidadeProduto"
                 value={quantidadeProduto}
-                onChange={(e) => setQuantidadeProduto(e.target.value)}
+                onChange={(e) => handleCountChange(e.target.value)}
                 error={errors.item}
               />
               <Button

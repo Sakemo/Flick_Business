@@ -1,0 +1,21 @@
+{
+  "vendas": {
+    "title": "Vendas",
+    "registerNewSale": "Registrar Nova Venda",
+    "filterByProduct": "Filtrar por Produto",
+    "searchProductPlaceholder": "Digite para buscar produto...",
+    "client": "Cliente",
+    "allClients": "Todos os clientes",
+    "paymentMethod": "Forma de Pagamento",
+    "allMethods": "Todas as formas"
+  },
+  "common": {
+    "add": "Adicionar",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "close": "Fechar",
+    "actions": "Ações",
+    "loading": "Carregando...",
+    "noDataFound": "Nenhum dado encontrado"
+  }
+}

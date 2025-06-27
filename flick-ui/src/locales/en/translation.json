@@ -1,0 +1,21 @@
+{
+  "vendas": {
+    "title": "Sales",
+    "registerNewSale": "Register New Sale",
+    "filterByProduct": "Filter by Product",
+    "searchProductPlaceholder": "Type to search product...",
+    "client": "Client",
+    "allClients": "All Clients",
+    "paymentMethod": "Payment Method",
+    "allMethods": "All Methods"
+  },
+  "common": {
+    "add": "Add",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "actions": "Actions",
+    "loading": "Loading...",
+    "noDataFound": "No data found"
+  }
+}

@@ -6,7 +6,9 @@ import Modal from '../common/Modal';
 import Input from '../ui/Input';
 import Textarea from '../ui/Textarea';
 import Button from '../ui/Button';
-
+import { useTranslation
+  
+ } from 'react-i18next';
 interface ClienteFormModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -20,6 +22,7 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
   onSaveSuccess,
   clienteInicial,
 }) => {
+  const { t } = useTranslation();
   const isEditMode = !!clienteInicial;
   const [formData, setFormData] = useState<Partial<ClienteRequest>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -71,7 +74,7 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
     if (!formData.nome || formData.nome.trim().length < 2) {
-      newErrors.nome = 'Nome é obrigatório (mínimo 2 caracteres)';
+      newErrors.nome = t('clientes.form.validation.nameRequired', 'Nome é obrigatório (mínimo 2 caracteres)');
     }
     if (
       formData.cpf &&
@@ -79,7 +82,7 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
       formData.limiteFiado !== undefined &&
       formData.limiteFiado < 0
     ) {
-      newErrors.limiteFiado = 'Limite de fiado não pode ser negativo';
+      newErrors.limiteFiado = t('clientes.form.validation.limitNonNegative','Limite de fiado não pode ser negativo');
     }
 
     setErrors(newErrors);
@@ -116,7 +119,7 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
       console.error('Erro ao salvar cliente: ', error);
       const errorMsg =
         error.response?.data?.message ||
-        (isEditMode ? 'Erro ao atualizar cliente' : 'Erro ao criar cliente');
+        (isEditMode ? t('clientes.form.error.updateFailed') : t('clientes.form.error.createFailed'));
       setErrors({ form: errorMsg });
     } finally {
       setIsLoading(false);
@@ -127,13 +130,13 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditMode ? 'Editar Cliente' : 'Adicionar Novo Cliente'}
+      title={isEditMode ? t('clientes.form.editTitle') : t('clientes.form.title')}
       className="sm:max-w-lg md:max-w-xl"
     >
       <form onSubmit={handleSubmit}>
         <div className="p-6 space-y-4">
           <Input
-            label="Nome Completo *"
+            label={t('clientes.form.fullName')}
             name="nome"
             value={formData.nome || ''}
             onChange={handleChange}
@@ -141,7 +144,7 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
             required
           />
           <Input
-            label="CPF"
+            label={t('clientes.form.cpf')}
             name="cpf"
             value={formData.cpf || ''}
             onChange={handleChange}
@@ -149,7 +152,7 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
             maxLength={11}
           />
           <Input
-            label="Telefone"
+            label={t('clientes.form.phone')}
             name="telefone"
             type="tel"
             value={formData.telefone || ''}
@@ -158,7 +161,7 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
             maxLength={11}
           />
           <Textarea
-            label="Endereço"
+            label={t('clientes.form.address')}
             name="endereco"
             value={formData.endereco || ''}
             onChange={handleChange}
@@ -168,7 +171,7 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
 
           <div className="pt-4 border-t border-border-light dark:border-border-dark">
             <h3 className="text-sm font-medium text-text-primary dark:text-white mb-2">
-              Controle de Fiado
+                {t('clientes.form.creditControlTitle')}
             </h3>
             <div className="flex items-center space-x-3">
               <input
@@ -183,12 +186,12 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
                 htmlFor="controleFiado"
                 className="text-sm text-text-secondary dark:text-gray-300"
               >
-                Permitir compras no fiado para este cliente?
+                {t('clientes.form.allowCredit')}
               </label>
             </div>
             {formData.controleFiado && (
               <Input
-                label="Limite de Crédito Fiado"
+                label={t('clientes.form.creditLimit')}
                 name="limiteFiado"
                 type="number"
                 step="0.01"
@@ -211,7 +214,7 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
               className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
             />
             <label htmlFor="ativo" className="ml-2 text-sm text-text-secondary dark:text-gray-300">
-              Cliente Ativo
+              {t('clientes.form.activeClient')}
             </label>
           </div>
 
@@ -219,10 +222,10 @@ const ClienteFormModal: React.FC<ClienteFormModalProps> = ({
         </div>
         <div className="bg-gray-50 dark:bg-gray-800 px-6 py-4 flex justify-end space-x-3">
           <Button type="button" variant="secondary" onClick={onClose} disabled={isLoading}>
-            Cancelar
+            {t('userActions.cancel')}
           </Button>
           <Button type="submit" variant="primary" isLoading={isLoading}>
-            {isEditMode ? 'Salvar Alterações' : 'Criar Cliente'}
+            {isEditMode ? t('userActions.saveChanges') : t('userActions.add')}
           </Button>
         </div>
       </form>

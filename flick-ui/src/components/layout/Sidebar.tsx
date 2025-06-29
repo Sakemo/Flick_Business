@@ -12,6 +12,7 @@ import {
 } from 'react-icons/lu';
 import clsx from 'clsx';
 import { useDarkMode } from '../../hooks/useDarkMode';
+import LanguageSelector from '../common/LanguageSelector';
 
 interface SidebarItem {
   path: string;
@@ -81,6 +82,7 @@ const Sidebar: React.FC = () => {
           />
           {settingsItem.name}
         </NavLink>
+        <LanguageSelector />
       </div>
       <button onClick={toggleTheme} className={clsx(linkClasses, 'w-full justify-start')}>
         {theme === 'light' ? (

@@ -14,6 +14,7 @@ import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
 import ClienteCard from '../components/clientes/ClienteCard';
 import ClienteFormModal from '../components/clientes/ClienteFormModal';
+import { useTranslation } from 'react-i18next';
 
 type FiltroAtivos = 'todos' | 'ativos' | 'inativos';
 type OrdemCliente =
@@ -25,8 +26,9 @@ type OrdemCliente =
   | 'cadastroAntigo';
 type FiltroDevedores = 'todos' | 'devedores' | 'naoDevedores';
 // type FiltroStatusFiado = 'todos' | 'emDia' | 'aVencer' | 'atrasado';
-
 const ClientesPage: React.FC = () => {
+  const { t } = useTranslation();
+
   const [clientes, setClientes] = useState<ClienteResponse[]>([]);
   const [configGeral, setConfigGeral] = useState<ConfiguracaoGeralResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -61,12 +63,12 @@ const ClientesPage: React.FC = () => {
       //TODO: Se o filtro de status fiado for no frontend, aplicar aqui sobre 'data'
       setClientes(data);
     } catch (err) {
-      setError('Falha ao carregar clientes');
+      setError(t('siteFeedback.error'));
       console.error(err);
     } finally {
       setLoading(false);
     }
-  }, [ordem, filtroDevedor, termoBuscaNome, filtroAtividade]);
+  }, [ordem, filtroDevedor, termoBuscaNome, filtroAtividade, t]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fetchConfig = useCallback(async () => {
@@ -110,16 +112,16 @@ const ClientesPage: React.FC = () => {
   };
 
   const handdleToggleAtivo = async (id: number, nomeCliente: string, estadoAtual: boolean) => {
-    const acao = estadoAtual ? 'INATIVAR' : 'ATIVAR';
+    const acao = estadoAtual ? t('siteFeedback.inactive') : t('siteFeedback.active');
     //TODO: Modal de confirmação
-    if (window.confirm(`Tem certeza que deseja ${acao} o cliente "${nomeCliente}"`)) {
+    if (window.confirm(`${t('userActions.confirm')}: ${acao} ${t('clientes.objectName').toLowerCase()} "${nomeCliente}"?`)) {
       try {
         setLoading(true);
         await toggleAtividadeCliente(id, !estadoAtual);
         fetchClientes();
       } catch (err) {
         const axiosError = err as import('axios').AxiosError<{ message?: string }>;
-        setError(axiosError.response?.data?.message || `Falha ao ${acao.toLowerCase()} cliente`);
+        setError(axiosError.response?.data?.message || t('siteFeedback.error'));
         console.error(err);
       } finally {
         setLoading(false);
@@ -131,7 +133,7 @@ const ClientesPage: React.FC = () => {
     //TODO: Modal de confirmacao
     if (
       window.confirm(
-        `ATENÇÃO: Deletar PEMANENTEMENTE o cliente ${nomeCliente}? Esta ação é IRREVERSÍVEL`
+        `${t('userActions.delete')}${t('clientes.objectName')} ${nomeCliente}? ${t('userActions.no')} ${t('userActions.cancel')}.`
       )
     ) {
       try {
@@ -140,7 +142,7 @@ const ClientesPage: React.FC = () => {
         fetchClientes();
       } catch (err) {
         const axiosError = err as import('axios').AxiosError<{ message?: string }>;
-        setError(axiosError.response?.data?.message || `Falha ao deletar cliente.`);
+        setError(axiosError.response?.data?.message || t('siteFeedback.deleteError'));
         console.error(err);
       } finally {
         setLoading(false);
@@ -156,10 +158,10 @@ const ClientesPage: React.FC = () => {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl lg:text-3xl font-semibold text-text-primary dark:text-white">
-          Gerenciamento de Clientes
+          {t('clientes.title')}
         </h1>
         <Button onClick={handleOpenAddModal} iconLeft={<LuPlus className="mr-1" />}>
-          Novo Cliente
+          {t('userActions.add')}{t('clientes.objectName')}
         </Button>
       </div>
 
@@ -174,8 +176,8 @@ const ClientesPage: React.FC = () => {
               }
             >
               <Input
-                label="Buscar por Nome"
-                placeholder="Digite o nome..."
+                label={t('userActions.searchBy') + t('common.name')}
+                placeholder={t('userActions.searchBy') + t('common.name') + '...'}
                 name={termoBuscaNome}
                 value={termoBuscaNome}
                 onChange={(e) => setTermoBuscaNome(e.target.value)}
@@ -191,47 +193,47 @@ const ClientesPage: React.FC = () => {
           </div>
 
           <Select
-            label="Mostrar Clientes"
+            label={t('userActions.all')}
             name="filtroAtividade"
             value={filtroAtividade}
             onChange={(e) => setFiltroAtividade(e.target.value as FiltroAtivos)}
           >
-            <option value="ativos">Apenas Ativos</option>
-            <option value="inativos">Apenas Inativos</option>
-            <option value="todos">Todos</option>
+            <option value="ativos">{t('siteFeedback.active')}</option>
+            <option value="inativos">{t('siteFeedback.inactive')}</option>
+            <option value="todos">{t('userActions.all')}</option>
           </Select>
 
           <Select
-            label="Ordernar por"
+            label={t('filter.orderBy')}
             name="ordem"
             value={ordem}
             onChange={(e) => setOrdem(e.target.value as OrdemCliente)}
           >
-            <option value="nomeAsc">Nome (A-Z)</option>
-            <option value="nomeDesc">Nome (Z-A)</option>
-            <option value="saldoDesc">Maior Fiado</option>
-            <option value="saldoAsc">Menor Fiado</option>
-            <option value="cadastroRecente">Mais Recente</option>
-            <option value="cadastroAntigo"> Mais Antigo</option>
+            <option value="nomeAsc">{t('common.name')} (A-Z)</option>
+            <option value="nomeDesc">{t('common.name')} (Z-A)</option>
+            <option value="saldoDesc">{t('filter.highestValue')}</option>
+            <option value="saldoAsc">{t('filter.lowestValue')}</option>
+            <option value="cadastroRecente">{t('filter.mostRecent')}</option>
+            <option value="cadastroAntigo">{t('filter.oldest')}</option>
           </Select>
           <Select
-            label="Filtrar Devedores"
+            label={t('clientes.onCredit')}
             name="filtroDevedor"
             value={filtroDevedor}
             onChange={(e) => setFiltroDevedor(e.target.value as FiltroDevedores)}
           >
-            <option value="todos">Todos</option>
-            <option value="devedores">Apenas Fiado</option>
-            <option value="naoDevedores">Apenas Em Dia</option>
+            <option value="todos">{t('userActions.all')}</option>
+            <option value="devedores">{t('clientes.onCredit')}</option>
+            <option value="naoDevedores">{t('userActions.no')}</option>
           </Select>
         </div>
       </Card>
 
-      {loading && <p className="p-6 text-center">Carregando clientes...</p>}
+      {loading && <p className="p-6 text-center">{t('siteFeedback.loading')}</p>}
       {error && <p className="p-6 text-center text-red-500">{error}</p>}
       {!loading && !error && clientes.length === 0 && (
         <Card>
-          <p className="p-6 text-center text-text-secondary">Nenhum cliente cadastrado</p>
+          <p className="p-6 text-center text-text-secondary">{t('siteFeedback.noData')}</p>
         </Card>
       )}
       {!loading && !error && clientes.length > 0 && (
@@ -260,5 +262,4 @@ const ClientesPage: React.FC = () => {
     </div>
   );
 };
-
 export default ClientesPage;

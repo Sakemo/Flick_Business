@@ -18,8 +18,10 @@ import { AxiosError } from 'axios';
 import Pagination from '../components/common/Pagination';
 import { TableRow } from '../hooks/GroupHeader';
 import { formatVendaDate } from '../utils/formatters';
+import { useTranslation } from 'react-i18next';
 
 const VendasPage: React.FC = () => {
+  const { t } = useTranslation(); 
   const [vendas, setVendas] = useState<VendaResponse[]>([]);
   const [clientes, setClientes] = useState<ClienteResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -45,12 +47,12 @@ const VendasPage: React.FC = () => {
   const [todosOsProdutos, setTodosOsProdutos] = useState<{ value: number; label: string }[]>([]);
 
   const opcoesOrdenacaoVendas = [
-    { value: 'dataVenda,desc', label: 'Mais Recentes' },
-    { value: 'dataVenda,asc', label: 'Mais Antigo' },
-    { value: 'valorTotal,desc', label: 'Maior Valor' },
-    { value: 'valorTotal,asc', label: 'Menor Valor' },
-    { value: 'cliente.nome,asc', label: 'Cliente (A-Z)' },
-    { value: 'cliente.nome,desc', label: 'Cliente (Z-A)' },
+    { value: 'dataVenda,desc', label: t('filter.mostRecent') },
+    { value: 'dataVenda,asc', label: t('filter.oldest') },
+    { value: 'valorTotal,desc', label: t('filter.highestValue') },
+    { value: 'valorTotal,asc', label: t('filter.lowestValue') },
+    { value: 'cliente.nome,asc', label: `${t('clientes.objectName')} (A-Z)` },
+    { value: 'cliente.nome,desc', label: `${(t('clientes.objectName'))} (Z-A)` },
   ];
 
   const [ordemVendas, setOrdemVendas] = useState<string>(opcoesOrdenacaoVendas[0].value);
@@ -274,11 +276,11 @@ const VendasPage: React.FC = () => {
                 )
               }
             >
-              {filtroHojeAtivo ? 'Ver tudo' : 'Vendas do dia'}
+              {filtroHojeAtivo ? t('userActions.viewAll') : t('userActions.daySells')}
             </Button>
           </div>
           <Input
-            label="Data Início"
+            label={t('filter.dateStart')}
             type="date"
             value={filtroDataInicio}
             onChange={(e) => {
@@ -288,7 +290,7 @@ const VendasPage: React.FC = () => {
             disabled={loading}
           />
           <Input
-            label="Data Fim"
+            label={t('filter.dateEnd')}
             type="date"
             value={filtroDataFim}
             onChange={(e) => {
@@ -298,7 +300,7 @@ const VendasPage: React.FC = () => {
             disabled={loading}
           />
           <AutoCompleteInput
-            label="Filtrar por Produto"
+            label={`${t('filter.filterByProduct')}`}
             placeholder="Digite para buscar produto..."
             options={todosOsProdutos}
             value={filtroProduto}
@@ -309,7 +311,7 @@ const VendasPage: React.FC = () => {
             // isLoading={loadingProdutosAutocomplete} // Se tiver loading separado
           />
           <Select
-            label="Cliente"
+            label={t('clientes.objectName')}
             value={filtroClienteId}
             onChange={(e) => setFiltroClienteId(e.target.value)}
           >
@@ -321,7 +323,7 @@ const VendasPage: React.FC = () => {
             ))}
           </Select>
           <Select
-            label="Forma de Pagamento"
+            label={t('common.paymentMethod')}
             value={filtroFormaPagamento}
             onChange={(e) => setFiltroFormaPagamento(e.target.value)}
           >
@@ -336,7 +338,7 @@ const VendasPage: React.FC = () => {
             <LuX />
           </Button>
           <Select
-            label="Ordenar Por"
+            label={t('filter.orderBy')}
             value={ordemVendas}
             onChange={(e) => setOrdemVendas(e.target.value)}
           >

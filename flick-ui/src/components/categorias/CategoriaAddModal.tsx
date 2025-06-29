@@ -1,3 +1,5 @@
+// Arquivo: src/components/categorias/CategoriaAddModal.tsx
+
 import React, { useEffect, useState } from 'react';
 import { CategoriaResponse } from '../../types/domain';
 import { createCategoria } from '../../services/categoriaService';
@@ -5,6 +7,7 @@ import { CategoriaRequest } from '../../types/domain';
 import Modal from '../common/Modal';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
+import { useTranslation } from 'react-i18next'; // << PASSO 1: Importar o hook
 
 interface CategoriaAddModalProps {
   isOpen: boolean;
@@ -17,6 +20,7 @@ const CategoriaAddModal: React.FC<CategoriaAddModalProps> = ({
   onClose,
   onCategoriaAdded,
 }) => {
+  const { t } = useTranslation(); // << PASSO 2: Chamar o hook
   const [nomeCategoria, setNomeCategoria] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +28,8 @@ const CategoriaAddModal: React.FC<CategoriaAddModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nomeCategoria.trim()) {
-      setError('Nome da categoria é obrigatório');
+      // Usar uma chave para a mensagem de erro de validação
+      setError(t('categorias.form.validation.nameRequired')); 
       return;
     }
     setIsLoading(true);
@@ -35,10 +40,10 @@ const CategoriaAddModal: React.FC<CategoriaAddModalProps> = ({
       onCategoriaAdded(novaCategoria);
       setNomeCategoria('');
       onClose();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Erro ao adicionar categoria: ', err);
-      setError(err.response?.data?.message || 'Falha ao adicionar categoria');
+      // Usar uma chave para a mensagem de erro da API
+      setError(err.response?.data?.message || t('categorias.form.error.addFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -52,11 +57,12 @@ const CategoriaAddModal: React.FC<CategoriaAddModalProps> = ({
   }, [isOpen]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Adicionar categoria">
+    // << PASSO 3: Substituir os textos estáticos
+    <Modal isOpen={isOpen} onClose={onClose} title={t('categorias.form.title')}>
       <form onSubmit={handleSubmit}>
         <div className="p-2">
           <Input
-            label="Nome da Categoria"
+            label={t('categorias.form.name')}
             value={nomeCategoria}
             onChange={(e) => setNomeCategoria(e.target.value)}
             error={error}
@@ -66,10 +72,10 @@ const CategoriaAddModal: React.FC<CategoriaAddModalProps> = ({
         </div>
         <div className="bg-gray-50 dark:bg-gray-800 px-6 py-4 flex justify-end space-x-3">
           <Button type="button" variant="secondary" onClick={onClose} disabled={isLoading}>
-            Cancelar
+            {t('userActions.cancel')}
           </Button>
           <Button type="submit" isLoading={isLoading}>
-            Salvar
+            {t('userActions.save')}
           </Button>
         </div>
       </form>

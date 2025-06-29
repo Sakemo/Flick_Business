@@ -8,6 +8,7 @@ import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
 import DespesasTable from '../components/despesas/DespesasTable';
 import DespesaFormModal from '../components/despesas/DespesaFormModal';
+import { useTranslation } from 'react-i18next';
 
 const DespesaPage: React.FC = () => {
   const [despesas, setDespesas] = useState<DespesaResponse[]>([]);
@@ -19,124 +20,125 @@ const DespesaPage: React.FC = () => {
   const [filtroDataInicio, setFiltroDataInicio] = useState<string>('');
   const [filtroDataFim, setFiltroDataFim] = useState<string>('');
   const [filtroTipoDespesa, setFiltroTipoDespesa] = useState<string>('');
+  const { t } = useTranslation();
 
-  const fetchDespesas = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    const fetchDespesas = useCallback(async () => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const params: GetDespesasParams = {};
-      if (filtroDataInicio) params.inicio = `${filtroDataInicio}T00:00:00`;
-      if (filtroDataFim) params.fim = `${filtroDataFim}T23:59:59`;
-      if (filtroTipoDespesa) params.tipoDespesa = filtroTipoDespesa;
-      const data = await getDespesas(params);
-      setDespesas(data);
-    } catch (err) {
-      setError('Falha ao carregar despesas');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, [filtroDataInicio, filtroDataFim, filtroTipoDespesa]);
-
-  useEffect(() => {
-    fetchDespesas();
-  }, [fetchDespesas]);
-
-  const handleOpenAddModal = () => {
-    setDespesaParaEditar(null);
-    setIsModalOpen(true);
-  };
-
-  const handleOpenEditModal = (despesa: DespesaResponse) => {
-    setDespesaParaEditar(despesa);
-    setIsModalOpen(true);
-  };
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setDespesaParaEditar(null);
-  };
-  const handleSaveSucess = () => {
-    handleCloseModal();
-    fetchDespesas(); //TODO: TOAST
-  };
-
-  const handleDelete = async (id: number) => {
-    if (window.confirm('Tem certeza que deseja deletar essa despesa?')) {
       try {
-        await deleteDespesa(id);
-        fetchDespesas(); //TODO: + TOAST
+        const params: GetDespesasParams = {};
+        if (filtroDataInicio) params.inicio = `${filtroDataInicio}T00:00:00`;
+        if (filtroDataFim) params.fim = `${filtroDataFim}T23:59:59`;
+        if (filtroTipoDespesa) params.tipoDespesa = filtroTipoDespesa;
+        const data = await getDespesas(params);
+        setDespesas(data);
       } catch (err) {
-        setError('Falha ao deletar despesa');
+        setError(t('siteFeedback.error'));
         console.error(err);
+      } finally {
+        setLoading(false);
       }
-    } //TODO: modal de confirmação
-  };
+    }, [filtroDataInicio, filtroDataFim, filtroTipoDespesa, t]);
 
-  const clearFilter = () => {
-    setFiltroDataInicio('');
-    setFiltroDataFim('');
-    setFiltroTipoDespesa('');
-  };
+    useEffect(() => {
+      fetchDespesas();
+    }, [fetchDespesas]);
 
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl lg:text-3xl font-semibold text-text-primary dark:text-white">
-          Gerenciamento de Despesas
-        </h1>
-        <Button onClick={handleOpenAddModal} iconLeft={<LuPlus className="mr-1" />}>
-          Nova Despesa
-        </Button>
-      </div>
+    const handleOpenAddModal = () => {
+      setDespesaParaEditar(null);
+      setIsModalOpen(true);
+    };
 
-      <Card className="mb-6 p-card-padding">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-          <Input
-            label="Data Início"
-            type="date"
-            value={filtroDataInicio}
-            onChange={(e) => setFiltroDataInicio(e.target.value)}
-          />
-          <Input
-            label="Data Fim"
-            type="date"
-            value={filtroDataFim}
-            onChange={(e) => setFiltroDataFim(e.target.value)}
-          />
-          <Select
-            label="Tipo de Despesa"
-            value={filtroTipoDespesa}
-            onChange={(e) => setFiltroTipoDespesa(e.target.value)}
-          >
-            <option value="">Todos os tipos</option>
-            {Object.values(TipoDespesa).map((tipo) => (
-              <option key={tipo} value={tipo}>
-                {tipo.charAt(0).toUpperCase() + tipo.slice(1).toLowerCase()}
-              </option>
-            ))}
-          </Select>
-          <Button variant="ghost" onClick={clearFilter}>
-            Limpar Filtros
+    const handleOpenEditModal = (despesa: DespesaResponse) => {
+      setDespesaParaEditar(despesa);
+      setIsModalOpen(true);
+    };
+    const handleCloseModal = () => {
+      setIsModalOpen(false);
+      setDespesaParaEditar(null);
+    };
+    const handleSaveSucess = () => {
+      handleCloseModal();
+      fetchDespesas(); //TODO: TOAST
+    };
+
+    const handleDelete = async (id: number) => {
+      if (window.confirm(t('siteFeedback.confirmDelete'))) {
+        try {
+          await deleteDespesa(id);
+          fetchDespesas(); //TODO: + TOAST
+        } catch (err) {
+          setError(t('siteFeedback.deleteError'));
+          console.error(err);
+        }
+      } //TODO: modal de confirmação
+    };
+
+    const clearFilter = () => {
+      setFiltroDataInicio('');
+      setFiltroDataFim('');
+      setFiltroTipoDespesa('');
+    };
+
+    return (
+      <div>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl lg:text-3xl font-semibold text-text-primary dark:text-white">
+            {t('userActions.totalExpenses')}
+          </h1>
+          <Button onClick={handleOpenAddModal} iconLeft={<LuPlus className="mr-1" />}>
+            {t('userActions.add') + t('expenseCategories.personal').replace(/^\w/, c => c.toLowerCase())}
           </Button>
         </div>
-      </Card>
 
-      {loading && <p className="p-6 text-center">Carregando Despesas</p>}
-      {error && <p className="p-6 text-center text-red-500">{error}</p>}
-      {!loading && !error && (
-        <DespesasTable despesas={despesas} onEdit={handleOpenEditModal} onDelete={handleDelete} />
-      )}
+        <Card className="mb-6 p-card-padding">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <Input
+              label={t('filter.dateStart')}
+              type="date"
+              value={filtroDataInicio}
+              onChange={(e) => setFiltroDataInicio(e.target.value)}
+            />
+            <Input
+              label={t('filter.dateEnd')}
+              type="date"
+              value={filtroDataFim}
+              onChange={(e) => setFiltroDataFim(e.target.value)}
+            />
+            <Select
+              label={t('common.category')}
+              value={filtroTipoDespesa}
+              onChange={(e) => setFiltroTipoDespesa(e.target.value)}
+            >
+              <option value="">{t('userActions.all')}</option>
+              {Object.values(TipoDespesa).map((tipo) => (
+                <option key={tipo} value={tipo}>
+                  {t(`expenseCategories.${tipo}`)}
+                </option>
+              ))}
+            </Select>
+            <Button variant="ghost" onClick={clearFilter}>
+              {t('userActions.cancel')}
+            </Button>
+          </div>
+        </Card>
 
-      {isModalOpen && (
-        <DespesaFormModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          onSaveSuccess={handleSaveSucess}
-          despesaInicial={despesaParaEditar}
-        />
-      )}
-    </div>
-  );
+        {loading && <p className="p-6 text-center">{t('siteFeedback.loading')}</p>}
+        {error && <p className="p-6 text-center text-red-500">{error}</p>}
+        {!loading && !error && (
+          <DespesasTable despesas={despesas} onEdit={handleOpenEditModal} onDelete={handleDelete} />
+        )}
+
+        {isModalOpen && (
+          <DespesaFormModal
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+            onSaveSuccess={handleSaveSucess}
+            despesaInicial={despesaParaEditar}
+          />
+        )}
+      </div>
+    );
 };
 export default DespesaPage;

@@ -7,7 +7,7 @@ import ptTranslation from './locales/pt/translation.json';
 
 i18n.use(LanguageDetector).use(initReactI18next).init({
 	debug: true,
-	fallbacking: 'en',
+	fallbackLng: 'en',
 	interpolation: {
 		escapeValue: false,
 	},
@@ -21,4 +21,4 @@ i18n.use(LanguageDetector).use(initReactI18next).init({
 	},
 });
 
-export defaullti18n;
+export default i18n;

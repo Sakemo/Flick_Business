@@ -13,6 +13,8 @@ import Select from '../components/ui/Select'; // Usaremos para filtro
 import Card from '../components/ui/Card'; // Para envolver a tabela/filtros
 import clsx from 'clsx';
 import ProdutoDetalhesDrawer from '../components/produtos/ProdutoDetalhesDrawer';
+import { useTranslation } from 'react-i18next';
+
 
 const ProdutosPage: React.FC = () => {
   // --- Estados ---
@@ -23,6 +25,8 @@ const ProdutosPage: React.FC = () => {
   const [filtroCategoriaId, setFiltroCategoriaId] = useState<string>(''); // Usar string para o <select>
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [produtoParaEditar, setProdutoParaEditar] = useState<ProdutoResponse | null>(null);
+
+  const { t } = useTranslation();
 
   // --- Funções de Busca ---
   const fetchProdutos = useCallback(async () => {
@@ -84,15 +88,20 @@ const ProdutosPage: React.FC = () => {
 
   //TODO: Modal de confirmação
   const handleDelete = async (id: number, nomeProduto: string, status: boolean) => {
-    const action = status ? 'INATIVAR' : 'ATIVAR';
-    if (window.confirm(`Tem certeza que deseja ${action} o produto "${nomeProduto}"?`)) {
+    const action = status ? t('siteFeedback.inactive') : t('siteFeedback.active');
+    if (
+      window.confirm(
+        t('siteFeedback.confirmDelete') +
+          `\n${t('userActions.status')}: ${action}\n${t('produtos.objectName')}: "${nomeProduto}"`
+      )
+    ) {
       try {
-        setLoading(true); // Pode ter um loading específico para delete
+        setLoading(true);
         await deleteProduto(id);
-        fetchProdutos(); // Recarrega a lista
+        fetchProdutos();
         // TODO: Adicionar notificação de sucesso (toast)
       } catch (err) {
-        setError('Falha ao deletar produto.');
+        setError(t('siteFeedback.deleteError'));
         console.error(err);
         // TODO: Adicionar notificação de erro (toast)
       } finally {
@@ -104,7 +113,7 @@ const ProdutosPage: React.FC = () => {
   const handleDeletarFisicamente = async (id: number, nomeProduto: string) => {
     if (
       window.confirm(
-        `ATENÇÃO: Esta ação é IRREVERSÍVEL. Tem certeza que deseja DELETAR PERMANENTEMENTE o produto ${nomeProduto}?`
+        `ATENÇÃO: ${t('siteFeedback.confirmDelete')} ${t('produtos.objectName')}: "${nomeProduto}"\n${t('siteFeedback.deleteError')}`
       )
     ) {
       try {

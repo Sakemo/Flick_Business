@@ -4,9 +4,11 @@ import { calcularStatusFiado, CalculoFiadoResult } from '../../utils/fiadoUtils'
 import { formatCurrency } from '../../utils/formatters';
 import Badge from '../ui/Badge';
 import Card from '../ui/Card';
-import { ptBR } from 'date-fns/locale';
+import { enUS, ptBR } from 'date-fns/locale';
 import Button from '../ui/Button';
 import { LuCheck, LuDelete, LuPen, LuTrash2 } from 'react-icons/lu';
+
+import { useTranslation } from 'react-i18next';
 
 interface ClienteCardProps {
   cliente: ClienteResponse;
@@ -23,7 +25,10 @@ const ClienteCard: React.FC<ClienteCardProps> = ({
   onToggleAtivo,
   onDeletePermanente,
 }) => {
+  const { t, i18n } = useTranslation(); 
+
   const statusFiadoInfo = calcularStatusFiado(cliente, configFiado);
+  const currentLocale = i18n.language.startsWith('pt') ? ptBR : enUS;
 
   const getStatusFiadoBadge = (statusInfo: CalculoFiadoResult) => {
     switch (statusInfo.status) {
@@ -32,11 +37,11 @@ const ClienteCard: React.FC<ClienteCardProps> = ({
           <Badge
             colorScheme="red"
             variant="solid"
-          >{`Atrasado ${statusInfo.diasParaVencer ? `(${Math.abs(statusInfo.diasParaVencer)} dias)` : ''}`}</Badge>
+          >{`Atrasado ${t('clientes.status.overdue', { count: Math.abs(statusInfo.diasParaVencer || 0) })}`}</Badge>
         );
       case 'A_VENCER': {
-        let textoVencer = 'A Vencer';
-        if (statusInfo.diasParaVencer === 0) textoVencer = 'Vence Hoje';
+        let textoVencer = t('clientes.status.dueSoon');
+        if (statusInfo.diasParaVencer === 0) textoVencer = t('clientes.status.dueToday');
         return (
           <Badge colorScheme="yellow" variant="subtle">
             {textoVencer}
@@ -46,8 +51,8 @@ const ClienteCard: React.FC<ClienteCardProps> = ({
       case 'EM_DIA': {
         let textoVencer = '';
         if (statusInfo.diasParaVencer && statusInfo.diasParaVencer > 0)
-          textoVencer = `Vence em ${statusInfo.diasParaVencer} dias`;
-        else if (statusInfo.valorComJuros === 0) textoVencer = `EM DIA`;
+          textoVencer = `${t('clientes.status.dueIn', { count: statusInfo.diasParaVencer })}`;
+        else if (statusInfo.valorComJuros === 0) textoVencer = t('clientes.status.onTime');
         return (
           <Badge colorScheme="green" variant="subtle">
             {textoVencer}
@@ -70,7 +75,7 @@ const ClienteCard: React.FC<ClienteCardProps> = ({
             {cliente.nome}
           </h3>
           <Badge colorScheme={cliente.ativo ? 'green' : 'gray'} variant="outline">
-            {cliente.ativo ? 'Ativo' : 'Inativo'}
+            {cliente.ativo ? t('siteFeedback.active') : t('siteFeedback.inactive')}
           </Badge>
         </div>
 
@@ -82,25 +87,25 @@ const ClienteCard: React.FC<ClienteCardProps> = ({
           className="text-sm text-text-secondary dark:text-gray-400 truncate"
           title={cliente.telefone}
         >
-          Tel: {cliente.telefone || 'N/A'}
+          {t('clientes.form.phone')}: {cliente.telefone || 'N/A'}
         </p>
         <p
           className="text-sm text-text-secondary dark:text-gray-400 truncate"
           title={cliente.endereco}
         >
-          End.: {cliente.endereco || 'N/A'}
+          {t('clientes.form.address')}: {cliente.endereco || 'N/A'}
         </p>
         <p className="text-sm text-text-secondary dark:text-gray-400">
-          CPF: {cliente.cpf || 'N/A'}
+          {t('clientes.form.cpf')}: {cliente.cpf || 'N/A'}
         </p>
 
         {cliente.controleFiado && (
           <div className="mt-3 pt-3 border-t border-border-light dark:border-border-dark">
             <p className="text-xs text-text-secondary dark:text-gray-500">
-              Controle de Fiado Ativo
+              {t('clientes.form.creditControlTitle')}
             </p>
             <p className="text-sm font-medium text-text-primary dark:text-white">
-              Saldo Devedor:{' '}
+              {t('clientes.form.debtBalance')}: {' '}
               <span className={cliente.saldoDevedor > 0 ? 'text-red-500' : ''}>
                 {formatCurrency(cliente.saldoDevedor)}
               </span>
@@ -114,26 +119,26 @@ const ClienteCard: React.FC<ClienteCardProps> = ({
             </p>
             {statusFiadoInfo.dataVencimento && (
               <p className="text-xs text-text-secondary dark:text-gray-400">
-                Vencimento: {format(statusFiadoInfo.dataVencimento, 'dd/MM/yyyy', { locale: ptBR })}
+                {t('clientes.form.dueDate')}: {format(statusFiadoInfo.dataVencimento, `${currentLocale === enUS ? 'MM/dd/yyyy' : 'dd/MM/yyyy'}`, { locale: currentLocale })}
               </p>
             )}
             <p className="text-xs text-text-secondary dark:text-gray-400">
-              Limite Fiado:{' '}
-              {cliente.limiteFiado ? formatCurrency(cliente.limiteFiado) : 'Não definido'}
+              {t('clientes.form.creditLimit')}: {' '}
+              {cliente.limiteFiado ? formatCurrency(cliente.limiteFiado) : t('clientes.notSet')}
             </p>
           </div>
         )}
       </div>
 
       <div className="mt-4 pt-4 border-t border-border-light dark:border-border-dark flex items-center justify-end space-x-2">
-        <Button variant="ghost" size="icon" onClick={onEdit} title="Editar Cliente">
+        <Button variant="ghost" size="icon" onClick={onEdit} title={t('userActions.edit') + ' ' + t('clientes.objectName')}>
           <LuPen className="h-4 w-4" />
         </Button>
         <Button
           variant="ghost"
           size="icon"
           onClick={onToggleAtivo}
-          title={cliente.ativo ? 'Inativar Cliente' : 'Ativar Cliente'}
+          title={cliente.ativo ? t('userActions.deactivate') : t('userActions.activate')}
           className={
             cliente.ativo
               ? 'text-yellow-500 hover:text-yellow-600'
@@ -146,7 +151,7 @@ const ClienteCard: React.FC<ClienteCardProps> = ({
           variant="danger"
           size="icon"
           onClick={onDeletePermanente}
-          title="Deletar Permanentemente"
+          title={t('userActions.deletePermanent')}
         >
           <LuTrash2 className="h-4 w-4" />
         </Button>

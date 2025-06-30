@@ -280,37 +280,6 @@ class ProdutoServiceTest {
 
   // ... (Teste para deletarLogicamente com ID inexistente permanece o mesmo) ...
 
-  @Test
-  @DisplayName("listarTodos: Deve chamar findAllWithCategoriaAndFornecedor quando categoriaId é null")
-  void listarTodos_quandoCategoriaIdNull_deveChamarFindAllWithCategoriaAndFornecedor() {
-    List<Produto> listaMock = List.of(mockProduto);
-    when(produtoRepositoryMock.findAllWithCategoriaAndFornecedor()).thenReturn(listaMock);
-    when(produtoMapperMock.toResponseDTOList(eq(listaMock))).thenReturn(List.of(mockResponseDTO));
-
-    List<ProdutoResponseDTO> resultado = produtoService.listarTodos(null);
-
-    assertNotNull(resultado);
-    assertFalse(resultado.isEmpty());
-    verify(produtoRepositoryMock).findAllWithCategoriaAndFornecedor();
-    verify(produtoRepositoryMock, never()).findByCategoriaIdWithFornecedor(anyLong());
-  }
-
-  @Test
-  @DisplayName("listarTodos: Deve chamar findByCategoriaIdWithFornecedor quando categoriaId é fornecido")
-  void listarTodos_quandoCategoriaIdFornecido_deveChamarFindByCategoriaIdWithFornecedor() {
-    List<Produto> listaFiltradaMock = List.of(mockProduto);
-    when(produtoRepositoryMock.findByCategoriaIdWithFornecedor(eq(categoriaId))).thenReturn(listaFiltradaMock);
-    when(produtoMapperMock.toResponseDTOList(eq(listaFiltradaMock))).thenReturn(List.of(mockResponseDTO));
-
-    List<ProdutoResponseDTO> resultado = produtoService.listarTodos(categoriaId);
-
-    assertNotNull(resultado);
-    assertFalse(resultado.isEmpty());
-    assertEquals(mockCategoria.getNome(), resultado.get(0).categoria().getNome());
-    verify(produtoRepositoryMock).findByCategoriaIdWithFornecedor(eq(categoriaId));
-    verify(produtoRepositoryMock, never()).findAllWithCategoriaAndFornecedor();
-  }
-
   // Teste para deleção física
   @Test
   @DisplayName("deletarFisicamente: Deve chamar deleteById quando produto existe")

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { DespesaResponse, TipoDespesa } from '../types/domain';
 import { deleteDespesa, getDespesas, GetDespesasParams } from '../services/despesaService';
 import Button from '../components/ui/Button';
-import { LuPlus } from 'react-icons/lu';
+import { LuPlus, LuX } from 'react-icons/lu';
 import Card from '../components/ui/Card';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
@@ -85,10 +85,10 @@ const DespesaPage: React.FC = () => {
       <div>
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl lg:text-3xl font-semibold text-text-primary dark:text-white">
-            {t('userActions.totalExpenses')}
+            {t('despesas.title')}
           </h1>
           <Button onClick={handleOpenAddModal} iconLeft={<LuPlus className="mr-1" />}>
-            {t('userActions.add') + t('expenseCategories.personal').replace(/^\w/, c => c.toLowerCase())}
+            {t('userActions.add') + t('despesas.objectName').replace(/^\w/, c => c.toLowerCase())}
           </Button>
         </div>
 
@@ -119,7 +119,7 @@ const DespesaPage: React.FC = () => {
               ))}
             </Select>
             <Button variant="ghost" onClick={clearFilter}>
-              {t('userActions.cancel')}
+              <LuX />
             </Button>
           </div>
         </Card>

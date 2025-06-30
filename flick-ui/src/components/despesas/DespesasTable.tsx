@@ -3,9 +3,11 @@ import { DespesaResponse } from '../../types/domain';
 import { formatCurrency } from '../../utils/formatters';
 import Table, { TableColumn } from '../common/Table';
 import Badge from '../ui/Badge';
-import { ptBR } from 'date-fns/locale';
+import { enUS, ptBR } from 'date-fns/locale';
 import Button from '../ui/Button';
 import { LuPencil, LuTrash2 } from 'react-icons/lu';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n';
 
 interface DespesasTableProps {
   despesas: DespesaResponse[];
@@ -14,16 +16,19 @@ interface DespesasTableProps {
 }
 
 const DespesasTable: React.FC<DespesasTableProps> = ({ despesas, onEdit, onDelete }) => {
+  const { t } = useTranslation();
+    const currentLocale = i18n.language.startsWith('pt') ? ptBR : enUS;
+
   const columns: TableColumn<DespesaResponse>[] = [
-    { header: 'Nome', accessor: 'nome', headerClassName: 'w-2/5' },
+    { header: t('common.name'), accessor: 'nome', headerClassName: 'w-2/5' },
     {
-      header: 'Valor',
+      header: t('common.value'),
       accessor: (row) => formatCurrency(row.valor),
       className: 'text-right',
       headerClassName: 'text-right',
     },
     {
-      header: 'Tipo',
+      header: t('common.category'),
       accessor: (row) => (
         <Badge
           colorScheme={
@@ -41,21 +46,21 @@ const DespesasTable: React.FC<DespesasTableProps> = ({ despesas, onEdit, onDelet
       ),
     },
     {
-      header: 'Data Despesa',
-      accessor: (row) => format(new Date(row.dataDespesa), 'dd/MM/yyyy', { locale: ptBR }),
+      header: t('common.date'),
+      accessor: (row) => format(new Date(row.dataDespesa), `${currentLocale === enUS ? 'MM/dd/yyyy' : 'dd/MM/yyyy'}`, { locale: currentLocale }),
     },
     {
-      header: 'Ações',
+      header: t('common.actions'),
       accessor: (row) => (
         <div className="flex justify-end space-x-2">
-          <Button variant="ghost" size="icon" onClick={() => onEdit(row)} title="Editar">
+          <Button variant="ghost" size="icon" onClick={() => onEdit(row)} title={t('userActions.edit')}>
             <LuPencil className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => onDelete(row.id)}
-            title="Deletar"
+            title= {t('userActions.delete')}
             className="hover:bg-red-100 dark:hover:bg-red-700/50"
           >
             <LuTrash2 className="h-4 w-4" />
@@ -70,7 +75,7 @@ const DespesasTable: React.FC<DespesasTableProps> = ({ despesas, onEdit, onDelet
     <Table<DespesaResponse>
       columns={columns}
       data={despesas}
-      emptyMessage="Nenhuma despesa registrada"
+      emptyMessage= {t('siteFeedback.noData')}
       selectedRowId={undefined}
     />
   );

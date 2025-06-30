@@ -43,10 +43,14 @@ public class ProdutoController {
   // Listar Produtos
   @GetMapping
   public ResponseEntity<List<ProdutoResponseDTO>> listarProdutos(
-      @RequestParam(required = false) Long categoriaId // <<< ADICIONAR @RequestParam
+      @RequestParam(required = false) String nome,
+      @RequestParam(required = false) Long categoriaId
+
   ) {
+    System.out
+        .println("BACKEND CONTROLLER: Recebidos parâmetros - nome: [" + nome + "], categoriaId: [" + categoriaId + "]");
     // Passe o categoriaId para o serviço
-    List<ProdutoResponseDTO> produtos = produtoService.listarTodos(categoriaId);
+    List<ProdutoResponseDTO> produtos = produtoService.listProducts(nome, categoriaId);
     return ResponseEntity.ok(produtos);
   }
 

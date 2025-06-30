@@ -2,7 +2,7 @@
 // src/pages/ProdutosPage.tsx
 //TODO: FILTRO DE APENAS ATIVOS
 import React, { useState, useEffect, useCallback } from 'react';
-import { LuPlus, LuX } from 'react-icons/lu';
+import { LuPlus, LuSearch, LuX } from 'react-icons/lu';
 import { getProdutos, deleteProduto, deleteProdutoFisicamente } from '../services/produtoService';
 import { getCategorias } from '../services/categoriaService';
 import { ProdutoResponse, CategoriaResponse } from '../types/domain';
@@ -14,6 +14,7 @@ import Card from '../components/ui/Card'; // Para envolver a tabela/filtros
 import clsx from 'clsx';
 import ProdutoDetalhesDrawer from '../components/produtos/ProdutoDetalhesDrawer';
 import { useTranslation } from 'react-i18next';
+import Input from '../components/ui/Input';
 
 
 const ProdutosPage: React.FC = () => {
@@ -26,6 +27,8 @@ const ProdutosPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [produtoParaEditar, setProdutoParaEditar] = useState<ProdutoResponse | null>(null);
 
+  const [filtroNome, setFiltroNome] = useState<string>('');
+
   const { t } = useTranslation();
 
   // --- Funções de Busca ---
@@ -33,7 +36,9 @@ const ProdutosPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const params = filtroCategoriaId ? { categoriaId: parseInt(filtroCategoriaId) } : {};
+      const params: { categoriaId?: number; nome?: string } = {};
+      if (filtroCategoriaId) params.categoriaId = parseInt(filtroCategoriaId);
+      if (filtroNome.trim() !== '') params.nome = filtroNome.trim();
       const data = await getProdutos(params);
       console.log('LOG: PRODUTOS - ', JSON.stringify(data, null, 2));
       setProdutos(data);
@@ -43,7 +48,7 @@ const ProdutosPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [filtroCategoriaId]);
+  }, [filtroCategoriaId, filtroNome]);
 
   const fetchCategorias = useCallback(async () => {
     try {
@@ -138,6 +143,7 @@ const ProdutosPage: React.FC = () => {
 
   const clearFilter = () => {
     setFiltroCategoriaId('');
+    setFiltroNome('');
   };
 
   const [produtoSelecionadoDetalhes, setProdutoSelecionadoDetalhes] =
@@ -168,7 +174,14 @@ const ProdutosPage: React.FC = () => {
       </div>
 
       <Card className="mb-6" padding="md">
-        <div className="flex flex-col sm:flex-row gap-4 items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+          <Input
+            label={t('userActions.searchBy') + ' ' + t('produtos.objectName')}
+            placeholder={t('userActions.searchBy') + '...'}
+            value={filtroNome}
+            onChange={(e) => setFiltroNome(e.target.value)}
+            iconLeft={<LuSearch />}
+          />
           <div className="flex-grow">
             <Select
               id="filtroCategoria"

@@ -2,6 +2,7 @@ package br.com.king.flick_business.service;
 
 import java.util.List;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import br.com.king.flick_business.entity.Produto;
 import br.com.king.flick_business.exception.RecursoNaoEncontrado;
 import br.com.king.flick_business.mapper.ProdutoMapper;
 import br.com.king.flick_business.repository.ProdutoRepository;
+import br.com.king.flick_business.repository.spec.ProdutoSpecification;
 
 @Service
 public class ProdutoService {
@@ -78,13 +80,9 @@ public class ProdutoService {
   }
 
   @Transactional(readOnly = true)
-  public List<ProdutoResponseDTO> listarTodos(Long categoriaId) {
-    List<Produto> produtos;
-    if (categoriaId != null) {
-      produtos = produtoRepository.findByCategoriaIdWithFornecedor(categoriaId);
-    } else {
-      produtos = produtoRepository.findAllWithCategoriaAndFornecedor();
-    }
+  public List<ProdutoResponseDTO> listProducts(String name, Long categoriaId) {
+    Specification<Produto> spec = ProdutoSpecification.withFilter(name, categoriaId);
+    List<Produto> produtos = produtoRepository.findAll(spec);
     return produtoMapper.toResponseDTOList(produtos);
   }
 

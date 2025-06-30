@@ -1,14 +1,34 @@
 import { format, isToday, isYesterday, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import i18n from "../i18n";
 
 export const formatCurrency = (value: number | null | undefined): string => {
-  if(value === null || value === undefined){
-    return 'R$0,00';
+  let cashSymbol;
+  if (i18n.language.startsWith('pt')) {
+    cashSymbol = 'R$';
+  } else {
+    cashSymbol = '$';
   }
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(value);
+  
+  if(value === null || value === undefined){
+    return `${cashSymbol}0,00`;
+  }
+
+  switch (cashSymbol){
+    case 'R$':
+      return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      }).format(value);
+    case '$':
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(value);
+    default:
+      console.warn(`Formato de moeda não suportado: ${cashSymbol}`);
+      return `${cashSymbol}${value.toFixed(2).replace('.', ',')}`;
+  }
 };
 
 export const formatVendaDate = (dateString: string | null | undefined, hours:boolean | null | undefined): string => {

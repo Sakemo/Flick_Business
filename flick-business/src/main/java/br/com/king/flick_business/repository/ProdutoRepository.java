@@ -3,6 +3,7 @@ package br.com.king.flick_business.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,7 @@ import br.com.king.flick_business.entity.Produto;
 import br.com.king.flick_business.enums.TipoUnidadeVenda;
 
 @Repository
-public interface ProdutoRepository extends JpaRepository<Produto, Long> {
+public interface ProdutoRepository extends JpaRepository<Produto, Long>, JpaSpecificationExecutor<Produto> {
   @Query("SELECT p FROM Produto p LEFT JOIN FETCH p.categoria LEFT JOIN FETCH p.fornecedor")
   List<Produto> findAllWithCategoriaAndFornecedor();
 

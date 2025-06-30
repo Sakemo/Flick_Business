@@ -255,10 +255,10 @@ const VendasPage: React.FC = () => {
     <>
       <div className="flex flex-wrap justify-between item-center fap-4 mb-8">
         <h1 className="text-2xl lg:text-3xl font-semibold text-text-primary dark:text-white">
-          Vendas
+          {t('vendas.title')}
         </h1>
         <Button onClick={handleOpenNovalVendaModal} iconLeft={<LuPlus className="mr-1" />}>
-          Registrar Nova Venda
+          {t('userActions.add') + t('vendas.objectName').replace(/^\w/, c => c.toLowerCase())}
         </Button>
       </div>
 
@@ -300,7 +300,7 @@ const VendasPage: React.FC = () => {
             disabled={loading}
           />
           <AutoCompleteInput
-            label={`${t('filter.filterByProduct')}`}
+            label={`${t('filter.filterBy')} ${t('produtos.objectName')}`}
             placeholder="Digite para buscar produto..."
             options={todosOsProdutos}
             value={filtroProduto}
@@ -327,10 +327,10 @@ const VendasPage: React.FC = () => {
             value={filtroFormaPagamento}
             onChange={(e) => setFiltroFormaPagamento(e.target.value)}
           >
-            <option value="">Todas as formas</option>
+            <option value="">{t('vendas.allMethods')}</option>
             {Object.values(FormaPagamento).map((fp) => (
               <option key={fp} value={fp}>
-                {fp.replace('_', ' ')}
+                {t(`vendas.paymentMethods.${fp.toLowerCase()}`) || fp}
               </option>
             ))}
           </Select>

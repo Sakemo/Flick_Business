@@ -19,6 +19,7 @@ import Pagination from '../components/common/Pagination';
 import { TableRow } from '../hooks/GroupHeader';
 import { formatVendaDate } from '../utils/formatters';
 import { useTranslation } from 'react-i18next';
+import GrossTotalCard from '../components/vendas/grossTotalCard';
 
 const VendasPage: React.FC = () => {
   const { t } = useTranslation(); 
@@ -56,6 +57,12 @@ const VendasPage: React.FC = () => {
   ];
 
   const [ordemVendas, setOrdemVendas] = useState<string>(opcoesOrdenacaoVendas[0].value);
+
+  const grossTotal = useMemo(() => {
+    return Object.values(groupSummaries).reduce((acc, summary) => {
+      return acc + summary.totalValue;
+    }, 0)
+  }, [groupSummaries]);
 
   const processedVendas: TableRow[] = useMemo(() => {
     console.log('processedVendas: vendas:', vendas, 'ordemVendas:', ordemVendas);
@@ -350,6 +357,9 @@ const VendasPage: React.FC = () => {
           </Select>
         </div>
       </Card>
+
+        
+      <GrossTotalCard value={grossTotal} />
 
       <div className="flex justify-between items-center mb-4">
         {/** TODO: card de produto mais vendido */}

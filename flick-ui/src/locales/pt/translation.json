@@ -132,6 +132,10 @@
     "searchProductPlaceholder": "Digite para buscar produto...",
     "allClients": "Todos os clientes",
     "allMethods": "Todas as formas",
+    "grossTotal": "Total Bruto",
+    "netTotal": "Lucro",
+    "grossTotalDescription": "Valor total da venda antes das despesas",
+    "netTotalDescription": "Lucro após despesas",
     "form": {
       "title": "Registrar Venda",
       "anonymous": "Anônimo",

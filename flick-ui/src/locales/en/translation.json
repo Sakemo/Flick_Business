@@ -131,6 +131,10 @@
     "searchProductPlaceholder": "Type to search for a product...",
     "allClients": "All clients",
     "allMethods": "All methods",
+    "grossTotal": "Gross Total",
+    "netTotal": "Net Profit",
+    "grossTotalDescription": "Total value of the sale before expenses",
+    "netTotalDescription": "Profit after expenses",
     "form": {
       "title": "Register Sale",
       "anonymous": "Anonymous",

@@ -18,6 +18,16 @@ export const getDespesas = async (params?: GetDespesasParams):Promise<DespesaRes
   }
 };
 
+export const getTotalExpenses = async (params: { begin?: string | null; end?: string | null }): Promise<number> => {
+  try {
+    const response = await apiClient.get<number>('/api/despesas/total', { params });
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar total de despesas:", error);
+    throw error;
+  }
+};
+
 export const getDespesaById = async (id: number): Promise<DespesaResponse> => {
   try{
     const response = await apiClient.get<DespesaResponse>(`/api/despesas/${id}`);

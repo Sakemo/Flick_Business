@@ -1,9 +1,11 @@
 package br.com.king.flick_business.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -107,6 +109,28 @@ public class DespesaService {
     }
     System.out.println("LOG: DespesaService.listarDespesas - Total de despesas encontradas: " + despesas.size());
     return despesas.stream().map(DespesaResponseDTO::new).collect(Collectors.toList());
+  }
+
+  /**
+   * Calcula a soma total das despesas dentro de um período
+   * 
+   * @param begin Data inicial
+   * @param end   Data final
+   * @return a soma total
+   */
+  @Transactional(readOnly = true)
+  public BigDecimal calcTotalExpensesPerPeriod(LocalDateTime begin, LocalDateTime end) {
+    System.out.println("LOG: DespesaService.calcTotalExpensesPerPeriod - Calculating...");
+
+    LocalDateTime currentMonthBegin = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+    LocalDateTime currentMonthEnd = currentMonthBegin.plusMonths(1).minusNanos(1);
+
+    LocalDateTime beginQuery = (begin != null) ? begin : currentMonthBegin;
+    LocalDateTime endQuery = (end != null) ? end : currentMonthEnd;
+
+    BigDecimal value = despesaRepository.sumValorByDataDespesaBetween(beginQuery, endQuery);
+
+    return value != null ? value : BigDecimal.ZERO;
   }
 
   /**

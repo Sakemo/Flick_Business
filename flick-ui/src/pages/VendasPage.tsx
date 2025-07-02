@@ -19,12 +19,14 @@ import Pagination from '../components/common/Pagination';
 import { TableRow } from '../hooks/GroupHeader';
 import { formatVendaDate } from '../utils/formatters';
 import { useTranslation } from 'react-i18next';
-import GrossTotalCard from '../components/vendas/grossTotalCard';
+import ValueTotalCard from '../components/vendas/valueTotalCard';
+import { getTotalExpenses } from '../services/despesaService';
 
 const VendasPage: React.FC = () => {
   const { t } = useTranslation(); 
   const [vendas, setVendas] = useState<VendaResponse[]>([]);
   const [clientes, setClientes] = useState<ClienteResponse[]>([]);
+  const [totalExpenses, setTotalExpenses] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,6 +65,10 @@ const VendasPage: React.FC = () => {
       return acc + summary.totalValue;
     }, 0)
   }, [groupSummaries]);
+
+  const netProfit = useMemo(()  => {
+    return grossTotal - totalExpenses;
+  }, [grossTotal, totalExpenses]);
 
   const processedVendas: TableRow[] = useMemo(() => {
     console.log('processedVendas: vendas:', vendas, 'ordemVendas:', ordemVendas);
@@ -129,12 +135,17 @@ const VendasPage: React.FC = () => {
       params.page = currentPage; params.size = 8;
       if (ordemVendas) params.orderBy = ordemVendas;
 
-      const [pageResponse, summaryResponse] = await Promise.all([
+      const [pageResponse, summaryResponse, expensesResponse] = await Promise.all([
         getVendas(params),
-        getVendasSummary(params)
+        getVendasSummary(params),
+        getTotalExpenses({
+          begin: params.inicio || null,
+          end: params.fim || null
+        })
       ]);
       setVendas(pageResponse.content);
       setTotalPages(pageResponse.totalPages);
+      setTotalExpenses(expensesResponse);
 
       const summaryMap = summaryResponse.reduce((acc, summary) => {
         acc[summary.groupKey] = summary;
@@ -358,8 +369,11 @@ const VendasPage: React.FC = () => {
         </div>
       </Card>
 
-        
-      <GrossTotalCard value={grossTotal} />
+
+      <div className='flex flex-wrap grid-cols-4 gap-4'>
+        <ValueTotalCard color='blue' value={grossTotal} />
+        <ValueTotalCard color={netProfit >= 0 ? 'green' : 'red'} value={netProfit} title={t("vendas.netTotal")} description={t("vendas.netTotalDescription")} />
+      </div>
 
       <div className="flex justify-between items-center mb-4">
         {/** TODO: card de produto mais vendido */}

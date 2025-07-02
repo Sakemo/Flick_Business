@@ -1,5 +1,6 @@
 package br.com.king.flick_business.controller;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.apache.catalina.connector.Response;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,6 +55,15 @@ public class DespesaController {
     List<DespesaResponseDTO> despesas = despesaService.listarDespesas(inicio, fim, tipoDespesa);
 
     return ResponseEntity.ok(despesas);
+  }
+
+  // Total Despesas
+  @GetMapping("/total")
+  public ResponseEntity<BigDecimal> getTotalExpenses(
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime begin,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
+    BigDecimal total = despesaService.calcTotalExpensesPerPeriod(begin, end);
+    return ResponseEntity.ok(total);
   }
 
   // Buscar Despesa por ID

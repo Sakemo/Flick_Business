@@ -1,26 +1,43 @@
+// React and hooks
 import { useCallback, useEffect, useMemo, useState } from 'react';
+
+// Types and domain models
 import { FormaPagamento, VendaResponse } from '../types/domain';
 import { ClienteResponse } from '../types/domain';
-import { GetVendasParams, GroupSummary, deleteVendaFisicamente, getVendas, getVendasSummary } from '../services/vendaService';
+
+// Services
+import { 
+  GetVendasParams, 
+  GroupSummary, 
+  deleteVendaFisicamente, 
+  getVendas, 
+  getVendasSummary 
+} from '../services/vendaService';
 import { getClientes } from '../services/clienteService';
+import { getProdutos as fetchAllProdutos } from '../services/produtoService';
+import { getTotalExpenses } from '../services/despesaService';
+
+// UI Components
 import Button from '../components/ui/Button';
-import { LuCalendarDays, LuCalendarX, LuPlus, LuX } from 'react-icons/lu';
 import Card from '../components/ui/Card';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
+import Pagination from '../components/common/Pagination';
+import AutoCompleteInput from '../components/common/AutoCompleteInput';
 import VendasTable from '../components/vendas/VendasTable';
 import VendaFormModal from '../components/vendas/VendaFormModal';
 import VendaDetalhesModal from '../components/vendas/VendaDetalhesModal';
-import { format } from 'date-fns';
-import AutoCompleteInput from '../components/common/AutoCompleteInput';
-import { getProdutos as fetchAllProdutos } from '../services/produtoService';
-import { AxiosError } from 'axios';
-import Pagination from '../components/common/Pagination';
+import ValueTotalCard from '../components/vendas/valueTotalCard';
+
+// Icons
+import { LuCalendarDays, LuCalendarX, LuPlus, LuX } from 'react-icons/lu';
+
+// Utils and helpers
+import { endOfMonth, format, startOfMonth } from 'date-fns';
 import { TableRow } from '../hooks/GroupHeader';
 import { formatVendaDate } from '../utils/formatters';
 import { useTranslation } from 'react-i18next';
-import ValueTotalCard from '../components/vendas/valueTotalCard';
-import { getTotalExpenses } from '../services/despesaService';
+import { AxiosError } from 'axios';
 
 const VendasPage: React.FC = () => {
   const { t } = useTranslation(); 
@@ -40,8 +57,16 @@ const VendasPage: React.FC = () => {
 
   const [groupSummaries, setGroupSummaries] = useState<Record<string, GroupSummary>>({});
 
-  const [filtroDataInicio, setFiltroDataInicio] = useState<string>('');
-  const [filtroDataFim, setFiltroDataFim] = useState<string>('');
+  const today = new Date();
+  const firstDayOfMonth = startOfMonth(today);
+  const lastDayOfMonth = endOfMonth(today);
+  const formatDateForInput = (date: Date): string => {
+    return format(date, 'yyyy-MM-dd')
+  }
+
+
+  const [filtroDataInicio, setFiltroDataInicio] = useState<string>(formatDateForInput(firstDayOfMonth));
+  const [filtroDataFim, setFiltroDataFim] = useState<string>(formatDateForInput(lastDayOfMonth));
   const [filtroClienteId, setFiltroClienteId] = useState<string>('');
   const [filtroFormaPagamento, setFiltroFormaPagamento] = useState<string>('');
   const [filtroHojeAtivo, setFiltroHojeAtivo] = useState<boolean>(false);

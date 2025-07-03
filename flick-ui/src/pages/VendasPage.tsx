@@ -30,14 +30,15 @@ import VendaDetalhesModal from '../components/vendas/VendaDetalhesModal';
 import ValueTotalCard from '../components/vendas/valueTotalCard';
 
 // Icons
-import { LuCalendarDays, LuCalendarX, LuPlus, LuX } from 'react-icons/lu';
+import { LuPlus, LuX } from 'react-icons/lu';
 
 // Utils and helpers
-import { endOfMonth, format, startOfMonth } from 'date-fns';
+import { endOfMonth, endOfYear, format, startOfMonth, startOfYear } from 'date-fns';
 import { TableRow } from '../hooks/GroupHeader';
 import { formatVendaDate } from '../utils/formatters';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
+import DateFilterDropdown, { DateFilterOption } from '../components/common/DateFilterDropdown';
 
 const VendasPage: React.FC = () => {
   const { t } = useTranslation(); 
@@ -46,6 +47,7 @@ const VendasPage: React.FC = () => {
   const [totalExpenses, setTotalExpenses] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
 
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
@@ -64,12 +66,13 @@ const VendasPage: React.FC = () => {
     return format(date, 'yyyy-MM-dd')
   }
 
-
   const [filtroDataInicio, setFiltroDataInicio] = useState<string>(formatDateForInput(firstDayOfMonth));
   const [filtroDataFim, setFiltroDataFim] = useState<string>(formatDateForInput(lastDayOfMonth));
   const [filtroClienteId, setFiltroClienteId] = useState<string>('');
   const [filtroFormaPagamento, setFiltroFormaPagamento] = useState<string>('');
-  const [filtroHojeAtivo, setFiltroHojeAtivo] = useState<boolean>(false);
+  const [dateFilter, setDateFilter] = useState<DateFilterOption>('this_month');
+  
+  // const [filtroHojeAtivo, setFiltroHojeAtivo] = useState<boolean>(false);
 
   const [filtroProduto, setFiltroProduto] = useState<{ value: number; label: string } | null>(null);
   const [todosOsProdutos, setTodosOsProdutos] = useState<{ value: number; label: string }[]>([]);
@@ -152,8 +155,16 @@ const VendasPage: React.FC = () => {
     setError(null);
     try {
       const params: GetVendasParams = { page: currentPage, size: 8 };
-      if (filtroDataInicio) params.inicio = `${filtroDataInicio}T00:00:00`;
-      if (filtroDataFim) params.fim = `${filtroDataFim}T23:59:59`;
+      if (filtroDataInicio) {
+        const dataInicio = new Date(filtroDataInicio);
+        dataInicio.setHours(0,0,0,0);
+        params.inicio = dataInicio.toISOString();
+      }
+      if (filtroDataFim) {
+        const dataFim = new Date(filtroDataFim);
+        dataFim.setHours(23,59,59,999);
+        params.fim = dataFim.toISOString();
+      }
       if (filtroClienteId) params.clienteId = parseInt(filtroClienteId);
       if (filtroFormaPagamento) params.formaPagamento = filtroFormaPagamento;
       if (filtroProduto) params.produtoId = filtroProduto.value;
@@ -238,21 +249,40 @@ const VendasPage: React.FC = () => {
     setVendasSelecionadaDetalhes(null);
   };
 
-  const handleToggleFiltroHoje = () => {
-    if (filtroHojeAtivo) {
-      setFiltroDataInicio('');
-      setFiltroDataFim('');
-      setFiltroHojeAtivo(false);
-    } else {
-      const hoje = new Date();
-      const hojeFormatado = format(hoje, 'yyyy-MM-dd');
+  const handleDateFilterSelect = (option: DateFilterOption) => {
+    setDateFilter(option);
+    const today = new Date();
 
-      setFiltroDataInicio(hojeFormatado);
-      setFiltroDataFim(hojeFormatado);
-
-      setFiltroHojeAtivo(true);
+    switch(option){
+      case 'today':
+        setFiltroDataInicio(formatDateForInput(today));
+        setFiltroDataFim(formatDateForInput(today));
+        break;
+      case 'this_month':
+        setFiltroDataInicio(formatDateForInput(startOfMonth(today)));
+        setFiltroDataFim(formatDateForInput(endOfMonth(today)));
+        break;
+      case 'this_year':
+        setFiltroDataInicio(formatDateForInput(startOfYear(today)));
+        setFiltroDataFim(formatDateForInput(endOfYear(today)));
+        break;
+      case 'all':
+        setFiltroDataInicio('');
+        setFiltroDataFim('');
+        break;
     }
   };
+
+  const dateFilterOptions = [
+    { key: 'today' as DateFilterOption, label: t('filter.today', t('filter.today')) },
+    { key: 'this_month' as DateFilterOption, label: t('filter.month', t('filter.month')) },
+    { key: 'this_year' as DateFilterOption, label: t('filter.year', t('filter.year')) },
+    { key: 'all' as DateFilterOption, label: t('filter.all', t('filter.all')) },
+  ];
+
+  const handleManualDateChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
+    setter(value);
+  }
 
   const handleDeleteVendaFisicamente = async (id: number, vendaDisplayInfo: string) => {
     if (
@@ -288,7 +318,7 @@ const VendasPage: React.FC = () => {
     setFiltroDataFim('');
     setFiltroClienteId('');
     setFiltroFormaPagamento('');
-    setFiltroHojeAtivo(false);
+    setDateFilter('this_month');
     setFiltroProduto(null);
     /**setOrdemVendas(opcoesOrdenacaoVendas[0].value); Reseta ordenação padrão */
     /**setCurrentPage(0) reseta a */
@@ -308,19 +338,12 @@ const VendasPage: React.FC = () => {
       <Card className="mb-6 p-card-padding">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_3fr_2fr_2fr_auto_auto] gap-4 items-end">
           <div className="flex flex-col h-full justify-end">
-            <Button
-              onClick={handleToggleFiltroHoje}
-              variant={filtroHojeAtivo ? 'secondary' : 'primary'}
-              iconLeft={
-                filtroHojeAtivo ? (
-                  <LuCalendarX className="mr-1 h-4 w-4" />
-                ) : (
-                  <LuCalendarDays className="mr-1 h-4 w-4" />
-                )
-              }
-            >
-              {filtroHojeAtivo ? t('userActions.viewAll') : t('userActions.daySells')}
-            </Button>
+            <DateFilterDropdown
+              selectedOption={dateFilter}
+              onSelect={handleDateFilterSelect}
+              options={dateFilterOptions}
+            />
+
           </div>
           <Input
             label={t('filter.dateStart')}
@@ -328,7 +351,6 @@ const VendasPage: React.FC = () => {
             value={filtroDataInicio}
             onChange={(e) => {
               setFiltroDataInicio(e.target.value);
-              setFiltroHojeAtivo(false);
             }}
             disabled={loading}
           />
@@ -338,7 +360,6 @@ const VendasPage: React.FC = () => {
             value={filtroDataFim}
             onChange={(e) => {
               setFiltroDataFim(e.target.value);
-              setFiltroHojeAtivo(false);
             }}
             disabled={loading}
           />

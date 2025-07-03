@@ -50,7 +50,7 @@ const VendaDetalhesModal: React.FC<VendaDetalhesModalProps> = ({ isOpen, onClose
         {venda.observacoes && (
           <div>
             <p className="text-sm font-medium text-text-secondary">Observações:</p>
-            <p className="text-text-primary p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
+            <p className="text-text-primary p-2 brand-muted dark:bg-gray-700 rounded-md">
               {venda.observacoes}
             </p>
           </div>
@@ -62,7 +62,7 @@ const VendaDetalhesModal: React.FC<VendaDetalhesModalProps> = ({ isOpen, onClose
           </h4>
           <ul className="divide-y divide-gray-200 dark:divide-gray-700 border rounded-md">
             {venda.itens.map((item) => (
-              <li key={item.id} className="p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+              <li key={item.id} className="p-3 hover:brand-muted dark:hover:bg-gray-700/50">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="font-medium text-text-primary dark:text-white">
@@ -81,7 +81,7 @@ const VendaDetalhesModal: React.FC<VendaDetalhesModalProps> = ({ isOpen, onClose
           </ul>
         </div>
       </div>
-      <div className="bg-gray-50 dark:bg-gray-800 px-6 py-4 flex justify-end">
+      <div className="brand-muted dark:bg-gray-800 px-6 py-4 flex justify-end">
         <Button variant="secondary" onClick={onClose}>
           Fechar
         </Button>

@@ -41,7 +41,7 @@ const Modal: React.FC<ModalProps> = ({
     >
       <div
         className={clsx(
-          'bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-full w-full sm:w-[32rem] relative',
+          'bg-white dark:bg-gray-800 rounded-card shadow-lg max-w-full w-full sm:w-[32rem] relative',
           className
         )}
         onClick={(e) => e.stopPropagation()}

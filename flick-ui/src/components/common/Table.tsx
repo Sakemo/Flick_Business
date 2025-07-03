@@ -39,14 +39,14 @@ function Table<T>({
   };
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-soft">
+    <div className="overflow-x-auto rounded-md border border-gray-200 dark:border-gray-700 shadow-soft">
       <table
         className={clsx(
           'min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-card-light dark:bg-card-dark',
           className
         )}
       >
-        <thead className="bg-gray-50 dark:bg-gray-700/50">
+        <thead className="brand-muted dark:bg-gray-700/50">
           <tr>
             {columns.map((col, index) => (
               <th
@@ -92,7 +92,7 @@ function Table<T>({
               <tr
                 key={rowId}
                 className={clsx(
-                  'hover:=bg-gray-50 dark:hover:bg-gray-700/40 transition-colors',
+                  'hover:=brand-muted dark:hover:bg-gray-700/40 transition-colors',
                   onRowClick && 'cursor-pointer',
                   selectedRowId === rowId && 'bg-brand-muted/50 dark:bg-gray-700'
                 )}

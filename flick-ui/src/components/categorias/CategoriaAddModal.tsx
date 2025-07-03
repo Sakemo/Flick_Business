@@ -70,7 +70,7 @@ const CategoriaAddModal: React.FC<CategoriaAddModalProps> = ({
             autoFocus
           />
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800 px-6 py-4 flex justify-end space-x-3">
+        <div className="brand-muted dark:bg-gray-800 px-6 py-4 flex justify-end space-x-3">
           <Button type="button" variant="secondary" onClick={onClose} disabled={isLoading}>
             {t('userActions.cancel')}
           </Button>

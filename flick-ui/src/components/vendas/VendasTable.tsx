@@ -103,7 +103,7 @@ const VendasTable: React.FC<VendasTableProps> = ({
 
         const venda = item;
         return (
-          <tr key={venda.id} onClick={() => onViewDetails(venda)} className={clsx('hover:bg-gray-50 dark:hover:bg-gray-700/40 transition-colors cursor-pointer', selectedRowId === venda.id && 'bg-brand-muted/50 dark:bg-gray-700')}>
+          <tr key={venda.id} onClick={() => onViewDetails(venda)} className={clsx('hover:brand-muted dark:hover:bg-gray-700/40 transition-colors cursor-pointer', selectedRowId === venda.id && 'bg-brand-muted/50 dark:bg-gray-700')}>
             {cols.map((col, index) => (
               <td key={index} className={clsx(
                 'px-4 py-3 whitespace-nowrap text-sm text-text-primary dark:text-gray-200', col.className)}>

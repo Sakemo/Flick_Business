@@ -327,7 +327,7 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
           />
           {errors.form && <p className="text-xs text-red-500 mt-1">{errors.form}</p>}
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800 px-6 py-4 flex justify-end space-x-2">
+        <div className="brand-muted dark:bg-gray-800 px-6 py-4 flex justify-end space-x-2">
           <Button type="button" variant="secondary" onClick={onClose} disabled={isLoading}>
             Cancelar
           </Button>

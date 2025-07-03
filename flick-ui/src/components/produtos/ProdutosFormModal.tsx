@@ -186,7 +186,7 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
             type="checkbox"
             checked={formData.ativo ?? true}
             onChange={handleChange}
-            className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+            className="h-4 w-4 rounded-md border-gray-300 text-brand-primary focus:ring-brand-primary"
           />
           <label
             htmlFor="ativo"

@@ -92,7 +92,7 @@ const FornecedorAddModal: React.FC<FornecedorAddModalProps> = ({
           </Select>
           {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
         </div>
-        <div className="bg-gray-50 dark:bg-gray-800 px-6 py-4 flex justify-end space-x-3">
+        <div className="brand-muted dark:bg-gray-800 px-6 py-4 flex justify-end space-x-3">
           <Button
             className="p-4"
             type="button"

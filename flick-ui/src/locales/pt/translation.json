@@ -33,7 +33,11 @@
     "mostRecent": "Mais Recente",
     "oldest": "Mais Antigo",
     "highestValue": "Maior Valor",
-    "lowestValue": "Menor Valor"
+    "lowestValue": "Menor Valor",
+    "today": "Hoje",
+    "month": "Este Mês",
+    "year": "Este Ano",
+    "all": "Ver Tudo"
   },
   "userActions": {
     "add": "Adicionar ",

@@ -9,10 +9,10 @@ export default {
     extend: {
       colors: {
         // Paleta principal
-        'brand-primary': '#6D28D9', // Roxo vibrante
-        'brand-accent': '#FDE047', // Amarelo limão
-        'brand-secondary-accent': '#38BDF8', // Azul Ciano
-        'brand-muted': '#EDE9FE',  // Roxo pastel
+        'brand-primary': '#00BFFF', // Roxo vibrante
+        'brand-accent': '#7DF9FF', // Amarelo limão
+        'brand-secondary-accent': '#8A2BE2', // Azul Ciano
+        'brand-muted': '#A3A3A3',  // Roxo pastel
         'bg-light': '#F8F9FA',     // Fundo claro
         'bg-dark': '#1A202C',      // Fundo escuro
         'card-light': '#F9FAFB',   // Card claro
@@ -26,9 +26,9 @@ export default {
         sans: ['Inter', 'ui-sans-serif', 'system-ui'],
       },
       borderRadius: {
-        'card': '1rem',     // 16px
-        'btn': '0.5rem',    // 8px
-        'lg': '1.5rem',     // 24px opcional para visuais mais "soft"
+        'card': '0.6rem',     // 16px
+        'btn': '0.3rem',    // 8px
+        'lg': '1.3rem',     // 24px opcional para visuais mais "soft"
       },
       boxShadow: {
         'soft': '0 2px 12px rgba(0, 0, 0, 0.06)',

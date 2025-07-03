@@ -155,16 +155,9 @@ const VendasPage: React.FC = () => {
     setError(null);
     try {
       const params: GetVendasParams = { page: currentPage, size: 8 };
-      if (filtroDataInicio) {
-        const dataInicio = new Date(filtroDataInicio);
-        dataInicio.setHours(0,0,0,0);
-        params.inicio = dataInicio.toISOString();
-      }
-      if (filtroDataFim) {
-        const dataFim = new Date(filtroDataFim);
-        dataFim.setHours(23,59,59,999);
-        params.fim = dataFim.toISOString();
-      }
+
+      if (filtroDataInicio) params.inicio = `${filtroDataInicio}T00:00:00`;
+      if (filtroDataFim) params.fim = `${filtroDataFim}T23:59:59`;
       if (filtroClienteId) params.clienteId = parseInt(filtroClienteId);
       if (filtroFormaPagamento) params.formaPagamento = filtroFormaPagamento;
       if (filtroProduto) params.produtoId = filtroProduto.value;

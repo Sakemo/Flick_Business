@@ -2,6 +2,7 @@ package br.com.king.flick_business.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,10 +81,32 @@ public class ProdutoService {
   }
 
   @Transactional(readOnly = true)
-  public List<ProdutoResponseDTO> listProducts(String name, Long categoriaId) {
+  public List<ProdutoResponseDTO> listProducts(String name, Long categoriaId, String orderBy) {
+    if ("maisVendido".equalsIgnoreCase(orderBy) || "menosVendido".equalsIgnoreCase(orderBy)) {
+      List<Produto> produtos = produtoRepository.findWithFiltersAndSortByVendas(name, categoriaId);
+      return produtoMapper.toResponseDTOList(produtos);
+
+    }
+    Sort sort = createSort(orderBy);
     Specification<Produto> spec = ProdutoSpecification.withFilter(name, categoriaId);
-    List<Produto> produtos = produtoRepository.findAll(spec);
+    List<Produto> produtos = produtoRepository.findAll(spec, sort);
     return produtoMapper.toResponseDTOList(produtos);
+  }
+
+  private Sort createSort(String orderBy) {
+    if (orderBy == null || orderBy.isBlank()) {
+      return Sort.by(Sort.Direction.ASC, "nome");
+    }
+
+    return switch (orderBy) {
+      case "nomeDesc" -> Sort.by(Sort.Direction.DESC, "nome");
+      case "nomeAsc" -> Sort.by(Sort.Direction.ASC, "nome");
+      case "maisBarato" -> Sort.by(Sort.Direction.ASC, "precoVenda");
+      case "maisCaro" -> Sort.by(Sort.Direction.DESC, "precoVenda");
+      case "maisAntigo" -> Sort.by(Sort.Direction.ASC, "criadoEm");
+      case "maisRecente" -> Sort.by(Sort.Direction.DESC, "criadoEm");
+      default -> Sort.by(Sort.Direction.ASC, "nome");
+    };
   }
 
   @Transactional(readOnly = true)

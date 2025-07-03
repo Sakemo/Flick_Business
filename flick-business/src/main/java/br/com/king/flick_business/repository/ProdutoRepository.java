@@ -13,6 +13,17 @@ import br.com.king.flick_business.enums.TipoUnidadeVenda;
 
 @Repository
 public interface ProdutoRepository extends JpaRepository<Produto, Long>, JpaSpecificationExecutor<Produto> {
+  @Query(value = "SELECT p.* FROM produtos p " +
+      "LEFT JOIN itens_venda iv ON p.id = iv.produto_id " +
+      "WHERE (:nome IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :nome, '%'))) " +
+      "AND (:categoriaId IS NULL OR p.categoria_id = :categoriaId) " +
+      "GROUP BY p.id " +
+      "ORDER BY COALESCE(SUM(iv.quantidade), 0) DESC, p.nome ASC", countQuery = "SELECT count(*) FROM produtos p " +
+          "WHERE (:nome IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :nome, '%'))) " +
+          "AND (:categoriaId IS NULL OR p.categoria_id = :categoriaId)", nativeQuery = true)
+  List<Produto> findWithFiltersAndSortByVendas(@Param("nome") String nome,
+      @Param("categoriaId") Long categoriaId);
+
   @Query("SELECT p FROM Produto p LEFT JOIN FETCH p.categoria LEFT JOIN FETCH p.fornecedor")
   List<Produto> findAllWithCategoriaAndFornecedor();
 

@@ -31,6 +31,8 @@
     "dateStart": "Start Date",
     "dateEnd": "End Date",
     "mostRecent": "Most Recent",
+    "mostSold": "Most Sold",
+    "newest": "Newest",
     "oldest": "Oldest",
     "highestValue": "Highest Value",
     "lowestValue": "Lowest Value",

@@ -27,18 +27,31 @@ const ProdutosPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [produtoParaEditar, setProdutoParaEditar] = useState<ProdutoResponse | null>(null);
 
+  const [ordem, setOrdem] = useState<string>(''); 
+
   const [filtroNome, setFiltroNome] = useState<string>('');
 
   const { t } = useTranslation();
+
+  const orderOptions = [
+    { value: 'nomeAsc', label: 'A-Z' },
+    { value: 'nomeDesc', label: 'Z-A' },
+    { value: 'maisCaro', label: t('filter.highestValue') },
+    { value: 'maisBarato', label: t('filter.lowestValue') },
+    { value: 'maisAntigo', label: t('filter.oldest') },
+    { value: 'maisRecente', label: t('filter.newest') },
+    { value: 'maisVendido', label: t('filter.mostSold') }
+  ]
 
   // --- Funções de Busca ---
   const fetchProdutos = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const params: { categoriaId?: number; nome?: string } = {};
+      const params: { categoriaId?: number; nome?: string; orderBy?: string } = {};
       if (filtroCategoriaId) params.categoriaId = parseInt(filtroCategoriaId);
       if (filtroNome.trim() !== '') params.nome = filtroNome.trim();
+      if (ordem) params.orderBy = ordem;
       const data = await getProdutos(params);
       console.log('LOG: PRODUTOS - ', JSON.stringify(data, null, 2));
       setProdutos(data);
@@ -48,7 +61,7 @@ const ProdutosPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [filtroCategoriaId, filtroNome]);
+  }, [filtroCategoriaId, filtroNome, ordem]);
 
   const fetchCategorias = useCallback(async () => {
     try {
@@ -166,10 +179,10 @@ const ProdutosPage: React.FC = () => {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-text-primary dark:text-white">
-          Gerenciamento de Produtos
+          {t('produtos.manage')}
         </h1>
         <Button className="p-4" onClick={handleOpenAddModal} iconLeft={<LuPlus className="mr-1" />}>
-          Adicionar Produto
+          {t('userActions.add') + ' ' + t('produtos.objectName')}
         </Button>
       </div>
 
@@ -185,7 +198,7 @@ const ProdutosPage: React.FC = () => {
           <div className="flex-grow">
             <Select
               id="filtroCategoria"
-              label="Filtrar por Categoria"
+              label={t('filter.filterBy') + ' ' + t('common.category')}
               value={filtroCategoriaId}
               onChange={handleFilterChange}
               disabled={loading}
@@ -197,6 +210,18 @@ const ProdutosPage: React.FC = () => {
                 </option>
               ))}
             </Select>
+
+
+            {(filtroCategoriaId || filtroNome) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearFilter}
+                iconLeft={<LuX />}
+                className="mt-4 sm:mt-0"
+              >
+                {t('userActions.clearFilter')}
+              </Button>)}
           </div>
           {filtroCategoriaId && (
             <Button
@@ -206,10 +231,23 @@ const ProdutosPage: React.FC = () => {
               iconLeft={<LuX />}
               className="mt-4 sm:mt-0"
             >
-              Limpar Filtro
+              {t('userActions.clearFilter')}
             </Button>
           )}
+                      <Select
+              label={t('filter.orderBy')}
+              value={ordem}
+              onChange={(e) => setOrdem(e.target.value)}
+              disabled={loading}
+            >
+              {orderOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </Select>
         </div>
+        
       </Card>
 
       <div className="flex flex-col lg:flex-row">

@@ -4,6 +4,7 @@ import { ProdutoResponse, ProdutoRequest } from '../types/domain';
 interface GetProdutosParams {
   categoriaId?:number | null;
   nome?: string;
+  orderBy?: string;
 }
 
 export const getProdutos = async (params?: GetProdutosParams) :

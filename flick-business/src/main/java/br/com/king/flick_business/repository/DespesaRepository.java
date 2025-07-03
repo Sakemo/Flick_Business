@@ -26,7 +26,7 @@ public interface DespesaRepository extends JpaRepository<Despesa, Long> {
         @Query("SELECT SUM(d.valor) FROM Despesa d WHERE d.dataDespesa BETWEEN :inicio AND :fim")
         BigDecimal sumValorByDataDespesaBetween(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 
-        @Query("SELECT SUM(d.valzor) FROM Despesa d WHERE d.tipoDespesa = :tipo AND d.dataDespesa BETWEEN :inicio AND :fim")
+        @Query("SELECT SUM(d.valor) FROM Despesa d WHERE d.tipoDespesa = :tipo AND d.dataDespesa BETWEEN :inicio AND :fim")
         BigDecimal sumValorByTipoDespesaAndDataDespesaBetween(@Param("tipo") TipoDespesa tipo,
                         @Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 

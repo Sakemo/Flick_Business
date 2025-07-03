@@ -31,6 +31,8 @@
     "dateStart": "Data Início",
     "dateEnd": "Data Fim",
     "mostRecent": "Mais Recente",
+    "mostSold": "Mais Vendido",
+    "newest": "Mais Novo",
     "oldest": "Mais Antigo",
     "highestValue": "Maior Valor",
     "lowestValue": "Menor Valor",
@@ -57,7 +59,7 @@
     "permanently": "Permanentemente"
   },
   "siteFeedback": {
-    "loading": "Carregando...",
+    "loang": "Carregando...",
     "error": "Ocorreu um erro",
     "deleteError": "Erro ao deletar",
     "noData": "Nenhum dado encontrado",

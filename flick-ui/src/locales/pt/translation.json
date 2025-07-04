@@ -9,11 +9,14 @@
     "status": "Status",
     "stock": "Estoque",
     "unit": "Unidade",
+    "payment": "Pagamento",
+    "items": "Itens",
     "paymentMethod": "Forma de Pagamento",
     "actions": "Ações",
     "details": "Detalhes",
     "client": "Cliente",
-    "date": "Data"
+    "date": "Data",
+    "totalOf": "Total de"
   },
   "sidebar": {
     "dashboard": "Dashboard",
@@ -37,6 +40,7 @@
     "highestValue": "Maior Valor",
     "lowestValue": "Menor Valor",
     "today": "Hoje",
+    "yesterday": "Ontem",
     "month": "Este Mês",
     "year": "Este Ano",
     "all": "Ver Tudo"

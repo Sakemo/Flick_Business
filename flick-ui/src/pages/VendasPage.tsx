@@ -129,7 +129,8 @@ const VendasPage: React.FC = () => {
         if(summary){
           let headerTitle = '';
           if (orderProperty === 'dataVenda'){
-            headerTitle = `Total de ${formatVendaDate(summary.groupTitle, false)}`;
+            const day = formatVendaDate(summary.groupTitle, false);
+            headerTitle = day === '1' ? t('filter.today') : day === '0' ? t('filter.yesterday') : day; 
           }  else if (orderProperty === 'cliente.nome'){
             headerTitle =  `Total de ${summary.groupTitle}`;
           }
@@ -148,7 +149,7 @@ const VendasPage: React.FC = () => {
     }
 
     return newRows;
-  }, [vendas, ordemVendas, groupSummaries])
+  }, [vendas, ordemVendas, groupSummaries, t])
 
   const fetchVendas = useCallback(async () => {
     setLoading(true);
@@ -358,7 +359,7 @@ const VendasPage: React.FC = () => {
           />
           <AutoCompleteInput
             label={`${t('filter.filterBy')} ${t('produtos.objectName')}`}
-            placeholder="Digite para buscar produto..."
+            placeholder={`${t('vendas.searchProductPlaceholder')}`}
             options={todosOsProdutos}
             value={filtroProduto}
             onChange={(selected) => {
@@ -372,7 +373,7 @@ const VendasPage: React.FC = () => {
             value={filtroClienteId}
             onChange={(e) => setFiltroClienteId(e.target.value)}
           >
-            <option value="">Todos os clientes</option>
+            <option value="">{t('vendas.allClients')}</option>
             {clientes.map((c) => (
               <option key={c.id} value={c.id.toString()}>
                 {c.nome}

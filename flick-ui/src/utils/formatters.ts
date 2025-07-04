@@ -55,12 +55,12 @@ export const formatVendaDate = (dateString: string | null | undefined, hours:boo
 
   if (today){
     return hours ? `Hoje às ${format(dateObj, 'HH:mm', { locale: ptBR })}`
-    : `Hoje`;
+    : '1';
   }
 
   if (yesterday){
     return hours ? `Ontem às ${format(dateObj, 'HH:mm', { locale: ptBR })}` 
-    : `Ontem`;
+    : '0';
   }
 
   return format (dateObj, hours ? 'dd/MM/yyyy às HH:mm' : 'dd/MM/yyyy', {locale: ptBR})

@@ -9,11 +9,13 @@
     "status": "Status",
     "stock": "Stock",
     "unit": "Unit",
+    "payment": "Payment",
+    "items": "Items",
     "paymentMethod": "Payment Method",
     "actions": "Actions",
     "details": "Details",
     "client": "Client",
-    "date": "Date"
+    "date": "Date"  
   },
   "sidebar": {
     "dashboard": "Dashboard",
@@ -37,6 +39,7 @@
     "highestValue": "Highest Value",
     "lowestValue": "Lowest Value",
     "today": "Today",
+    "yesterday": "Yesterday",
     "month": "This Month",
     "year": "This Year",
     "all": "View All"
@@ -49,6 +52,7 @@
     "searchBy": "Search by ",
     "viewAll": "View All",
     "daySells": "Today's Sales",
+    "yesterdayTotal": "Yesterday's Sales",
     "clearFilter": "Clear Filter",
     "cancel": "Cancel",
     "save": "Save",

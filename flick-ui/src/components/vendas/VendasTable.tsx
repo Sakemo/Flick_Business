@@ -6,6 +6,7 @@ import Button from '../ui/Button';
 import { LuEye, LuTrash2 } from 'react-icons/lu';
 import { TableRow } from '../../hooks/GroupHeader';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 interface VendasTableProps {
   vendas: TableRow[];
@@ -28,21 +29,22 @@ const VendasTable: React.FC<VendasTableProps> = ({
   selectedRowId,
   onDelete,
 }) => {
+  const { t } = useTranslation();
   const columns: TableColumn<VendaResponse>[] = [
     { header: 'ID', accessor: 'id', width: 'w-16' },
     {
-      header: 'Data',
+      header: t('common.date'),
       accessor: (row) => formatVendaDate(row.dataVenda, true),
     },
-    { header: 'Cliente', accessor: (row) => row.cliente?.nome || 'N/A' },
+    { header: t('common.client'), accessor: (row) => row.cliente?.nome || 'N/A' },
     {
-      header: 'Itens',
+      header: t('common.items'),
       accessor: (row) => row.itens.length,
       className: 'text-center',
       headerClassName: 'text-center',
     },
     {
-      header: 'Pagamento',
+      header: t('common.payment'),
       accessor: (row) => (
         <Badge colorScheme={BadgeColorByFormaPagamento[row.formaPagamento]} variant="subtle">
           {row.formaPagamento.replace('_', ' ')}
@@ -50,20 +52,20 @@ const VendasTable: React.FC<VendasTableProps> = ({
       ),
     },
     {
-      header: 'Valor Total',
+      header: t('vendas.form.totalValue'),
       accessor: (row) => formatCurrency(row.valorTotal),
       className: 'text-right font-semibold',
       headerClassName: 'text-right',
     },
     {
-      header: 'Ações',
+      header: t('common.actions'),
       accessor: (row) => (
         <div className="flex justify-end">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => onViewDetails(row)}
-            title="Ver detalhes"
+            title={t('common.details')}
           >
             <LuEye className="h-4 w-4" />
           </Button>
@@ -72,7 +74,7 @@ const VendasTable: React.FC<VendasTableProps> = ({
             size="icon"
             onClick={() => onDelete(row.id, `#${row.id} de ${formatCurrency(row.valorTotal)}`)}
             className="text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover-bg-red-700/50"
-            title="Deletar Venda"
+            title={t('userActions.delete')}
           >
             <LuTrash2 className="h-4 w-4" />
           </Button>
@@ -85,7 +87,7 @@ const VendasTable: React.FC<VendasTableProps> = ({
     <Table<TableRow>
       columns={columns}
       data={vendas}
-      emptyMessage="Nenhuma venda encontrada"
+      emptyMessage={t('siteFeedback.noData')}
       selectedRowId={selectedRowId}
       renderRow={(item, cols) => {
         if ('isGroupHeader' in item){

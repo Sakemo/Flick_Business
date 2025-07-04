@@ -44,6 +44,7 @@
   "userActions": {
     "add": "Adicionar ",
     "edit": "Editar",
+    "copy": "Copiar",
     "delete": "Deletar",
     "searchBy": "Buscar por ",
     "viewAll": "Ver Tudo",
@@ -56,12 +57,15 @@
     "confirm": "Confirmar",
     "all": "Todos",
     "no": "Não",
-    "permanently": "Permanentemente"
+    "permanently": "Permanentemente",
+    "inactivate": "Desativar",
+    "activate": "Ativar"
   },
   "siteFeedback": {
     "loang": "Carregando...",
     "error": "Ocorreu um erro",
     "deleteError": "Erro ao deletar",
+    "copyError": "Erro ao copiar",
     "noData": "Nenhum dado encontrado",
     "confirmDelete": "Tem certeza que deseja deletar?",
     "inactive": "Inativo",

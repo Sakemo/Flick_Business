@@ -3,17 +3,20 @@ import { ProdutoResponse } from '../../types/domain';
 import Table, { TableColumn } from '../common/Table';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
-import { LuCheck, LuDelete, LuPencil, LuTrash2 } from 'react-icons/lu';
+import { LuCheck, LuCopy, LuDelete, LuPencil, LuTrash2 } from 'react-icons/lu';
 import { format } from 'date-fns';
 import { formatCurrency } from '../../utils/formatters';
+import { useTranslation } from 'react-i18next';
+
 
 interface ProdutosTableProps {
   produtos: ProdutoResponse[];
   onEdit: (produto: ProdutoResponse) => void;
   onDelete: (id: number, nomeProduto: string, status: boolean) => void;
   onDeletePerm: (id: number, nomeProduto: string) => void;
-  isLoading?: boolean;
   onRowClick: (produto: ProdutoResponse) => void;
+  onCopy: (id: number) => void;
+  isLoading?: boolean;
   selectedRowId: number | undefined;
 }
 
@@ -22,28 +25,30 @@ const ProdutosTable: React.FC<ProdutosTableProps> = ({
   onEdit,
   onDelete,
   onDeletePerm,
-  isLoading,
   onRowClick,
+  onCopy,
+  isLoading,
   selectedRowId,
 }) => {
+  const { t } = useTranslation();
   const columns: TableColumn<ProdutoResponse>[] = [
     {
-      header: 'Nome',
+      header: t('common.name'),
       accessor: 'nome',
       headerClassName: 'w-1/4',
     },
     {
-      header: 'Categoria',
+      header: t('common.category'),
       accessor: (row) => row.categoria?.nome || 'N/A',
     },
     {
-      header: 'Preço de Venda',
+      header: t('produtos.form.salesPrice'),
       accessor: (row) => formatCurrency(row.precoVenda),
       className: 'text-right',
       headerClassName: 'text-right',
     },
     {
-      header: 'Status',
+      header: t('common.status'),
       accessor: (row) => (
         <Badge colorScheme={row.ativo ? 'green' : 'red'}>{row.ativo ? 'Ativo' : 'Inativo'}</Badge>
       ),
@@ -51,19 +56,19 @@ const ProdutosTable: React.FC<ProdutosTableProps> = ({
       headerClassName: 'text-center',
     },
     {
-      header: 'Estoque',
+      header: t('common.stock'),
       accessor: (row) => `${row.quantidadeEstoque} ${row.tipoUnidadeVenda}`,
       className: 'text-center',
       headerClassName: 'text-center',
     },
     {
-      header: 'Últ. Atualização',
+      header: t('produtos.lastUpdate'),
       accessor: (row) => format(new Date(row.atualizadoEm), 'dd/MM/yyyy HH:mm'),
     },
     {
-      header: 'Ações',
+      header: t('common.actions'),
       accessor: (row) => (
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end space-x-1">
           <Button
             variant="ghost"
             size="icon"
@@ -71,9 +76,20 @@ const ProdutosTable: React.FC<ProdutosTableProps> = ({
               e.stopPropagation();
               onEdit(row);
             }}
-            title="Editar"
+            title={t('userActions.edit')}
           >
             <LuPencil className="h-4 w-4" />
+          </Button>
+          <Button
+            variant='ghost'
+            size='icon'
+            onClick={(e) => {
+              e.stopPropagation();
+              onCopy(row.id);
+            }}
+            title={t('userActions.copy')}
+          >
+            <LuCopy className='h-4 w-4' />
           </Button>
           <Button
             variant="ghost"
@@ -83,7 +99,7 @@ const ProdutosTable: React.FC<ProdutosTableProps> = ({
               onDelete(row.id, row.nome, row.ativo);
             }}
             className="text-red-500 hover:bg-red-100 dark:hover:gb-red-700/50"
-            title={row.ativo ? 'Desativar' : 'Ativar'}
+            title={row.ativo ? t('userActions.inactivate') : t('userActions.activate')}
           >
             {row.ativo ? <LuDelete className="h-4 w-4" /> : <LuCheck className="h-4 w-4" />}
           </Button>
@@ -94,7 +110,7 @@ const ProdutosTable: React.FC<ProdutosTableProps> = ({
               e.stopPropagation();
               onDeletePerm(row.id, row.nome);
             }}
-            title="Deletar"
+            title={t('userActions.delete')}
           >
             <LuTrash2 className="h-4 w-4" />
           </Button>
@@ -109,7 +125,7 @@ const ProdutosTable: React.FC<ProdutosTableProps> = ({
       columns={columns}
       data={produtos}
       isLoading={isLoading}
-      emptyMessage="Nenhum produto registrado"
+      emptyMessage={t('siteFeedback.noData')}
       onRowClick={onRowClick}
       selectedRowId={selectedRowId}
     />

@@ -68,6 +68,14 @@ public class ProdutoController {
     return ResponseEntity.ok(produtoAtualizado);
   }
 
+  // Copiar Produto
+  @PostMapping("/{id}/copiar")
+  public ResponseEntity<ProdutoResponseDTO> copiarProduto(@PathVariable Long id, UriComponentsBuilder uriBuilder) {
+    ProdutoResponseDTO produtoCopiadoDTO = produtoService.copiarProduto(id);
+    URI uri = uriBuilder.path("/api/produtos/{id}").buildAndExpand(produtoCopiadoDTO.id()).toUri();
+    return ResponseEntity.created(uri).body(produtoCopiadoDTO);
+  }
+
   // Deletar Produto
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deletarProduto(@PathVariable Long id) {

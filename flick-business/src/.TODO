@@ -15,7 +15,7 @@
 - Clientes: Adicionar validações antes de deletar caso esteja associado a uma venda
 - Produto: Adicionar pesquisa por nome [X]
 - Produto: Filtro de apenas ativos
-- Produto: Ordenar por (A-Z, Mais Caro, Mais Barato, Mais Vendido, Menos Vendido, Mais Recente, Mais Antigo)
+- Produto: Ordenar por (A-Z, Mais Caro, Mais Barato, Mais Vendido, Menos Vendido, Mais Recente, Mais Antigo) [X]
 - Produto: Adiconar função de copiar produto rapidamente
 - Despesas: Card de detalhes
 - Despesas: Input de pesquisa por nome
@@ -28,5 +28,8 @@
 - Paginação de Clientes: no maximo 6 por pagina e escolha de paginas
 - Cards de vendas: Soma total das vendas que aparecem na tabela considerando os filtros aplicados. card deve ficar acima da tabela e embaixo dos filtros.
 - Geral: Lidar com configurações de ne    gócio gerais (Nome do negócio)
+- Geral: Menu Hamburguer
+- Categorias: Deletar, editar e adicinar categorias em um modal em Produtos
+- Fornecedores: Deletar, editar e adicinar forcenecedores em um modal em Produtos
 - Botão de doação
 - Marca de King

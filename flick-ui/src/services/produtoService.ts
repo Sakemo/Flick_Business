@@ -51,6 +51,17 @@ Promise<ProdutoResponse> => {
   }
 };
 
+// Copiar Produto
+export const copyProduto = async (id: number): Promise<ProdutoResponse> => {
+  try {
+    const response = await apiClient.post<ProdutoResponse>(`/api/produtos/${id}/copiar`);
+    return response.data;
+  } catch (error){
+    console.error(`Erro ao copiar produto ${id}: `, error);
+    throw error;
+  }
+};
+
 export const deleteProduto = async (id:number) : Promise<void> => {
   try{
     await apiClient.delete(`/api/produtos/${id}`)

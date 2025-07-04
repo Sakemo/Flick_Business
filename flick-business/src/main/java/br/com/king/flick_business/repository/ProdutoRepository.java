@@ -37,4 +37,6 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long>, JpaSpec
   List<Produto> findByAtivoTrueAndCategoriaId(Long categoriaId);
 
   List<Produto> findByTipoUnidadeVenda(TipoUnidadeVenda tipoUnidadeVenda);
+
+  List<Produto> findByNomeStartingWith(String prefixo);
 }

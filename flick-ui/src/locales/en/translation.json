@@ -44,6 +44,7 @@
   "userActions": {
     "add": "Add ",
     "edit": "Edit",
+    "copy": "Copy",
     "delete": "Delete",
     "searchBy": "Search by ",
     "viewAll": "View All",
@@ -56,7 +57,9 @@
     "confirm": "Confirm",
     "all": "All",
     "no": "No",
-    "permanently": "Permanently"
+    "permanently": "Permanently",
+    "inactivate": "Disable",
+    "activate": "Enable"
   },
   "siteFeedback": {
     "loading": "Loading...",

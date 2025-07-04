@@ -1,5 +1,6 @@
 package br.com.king.flick_business.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.domain.Sort;
@@ -107,6 +108,62 @@ public class ProdutoService {
       case "maisRecente" -> Sort.by(Sort.Direction.DESC, "criadoEm");
       default -> Sort.by(Sort.Direction.ASC, "nome");
     };
+  }
+
+  @Transactional
+  public ProdutoResponseDTO copiarProduto(Long id) {
+    // 1. Encontra o produto original
+    Produto original = produtoRepository.findById(id)
+        .orElseThrow(() -> new RecursoNaoEncontrado("Produto não encontrado para cópia com ID: " + id));
+
+    // 2. Define o nome base para a busca de cópias
+    String nomeBase = original.getNome();
+    // Remove um sufixo " - Cópia (n)" se o produto que está sendo copiado já for
+    // uma cópia
+    if (nomeBase.matches(".* - Cópia \\(\\d+\\)$")) {
+      nomeBase = nomeBase.substring(0, nomeBase.lastIndexOf(" - Cópia"));
+    }
+    String prefixoBusca = nomeBase + " - Cópia";
+
+    // 3. Conta quantas cópias já existem
+    List<Produto> copiasExistentes = produtoRepository.findByNomeStartingWith(prefixoBusca);
+    int proximoNumeroCopia = copiasExistentes.size() + 1;
+
+    // Validação extra para garantir que o nome não se repita caso uma cópia
+    // intermediária tenha sido deletada
+    String novoNome;
+    boolean nomeDisponivel = false;
+    while (!nomeDisponivel) {
+      novoNome = String.format("%s - Cópia (%d)", nomeBase, proximoNumeroCopia);
+      String finalNovoNome = novoNome; // Variável final para usar na lambda
+      if (copiasExistentes.stream().noneMatch(p -> p.getNome().equalsIgnoreCase(finalNovoNome))) {
+        nomeDisponivel = true;
+      } else {
+        proximoNumeroCopia++;
+      }
+    }
+    novoNome = String.format("%s - Cópia (%d)", nomeBase, proximoNumeroCopia);
+
+    // 4. Cria a nova instância do produto
+    Produto copia = new Produto();
+    copia.setNome(novoNome); // Usa o novo nome com o contador
+
+    // ... (resto da lógica de copiar atributos permanece a mesma)
+    copia.setDescricao(original.getDescricao());
+    copia.setPrecoVenda(original.getPrecoVenda());
+    copia.setPrecoCustoUnitario(original.getPrecoCustoUnitario());
+    copia.setTipoUnidadeVenda(original.getTipoUnidadeVenda());
+    copia.setCategoria(original.getCategoria());
+    copia.setFornecedor(original.getFornecedor());
+    copia.setAtivo(false);
+    copia.setQuantidadeEstoque(BigDecimal.ZERO);
+    copia.setCodigoBarras(null);
+
+    // 5. Salva a nova entidade
+    Produto produtoCopiado = produtoRepository.save(copia);
+
+    // 6. Retorna o DTO
+    return produtoMapper.toResponseDTO(produtoCopiado);
   }
 
   @Transactional(readOnly = true)

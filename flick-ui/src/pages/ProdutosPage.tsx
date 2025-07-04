@@ -3,7 +3,7 @@
 //TODO: FILTRO DE APENAS ATIVOS
 import React, { useState, useEffect, useCallback } from 'react';
 import { LuPlus, LuSearch, LuX } from 'react-icons/lu';
-import { getProdutos, deleteProduto, deleteProdutoFisicamente } from '../services/produtoService';
+import { getProdutos, deleteProduto, deleteProdutoFisicamente, copyProduto } from '../services/produtoService';
 import { getCategorias } from '../services/categoriaService';
 import { ProdutoResponse, CategoriaResponse } from '../types/domain';
 import ProdutosTable from '../components/produtos/ProdutosTable'; // Criaremos depois
@@ -91,6 +91,18 @@ const ProdutosPage: React.FC = () => {
   const handleOpenEditModal = (produto: ProdutoResponse) => {
     setProdutoParaEditar(produto);
     setIsModalOpen(true);
+  };
+
+  const handleCopyProduto = async (id: number) => {
+    try {
+      await copyProduto(id);
+      fetchProdutos();
+    } catch(err){
+      setError(t('siteFeedback.copyError', 'Falha ao copiar o produto'));
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCloseModal = () => {
@@ -268,6 +280,7 @@ const ProdutosPage: React.FC = () => {
               onDeletePerm={handleDeletarFisicamente}
               onRowClick={handleVerDetalhesProduto}
               selectedRowId={produtoSelecionadoDetalhes?.id}
+              onCopy={handleCopyProduto}
             />
           )}
         </div>

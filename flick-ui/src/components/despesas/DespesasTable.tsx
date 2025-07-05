@@ -13,9 +13,11 @@ interface DespesasTableProps {
   despesas: DespesaResponse[];
   onEdit: (despesa: DespesaResponse) => void;
   onDelete: (id: number) => void;
+  onRowClick: (despesa: DespesaResponse) => void;
+  selectedRowId: number | undefined;
 }
 
-const DespesasTable: React.FC<DespesasTableProps> = ({ despesas, onEdit, onDelete }) => {
+const DespesasTable: React.FC<DespesasTableProps> = ({ despesas, onEdit, onDelete, onRowClick, selectedRowId }) => {
   const { t } = useTranslation();
     const currentLocale = i18n.language.startsWith('pt') ? ptBR : enUS;
 
@@ -53,13 +55,13 @@ const DespesasTable: React.FC<DespesasTableProps> = ({ despesas, onEdit, onDelet
       header: t('common.actions'),
       accessor: (row) => (
         <div className="flex justify-end space-x-2">
-          <Button variant="ghost" size="icon" onClick={() => onEdit(row)} title={t('userActions.edit')}>
+          <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(row)}} title={t('userActions.edit')}>
             <LuPencil className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onDelete(row.id)}
+            onClick={(e) => {e.stopPropagation();  onDelete(row.id)}}
             title= {t('userActions.delete')}
             className="hover:bg-red-100 dark:hover:bg-red-700/50"
           >
@@ -76,7 +78,8 @@ const DespesasTable: React.FC<DespesasTableProps> = ({ despesas, onEdit, onDelet
       columns={columns}
       data={despesas}
       emptyMessage= {t('siteFeedback.noData')}
-      selectedRowId={undefined}
+      selectedRowId={selectedRowId}
+      onRowClick={onRowClick}
     />
   );
 };

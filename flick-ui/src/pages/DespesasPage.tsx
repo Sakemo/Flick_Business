@@ -9,8 +9,11 @@ import Select from '../components/ui/Select';
 import DespesasTable from '../components/despesas/DespesasTable';
 import DespesaFormModal from '../components/despesas/DespesaFormModal';
 import { useTranslation } from 'react-i18next';
+import DespesaDetalhesDrawer from '../components/despesas/DespesaDetalhesDrawer';
+import clsx from 'clsx';
 
 const DespesaPage: React.FC = () => {
+  const [despesaSelecionada, setDespesaSelecionada] = useState<DespesaResponse | null>(null);
   const [despesas, setDespesas] = useState<DespesaResponse[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +47,18 @@ const DespesaPage: React.FC = () => {
     useEffect(() => {
       fetchDespesas();
     }, [fetchDespesas]);
+
+    const handleRowClick = (despesa: DespesaResponse) => {
+      if(despesaSelecionada && despesaSelecionada.id === despesa.id){
+        setDespesaSelecionada(null);
+      } else {
+        setDespesaSelecionada(despesa);
+      }
+    }
+
+    const handleCloseDrawer = () => {
+      setDespesaSelecionada(null);
+    }
 
     const handleOpenAddModal = () => {
       setDespesaParaEditar(null);
@@ -124,21 +139,45 @@ const DespesaPage: React.FC = () => {
           </div>
         </Card>
 
-        {loading && <p className="p-6 text-center">{t('siteFeedback.loading')}</p>}
-        {error && <p className="p-6 text-center text-red-500">{error}</p>}
-        {!loading && !error && (
-          <DespesasTable despesas={despesas} onEdit={handleOpenEditModal} onDelete={handleDelete} />
-        )}
 
-        {isModalOpen && (
-          <DespesaFormModal
-            isOpen={isModalOpen}
-            onClose={handleCloseModal}
-            onSaveSuccess={handleSaveSucess}
-            despesaInicial={despesaParaEditar}
-          />
-        )}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Coluna da Tabela */}
+        <div className={clsx("transition-all duration-300 ease-in-out", despesaSelecionada ? "lg:w-2/3" : "w-full")}>
+          {loading && <p className="p-6 text-center">{t('siteFeedback.loading')}</p>}
+          {error && <p className="p-6 text-center text-red-500">{error}</p>}
+          {!loading && !error && (
+            <DespesasTable
+              despesas={despesas}
+              onEdit={handleOpenEditModal}
+              onDelete={handleDelete}
+              onRowClick={handleRowClick}
+              selectedRowId={despesaSelecionada?.id}
+            />
+          )}
+        </div>
+
+        {/* Coluna do Drawer (aparece e desaparece) */}
+        <div className={clsx("transition-all duration-300 ease-in-out", despesaSelecionada ? "lg:w-1/3 opacity-100" : "w-0 opacity-0 overflow-hidden")}>
+          {despesaSelecionada && (
+            <DespesaDetalhesDrawer 
+              despesa={despesaSelecionada}
+              onClose={handleCloseDrawer}
+              onEdit={handleOpenEditModal}
+            />
+          )}
+        </div>
       </div>
+
+
+      {isModalOpen && (
+        <DespesaFormModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSaveSuccess={handleSaveSucess}
+          despesaInicial={despesaParaEditar}
+        />
+      )}
+    </div>
     );
 };
 export default DespesaPage;

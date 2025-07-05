@@ -66,11 +66,14 @@ const DespesaDetalhesDrawer: React.FC<DespesaDetalhesDrawerProps> = ({
              <DetailRow label={t('vendas.form.observations')} value={
                 <p className="whitespace-pre-wrap">{despesa.observacao}</p>
              }/>
-          )}
-          <DetailRow label={t('produtos.createdAt')} value={formatVendaDate(despesa.dataCriacao, true)} />
-          <DetailRow label={t('produtos.lastUpdate')} value={formatVendaDate(despesa.dataAtualizacao, true)} />
-                </dl>
+            )}
+            <DetailRow label={t('produtos.createdAt')} value={formatVendaDate(despesa.dataCriacao, true)} />
+            <DetailRow label={t('produtos.lastUpdate')} value={formatVendaDate(despesa.dataAtualizacao, true)} />
+            <DetailRow label={t('common.description')} value={despesa.observacao} />
+            </dl>
             </div>
         </Card>
     )
-}
+};
+
+export default DespesaDetalhesDrawer;

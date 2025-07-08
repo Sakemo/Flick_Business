@@ -122,18 +122,18 @@ const VendasPage: React.FC = () => {
       if(itemGroupKey && !addedHeaders.has(itemGroupKey)){
         const summary = groupSummaries[itemGroupKey];
         if(summary){
-          let headerTitle = '';
+          const headerTitle = [];
           if (orderProperty === 'dataVenda'){
             const day = formatVendaDate(summary.groupTitle, false);
-            headerTitle = day === '1' ? t('filter.today') : day === '0' ? t('filter.yesterday') : day; 
+            headerTitle[0] = day[0] === '1' ? t('filter.today') : day[0] === '0' ? t('filter.yesterday') : day; 
           }  else if (orderProperty === 'cliente.nome'){
-            headerTitle =  `Total de ${summary.groupTitle}`;
+            headerTitle[0] =  `Total de ${summary.groupTitle}`;
           }
-          
+          const headerTitleStr = Array.isArray(headerTitle[0]) ? headerTitle[0].join(' ') : headerTitle[0] ?? '';
           newRows.push({
             isGroupHeader: true,
             groupKey: summary.groupKey,
-            title: headerTitle,
+            title: headerTitleStr,
             value: summary.totalValue,
             itemCount: 0
           });
@@ -150,32 +150,29 @@ const VendasPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const params: GetVendasParams = { page: currentPage, size: 8 };
+      const params: GetVendasParams = { page: currentPage, size: 8, orderBy: ordemVendas };
 
       
       // Definir data inicio
-      const dataInicio = new Date(filtroDataInicio);
-      dataInicio.setHours(0, 0, 0, 0);
-      params.inicio = dataInicio.toISOString();
+      if (filtroDataInicio) {
+        params.inicio = new Date(`${filtroDataInicio}T00:00:00.000Z`).toISOString();
+      }
       
       // Definir data fim
-      
-      const dataFim = new Date(filtroDataFim);
-      dataFim.setHours(23, 59, 59, 999);      
-      params.fim = dataFim.toISOString();
+      if (filtroDataFim){
+        params.fim = new Date(`${filtroDataFim}T23:59:59.999Z`).toISOString();
+      }
 	
       if (filtroClienteId) params.clienteId = parseInt(filtroClienteId);
       if (filtroFormaPagamento) params.formaPagamento = filtroFormaPagamento;
       if (filtroProduto) params.produtoId = filtroProduto.value;
-      params.page = currentPage; params.size = 8;
-      if (ordemVendas) params.orderBy = ordemVendas;
 
       const [pageResponse, grossTotalResponse, expensesResponse] = await Promise.all([
         getVendas(params),
         getVendasGrossTotal(params),
         getTotalExpenses({
-          begin: params.inicio || null,
-          end: params.fim || null
+          begin: params.inicio,
+          end: params.fim
         })
       ]);
       setVendas(pageResponse.content);
@@ -183,20 +180,17 @@ const VendasPage: React.FC = () => {
       setGrossTotal(grossTotalResponse);
       setTotalExpenses(expensesResponse);
 
-      const orderProperty = ordemVendas.split(',')[0];
-      if(orderProperty === "dataVenda" || orderProperty === 'cliente.nome')
-	{
-
-      const summaryResponse = await getVendasSummary(params);
-      const summaryMap = summaryResponse.reduce((acc, summary) => {
-        acc[summary.groupKey] = summary;
-        return acc;
-      }, {} as Record<string, GroupSummary>);
-      setGroupSummaries(summaryMap);
-	
-	} else {
-		setGroupSummaries({});
-	}
+        const orderProperty = ordemVendas.split(',')[0];
+        if (orderProperty === "dataVenda" || orderProperty === 'cliente.nome') {
+            const summaryResponse = await getVendasSummary(params);
+            const summaryMap = summaryResponse.reduce((acc, summary) => {
+                acc[summary.groupKey] = summary;
+                return acc;
+            }, {} as Record<string, GroupSummary>);
+            setGroupSummaries(summaryMap);
+        } else {
+            setGroupSummaries({});
+        }
     } catch (err) {
       setError('Erro ao buscar vendas');
       console.error('Erro ao buscar vendas:', err);

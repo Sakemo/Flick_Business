@@ -31,9 +31,9 @@ export const formatCurrency = (value: number | null | undefined): string => {
   }
 };
 
-export const formatVendaDate = (dateString: string | null | undefined, hours:boolean | null | undefined): string => {
+export const formatVendaDate = (dateString: string | null | undefined, hours:boolean | null | undefined): string[] => {
   if (!dateString) {
-    return 'Data inválida';
+    return ['Data inválida'];
   }
   let dateObj: Date;
   try {
@@ -41,28 +41,28 @@ export const formatVendaDate = (dateString: string | null | undefined, hours:boo
     if (isNaN(dateObj.getTime())) {
       dateObj = new Date(dateString);
       if (isNaN(dateObj.getTime())){
-        return 'Data inválida'
+        return ['Data inválida']
       }
     }
 
   } catch (error){
     console.error("Erro ao parsear data: ", dateString, error);
-    return `${error}`  
+    return [`${error}`  ]
   }
 
   const today = isToday(dateObj);
   const yesterday = isYesterday(dateObj);
 
   if (today){
-    return hours ? `Hoje às ${format(dateObj, 'HH:mm', { locale: ptBR })}`
-    : '1';
-  }
+    return hours ? ['1',` | ${format(dateObj, 'HH:mm', { locale: ptBR })}`]
+    : ['1'];
+  };
 
   if (yesterday){
-    return hours ? `Ontem às ${format(dateObj, 'HH:mm', { locale: ptBR })}` 
-    : '0';
-  }
+    return hours ? ['0', ` | ${format(dateObj, 'HH:mm', { locale: ptBR })}`]
+    : ['0'];
+  };
 
-  return format (dateObj, hours ? 'dd/MM/yyyy às HH:mm' : 'dd/MM/yyyy', {locale: ptBR})
+  return [`${format (dateObj, hours ? 'dd/MM/yyyy | HH:mm' : 'dd/MM/yyyy', {locale: ptBR})}`];
 
 } 

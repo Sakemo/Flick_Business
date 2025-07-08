@@ -29,12 +29,23 @@ const VendasTable: React.FC<VendasTableProps> = ({
   selectedRowId,
   onDelete,
 }) => {
+
+  const getTimeRow = (row:any): string[] => {
+    return formatVendaDate(row.dataVenda, true);
+  }
+
   const { t } = useTranslation();
   const columns: TableColumn<VendaResponse>[] = [
     { header: 'ID', accessor: 'id', width: 'w-16' },
     {
       header: t('common.date'),
-      accessor: (row) => formatVendaDate(row.dataVenda, true),
+      accessor: (row) => {
+        const [day, time] = getTimeRow(row);
+
+        if (day === '1') return t('filter.today') + time;
+        if (day === '0') return t('filter.yesterday') + time;
+        return [day, time];
+      },
     },
     { header: t('common.client'), accessor: (row) => row.cliente?.nome || 'N/A' },
     {

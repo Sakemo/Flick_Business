@@ -1,6 +1,5 @@
 import apiClient from "../lib/axios";
-import { VendaRequest, VendaResponse } from "../types/domain";
-
+import { VendaRequest, VendaResponse, FormaPagamento } from "../types/domain";
 
 export interface PageResponse<T> {
   content: T[];
@@ -23,6 +22,11 @@ export interface GroupSummary {
   groupTitle: string;
   totalValue: number;
 }
+export interface TotalPorPagamento {
+  formaPagamento: FormaPagamento;
+  total: number;
+}
+
 
 export const getVendas = async (params?: GetVendasParams):Promise<PageResponse<VendaResponse>> => {
   try {
@@ -50,6 +54,16 @@ export const getVendasGrossTotal = async (params: GetVendasParams): Promise<numb
     console.error("Erro ao buscar total bruto de vendas: ", error);
     throw error;
   }
+};
+
+export const getVendasTotalPorPagamento = async(params: { inicio?: string | null; fim?:string | null }): Promise<TotalPorPagamento[]> => {
+	try {
+		const response = await apiClient.get<TotalPorPagamento[]>('/api/vendas/total-por-pagamento', { params});
+		return response.data ?? [];
+	} catch (error) {
+		console.error("Erro ao buscar totais por forma de pagamento:", error);
+		throw error;
+	}
 };
 
 export const getVendasSummary = async (params:GetVendasParams):Promise<GroupSummary[]> => {

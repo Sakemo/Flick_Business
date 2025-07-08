@@ -3,7 +3,6 @@ package br.com.king.flick_business.controller;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZonedDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import br.com.king.flick_business.dto.response.TotalPorFormaPagamentoDTO;
 import br.com.king.flick_business.dto.VendaRequestDTO;
 import br.com.king.flick_business.dto.VendaResponseDTO;
 import br.com.king.flick_business.dto.response.PageResponse;
@@ -115,6 +115,14 @@ public class VendaController {
       @RequestParam(required = false) Long produtoId) {
     BigDecimal total = vendaService.calcularTotalBrutoVendas(inicio, fim, clienteId, formaPagamento, produtoId);
     return ResponseEntity.ok(total);
+  }
+
+  @GetMapping("total-por-pagamento")
+  public ResponseEntity<List<TotalPorFormaPagamentoDTO>> getTotaisPorFormaPagamento(
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime inicio,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime fim) {
+    List<TotalPorFormaPagamentoDTO> totais = vendaService.calcularTotaisPorFormaPagamento(inicio, fim);
+    return ResponseEntity.ok(totais);
   }
 
   /**

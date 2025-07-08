@@ -150,6 +150,8 @@
     "netTotal": "Lucro",
     "grossTotalDescription": "Valor total da venda antes das despesas",
     "netTotalDescription": "Lucro após despesas",
+    "selectPaymentMethod": "Selecione um pagamento",
+    "totalForSelectedMethod": "Total para a forma selecionada",
     "form": {
       "title": "Registrar Venda",
       "anonymous": "Anônimo",

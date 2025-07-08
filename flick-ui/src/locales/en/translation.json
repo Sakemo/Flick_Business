@@ -148,7 +148,9 @@
     "netTotal": "Net Profit",
     "grossTotalDescription": "Total value of the sale before expenses",
     "netTotalDescription": "Profit after expenses",
-    "form": {
+    "selectPaymentMethod": "Select a payment method",
+    "totalForSelectedMethod": "Total for selected method",
+  "form": {
       "title": "Register Sale",
       "anonymous": "Anonymous",
       "addItem": "Add Item",

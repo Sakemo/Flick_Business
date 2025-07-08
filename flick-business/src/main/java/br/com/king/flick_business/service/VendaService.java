@@ -16,6 +16,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+import br.com.king.flick_business.dto.response.TotalPorFormaPagamentoDTO;
 import br.com.king.flick_business.dto.VendaRequestDTO;
 import br.com.king.flick_business.dto.VendaResponseDTO;
 import br.com.king.flick_business.dto.request.ItemVendaRequestDTO;
@@ -281,6 +283,21 @@ public class VendaService {
     return vendaRepository.sumValorTotalComFiltros(
         inicioQuery, fimQuery, clienteId, formaPagamentoFiltro, produtoId);
   }
+
+  @Transactional(readOnly=true)
+  public List<TotalPorFormaPagamentoDTO> calcularTotaisPorFormaPagamento(
+	ZonedDateTime inicio, ZonedDateTime fim) 
+  {
+   	ZonedDateTime inicioQuery = (inicio != null) ? inicio : ZonedDateTime.parse("1900-01-01T00:00:00Z");
+   	ZonedDateTime fimQuery = (fim != null) ? fim: ZonedDateTime.parse("9999-12-31T23:59:59Z");
+   
+   	List<Object[]> results = vendaRepository.sumValorTotalGroupByFormaPagamentoBetween(inicioQuery, fimQuery);
+   
+   	return results.stream()
+   		.map(res -> new TotalPorFormaPagamentoDTO((FormaPagamento) res[0], (BigDecimal) res[1]))
+   		.collect(Collectors.toList());
+  }
+
 
   /**
    * Busca uma venda pelo ID, incluindo itens e cliente relacionados.

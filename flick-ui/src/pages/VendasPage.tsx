@@ -9,10 +9,12 @@ import { ClienteResponse } from '../types/domain';
 import { 
   GetVendasParams, 
   GroupSummary, 
+  TotalPorPagamento, 
   deleteVendaFisicamente, 
   getVendas, 
   getVendasGrossTotal, 
-  getVendasSummary 
+  getVendasSummary, 
+  getVendasTotalPorPagamento
 } from '../services/vendaService';
 import { getClientes } from '../services/clienteService';
 import { getProdutos as fetchAllProdutos } from '../services/produtoService';
@@ -40,6 +42,7 @@ import { formatVendaDate } from '../utils/formatters';
 import { useTranslation } from 'react-i18next';
 import { AxiosError } from 'axios';
 import DateFilterDropdown, { DateFilterOption } from '../components/common/DateFilterDropdown';
+import TotalPorPagamentoCard from '../components/vendas/TotalPagamentoCard';
 
 const VendasPage: React.FC = () => {
   const { t } = useTranslation(); 
@@ -50,6 +53,8 @@ const VendasPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [grossTotal, setGrossTotal] = useState<number>(0);
+  const [totaisPorPagamento, setTotaisPorPagamento] = useState<TotalPorPagamento[]>([]);
+
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
 
@@ -167,18 +172,20 @@ const VendasPage: React.FC = () => {
       if (filtroFormaPagamento) params.formaPagamento = filtroFormaPagamento;
       if (filtroProduto) params.produtoId = filtroProduto.value;
 
-      const [pageResponse, grossTotalResponse, expensesResponse] = await Promise.all([
+      const [pageResponse, grossTotalResponse, expensesResponse, totaisPagamentoResponse] = await Promise.all([
         getVendas(params),
         getVendasGrossTotal(params),
         getTotalExpenses({
           begin: params.inicio,
           end: params.fim
-        })
+        }),
+        getVendasTotalPorPagamento({ inicio: params.inicio, fim:params.fim })
       ]);
       setVendas(pageResponse.content);
       setTotalPages(pageResponse.totalPages);
       setGrossTotal(grossTotalResponse);
       setTotalExpenses(expensesResponse);
+      setTotaisPorPagamento(totaisPagamentoResponse);
 
         const orderProperty = ordemVendas.split(',')[0];
         if (orderProperty === "dataVenda" || orderProperty === 'cliente.nome') {
@@ -282,10 +289,6 @@ const VendasPage: React.FC = () => {
     { key: 'this_year' as DateFilterOption, label: t('filter.year', t('filter.year')) },
     { key: 'all' as DateFilterOption, label: t('filter.all', t('filter.all')) },
   ];
-
-  const handleManualDateChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
-    setter(value);
-  }
 
   const handleDeleteVendaFisicamente = async (id: number, vendaDisplayInfo: string) => {
     if (
@@ -422,6 +425,7 @@ const VendasPage: React.FC = () => {
       <div className='flex flex-wrap grid-cols-4 gap-4'>
         <ValueTotalCard color='blue' value={grossTotal} />
         <ValueTotalCard color={netProfit >= 0 ? 'green' : 'red'} value={netProfit} title={t("vendas.netTotal")} description={t("vendas.netTotalDescription")} />
+        <TotalPorPagamentoCard totais={totaisPorPagamento} />
       </div>
 
       <div className="flex justify-between items-center mb-4">

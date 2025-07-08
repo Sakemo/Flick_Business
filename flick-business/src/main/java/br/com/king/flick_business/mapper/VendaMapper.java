@@ -1,6 +1,6 @@
 package br.com.king.flick_business.mapper;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.springframework.data.domain.Sort;
 
@@ -20,11 +20,13 @@ public class VendaMapper {
         }
     }
 
-    public static LocalDateTime[] buildDataRange(LocalDateTime inicio, LocalDateTime fim) {
-        LocalDateTime dataInicio = (inicio != null) ? inicio : LocalDateTime.of(1900, 1, 1, 0, 0, 0, 0);
-        LocalDateTime dataFim = (fim != null) ? fim : LocalDateTime.of(9999, 12, 31, 23, 59, 59, 999999999);
+    public static ZonedDateTime[] buildDataRange(ZonedDateTime inicio, ZonedDateTime fim) {
+        ZonedDateTime dataInicio = (inicio != null) ? inicio
+                : ZonedDateTime.of(1900, 1, 1, 0, 0, 0, 0, java.time.ZoneId.systemDefault());
+        ZonedDateTime dataFim = (fim != null) ? fim
+                : ZonedDateTime.of(9999, 12, 31, 23, 59, 59, 999999999, java.time.ZoneId.systemDefault());
 
-        return new LocalDateTime[] { dataInicio, dataFim };
+        return new ZonedDateTime[] { dataInicio, dataFim };
     }
 
     public static Sort buildSort(String orderBy) {

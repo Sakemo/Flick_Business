@@ -1,7 +1,7 @@
 package br.com.king.flick_business.service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -59,9 +59,9 @@ class ClienteServiceTest {
         .telefone("11999998888").endereco("Rua Teste, 123")
         .controleFiado(true).limiteFiado(new BigDecimal("100.00"))
         .saldoDevedor(BigDecimal.ZERO).ativo(true)
-        .dataCadastro(LocalDateTime.now().minusDays(10))
-        .dataUltimaCompraFiado(LocalDateTime.now().minusDays(5))
-        .dataAtualizacao(LocalDateTime.now().minusDays(1))
+        .dataCadastro(ZonedDateTime.now().minusDays(10))
+        .dataUltimaCompraFiado(ZonedDateTime.now().minusDays(5))
+        .dataAtualizacao(ZonedDateTime.now().minusDays(1))
         .build();
 
     clienteRequestDTO = new ClienteRequestDTO("Novo Cliente", "55566677788", "22888887777", "Avenida Nova, 456", false,

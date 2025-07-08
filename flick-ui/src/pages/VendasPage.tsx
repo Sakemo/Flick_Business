@@ -11,6 +11,7 @@ import {
   GroupSummary, 
   deleteVendaFisicamente, 
   getVendas, 
+  getVendasGrossTotal, 
   getVendasSummary 
 } from '../services/vendaService';
 import { getClientes } from '../services/clienteService';
@@ -48,7 +49,7 @@ const VendasPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-
+  const [grossTotal, setGrossTotal] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(0);
 
@@ -87,12 +88,6 @@ const VendasPage: React.FC = () => {
   ];
 
   const [ordemVendas, setOrdemVendas] = useState<string>(opcoesOrdenacaoVendas[0].value);
-
-  const grossTotal = useMemo(() => {
-    return Object.values(groupSummaries).reduce((acc, summary) => {
-      return acc + summary.totalValue;
-    }, 0)
-  }, [groupSummaries]);
 
   const netProfit = useMemo(()  => {
     return grossTotal - totalExpenses;
@@ -157,17 +152,27 @@ const VendasPage: React.FC = () => {
     try {
       const params: GetVendasParams = { page: currentPage, size: 8 };
 
-      if (filtroDataInicio) params.inicio = `${filtroDataInicio}T00:00:00`;
-      if (filtroDataFim) params.fim = `${filtroDataFim}T23:59:59`;
+      
+      // Definir data inicio
+      const dataInicio = new Date(filtroDataInicio);
+      dataInicio.setHours(0, 0, 0, 0);
+      params.inicio = dataInicio.toISOString();
+      
+      // Definir data fim
+      
+      const dataFim = new Date(filtroDataFim);
+      dataFim.setHours(23, 59, 59, 999);      
+      params.fim = dataFim.toISOString();
+	
       if (filtroClienteId) params.clienteId = parseInt(filtroClienteId);
       if (filtroFormaPagamento) params.formaPagamento = filtroFormaPagamento;
       if (filtroProduto) params.produtoId = filtroProduto.value;
       params.page = currentPage; params.size = 8;
       if (ordemVendas) params.orderBy = ordemVendas;
 
-      const [pageResponse, summaryResponse, expensesResponse] = await Promise.all([
+      const [pageResponse, grossTotalResponse, expensesResponse] = await Promise.all([
         getVendas(params),
-        getVendasSummary(params),
+        getVendasGrossTotal(params),
         getTotalExpenses({
           begin: params.inicio || null,
           end: params.fim || null
@@ -175,13 +180,23 @@ const VendasPage: React.FC = () => {
       ]);
       setVendas(pageResponse.content);
       setTotalPages(pageResponse.totalPages);
+      setGrossTotal(grossTotalResponse);
       setTotalExpenses(expensesResponse);
 
+      const orderProperty = ordemVendas.split(',')[0];
+      if(orderProperty === "dataVenda" || orderProperty === 'cliente.nome')
+	{
+
+      const summaryResponse = await getVendasSummary(params);
       const summaryMap = summaryResponse.reduce((acc, summary) => {
         acc[summary.groupKey] = summary;
         return acc;
       }, {} as Record<string, GroupSummary>);
       setGroupSummaries(summaryMap);
+	
+	} else {
+		setGroupSummaries({});
+	}
     } catch (err) {
       setError('Erro ao buscar vendas');
       console.error('Erro ao buscar vendas:', err);
@@ -233,7 +248,7 @@ const VendasPage: React.FC = () => {
     handleCloseNovaVendaModal();
     fetchVendas();
     //TODO: Toast
-  };
+  }
 
   const handleVerDetalhesVenda = (venda: VendaResponse) => {
     setVendasSelecionadaDetalhes(venda);

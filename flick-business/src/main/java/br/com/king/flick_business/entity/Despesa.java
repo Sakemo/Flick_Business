@@ -1,7 +1,7 @@
 package br.com.king.flick_business.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -69,7 +69,7 @@ public class Despesa {
   @NotNull(message = "A data da despesa não pode ser nula")
   @PastOrPresent(message = "A data da despesa deve ser no passado ou presente")
   @Column(nullable = false, name = "data_despesa")
-  private LocalDateTime dataDespesa;
+  private ZonedDateTime dataDespesa;
 
   // Tipo de despesa
   @NotNull(message = "O tipo de despesa não pode ser nulo")
@@ -80,10 +80,10 @@ public class Despesa {
   // -- METADADOS -- //
   @CreationTimestamp
   @Column(name = "data_criacao", updatable = false, nullable = false)
-  private LocalDateTime dataCriacao;
+  private ZonedDateTime dataCriacao;
 
   @UpdateTimestamp
   @Column(name = "data_atualizacao", nullable = false)
-  private LocalDateTime dataAtualizacao;
+  private ZonedDateTime dataAtualizacao;
 
 }

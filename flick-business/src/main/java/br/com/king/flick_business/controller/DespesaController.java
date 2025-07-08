@@ -2,7 +2,7 @@ package br.com.king.flick_business.controller;
 
 import java.math.BigDecimal;
 import java.net.URI;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -47,11 +47,14 @@ public class DespesaController {
   // Listar Despesas
   @GetMapping
   public ResponseEntity<List<DespesaResponseDTO>> listarDespesas(
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime inicio,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime fim,
       @RequestParam(name = "tipoDespesa", required = false) String tipoDespesa) {
 
-    List<DespesaResponseDTO> despesas = despesaService.listarDespesas(inicio, fim, tipoDespesa);
+    List<DespesaResponseDTO> despesas = despesaService.listarDespesas(
+        inicio != null ? inicio.toLocalDateTime() : null,
+        fim != null ? fim.toLocalDateTime() : null,
+        tipoDespesa);
 
     return ResponseEntity.ok(despesas);
   }
@@ -59,9 +62,11 @@ public class DespesaController {
   // Total Despesas
   @GetMapping("/total")
   public ResponseEntity<BigDecimal> getTotalExpenses(
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime begin,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
-    BigDecimal total = despesaService.calcTotalExpensesPerPeriod(begin, end);
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime begin,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime end) {
+    BigDecimal total = despesaService.calcTotalExpensesPerPeriod(
+        begin != null ? begin.toLocalDateTime() : null,
+        end != null ? end.toLocalDateTime() : null);
     return ResponseEntity.ok(total);
   }
 

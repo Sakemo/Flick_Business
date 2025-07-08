@@ -1,8 +1,9 @@
 package br.com.king.flick_business.controller;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -24,14 +25,14 @@ public class DashboardController {
   }
 
   @GetMapping("/summary")
-  public ResponseEntity<DashboardSummaryDTO> getDashboardSumarry(
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+  public ResponseEntity<DashboardSummaryDTO> getDashboardSummary(
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
-    LocalDateTime inicio = dataInicio.atStartOfDay();
-    LocalDateTime fim = dataFim.atTime(LocalTime.MAX);
+    ZonedDateTime start = startDate.atStartOfDay(java.time.ZoneId.systemDefault());
+    ZonedDateTime end = endDate.atTime(LocalTime.MAX).atZone(java.time.ZoneId.systemDefault());
 
-    DashboardSummaryDTO summary = dashboardService.getDashboardSummary(inicio, fim);
+    DashboardSummaryDTO summary = dashboardService.getDashboardSummary(start, end);
     return ResponseEntity.ok(summary);
   }
 

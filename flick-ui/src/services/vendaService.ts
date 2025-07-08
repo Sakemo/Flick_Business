@@ -37,6 +37,21 @@ export const getVendas = async (params?: GetVendasParams):Promise<PageResponse<V
   }
 };
 
+export const getVendasGrossTotal = async (params: GetVendasParams): Promise<number> => {
+  try {
+    const queryParams = { ...params };
+    delete (queryParams as any).orderBy;
+    delete (queryParams as any).page;
+    delete (queryParams as any).size;
+
+    const response = await apiClient.get<number>('/api/vendas/total-bruto', { params: queryParams });
+    return response.data ?? 0;
+  } catch (error) {
+    console.error("Erro ao buscar total bruto de vendas: ", error);
+    throw error;
+  }
+};
+
 export const getVendasSummary = async (params:GetVendasParams):Promise<GroupSummary[]> => {
   const groupBy = params.orderBy?.split(',')[0];
   if (!groupBy) return [];

@@ -13,6 +13,7 @@ import {
 import clsx from 'clsx';
 import { useDarkMode } from '../../hooks/useDarkMode';
 import LanguageSelector from '../common/LanguageSelector';
+import { useTranslation } from 'react-i18next';
 
 interface SidebarItem {
   path: string;
@@ -22,19 +23,20 @@ interface SidebarItem {
 }
 
 const Sidebar: React.FC = () => {
+  const { t } = useTranslation();
   const [theme, toggleTheme] = useDarkMode();
 
   const navItems: SidebarItem[] = [
-    { path: '/', name: 'Dashboard', icon: LuLayoutDashboard, end: true },
-    { path: '/vendas', name: 'Vendas', icon: LuShoppingCart },
-    { path: '/produtos', name: 'Produtos', icon: LuPackage },
-    { path: '/clientes', name: 'Clientes', icon: LuUsers },
-    { path: '/despesas', name: 'Despesas', icon: LuDollarSign },
+    { path: '/', name: t('sidebar.dashboard'), icon: LuLayoutDashboard, end: true },
+    { path: '/vendas', name: t('sidebar.sales'), icon: LuShoppingCart },
+    { path: '/produtos', name: t('sidebar.products'), icon: LuPackage },
+    { path: '/clientes', name: t('sidebar.clients'), icon: LuUsers },
+    { path: '/despesas', name: t('sidebar.expenses'), icon: LuDollarSign },
   ];
 
   const settingsItem: SidebarItem = {
     path: '/configuracoes',
-    name: 'Configurações',
+    name: t('sidebar.settings'),
     icon: LuSettings,
   };
 
@@ -90,7 +92,7 @@ const Sidebar: React.FC = () => {
         ) : (
           <LuSun className="mr-3 h-5 flex-shrink-0 text-gray-400 dark:text-gray-500 group-hover:text-text-primary dark:group-hover:text-gray-300 transition-colors" />
         )}
-        {theme === 'light' ? 'Modo Escuro' : 'Modo Claro'}
+        {theme === 'light' ? t('sidebar.darkMode') : t('sidebar.lightMode')}
       </button>
       {/* TODO: Adicionar link/botão de Logout aqui no futuro */}
     </aside>

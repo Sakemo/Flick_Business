@@ -1,7 +1,7 @@
 package br.com.king.flick_business.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -75,16 +75,16 @@ public class Cliente {
 
   // Data de Última Compra Fiado
   @Column(name = "data_ultima_compra_fiado")
-  private LocalDateTime dataUltimaCompraFiado;
+  private ZonedDateTime dataUltimaCompraFiado;
 
   // Metadados
   @CreationTimestamp
   @Column(name = "data_cadastro", updatable = false)
-  private LocalDateTime dataCadastro;
+  private ZonedDateTime dataCadastro;
 
   @UpdateTimestamp
   @Column(name = "data_atualizacao", nullable = false)
-  private LocalDateTime dataAtualizacao;
+  private ZonedDateTime dataAtualizacao;
 
   // Exclusão Lógica
   @Builder.Default

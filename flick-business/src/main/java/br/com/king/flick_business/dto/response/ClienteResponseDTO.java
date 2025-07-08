@@ -1,7 +1,7 @@
 package br.com.king.flick_business.dto.response;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import br.com.king.flick_business.entity.Cliente;
 
@@ -18,11 +18,11 @@ public record ClienteResponseDTO(
     // -- FIADO -- //
     BigDecimal limiteFiado,
     BigDecimal saldoDevedor,
-    LocalDateTime dataUltimaCompraFiado,
+    ZonedDateTime dataUltimaCompraFiado,
 
     // -- METADADOS -- //
-    LocalDateTime dataCadastro,
-    LocalDateTime dataAtualizacao,
+    ZonedDateTime dataCadastro,
+    ZonedDateTime dataAtualizacao,
     Boolean ativo)
 
 {

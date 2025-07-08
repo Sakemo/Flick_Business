@@ -1,7 +1,7 @@
 package br.com.king.flick_business.service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -86,7 +86,7 @@ class ProdutoServiceTest {
         .precoVenda(BigDecimal.TEN).precoCustoUnitario(BigDecimal.valueOf(5))
         .quantidadeEstoque(BigDecimal.valueOf(10)).tipoUnidadeVenda(TipoUnidadeVenda.UNIDADE)
         .categoria(mockCategoria).fornecedor(mockFornecedor).ativo(true)
-        .criadoEm(LocalDateTime.now().minusDays(1)).atualizadoEm(LocalDateTime.now())
+        .criadoEm(ZonedDateTime.now().minusDays(1)).atualizadoEm(ZonedDateTime.now())
         .build();
 
     // Ordem dos campos DEVE bater com ProdutoRequestDTO.java do backend
@@ -164,7 +164,7 @@ class ProdutoServiceTest {
         .precoVenda(produtoParaSalvar.getPrecoVenda()).precoCustoUnitario(produtoParaSalvar.getPrecoCustoUnitario())
         .tipoUnidadeVenda(produtoParaSalvar.getTipoUnidadeVenda()).ativo(produtoParaSalvar.isAtivo())
         .categoria(produtoParaSalvar.getCategoria()).fornecedor(produtoParaSalvar.getFornecedor())
-        .criadoEm(LocalDateTime.now()).atualizadoEm(LocalDateTime.now()).build();
+        .criadoEm(ZonedDateTime.now()).atualizadoEm(ZonedDateTime.now()).build();
     when(produtoRepositoryMock.save(eq(produtoParaSalvar))).thenReturn(produtoSalvoComId);
 
     ProdutoResponseDTO dtoEsperado = new ProdutoResponseDTO(produtoSalvoComId);
@@ -219,7 +219,7 @@ class ProdutoServiceTest {
         // ... outros campos do DTO ...
         .categoria(mockCategoria).fornecedor(mockFornecedor)
         .criadoEm(mockProduto.getCriadoEm()) // Mantém criadoEm original
-        .atualizadoEm(LocalDateTime.now()) // Simula atualização
+        .atualizadoEm(ZonedDateTime.now()) // Simula atualização
         .ativo(mockRequestDTO.ativo())
         .precoVenda(mockRequestDTO.precoVenda())
         .quantidadeEstoque(mockRequestDTO.quantidadeEstoque())

@@ -1,7 +1,9 @@
 package br.com.king.flick_business.controller;
 
+import java.math.BigDecimal;
 import java.net.URI;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -66,8 +68,8 @@ public class VendaController {
    */
   @GetMapping
   public ResponseEntity<PageResponse<VendaResponseDTO>> listarVendas(
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime inicio,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime fim,
       @RequestParam(required = false) Long clienteId,
       @RequestParam(required = false) String formaPagamento,
       @RequestParam(required = false) Long produtoId,
@@ -93,8 +95,8 @@ public class VendaController {
 
   @GetMapping("/summary-by-group")
   public ResponseEntity<List<GroupsummaryDTO>> getVendassummary(
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime inicio,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime fim,
       @RequestParam(required = false) Long clienteId,
       @RequestParam(required = false) String formaPagamento,
       @RequestParam(required = false) Long produtoId,
@@ -102,6 +104,17 @@ public class VendaController {
     List<GroupsummaryDTO> summary = vendaService.getVendassummary(inicio, fim, clienteId, formaPagamento, produtoId,
         groupBy);
     return ResponseEntity.ok(summary);
+  }
+
+  @GetMapping("/total-bruto")
+  public ResponseEntity<BigDecimal> getTotalBrutoVendas(
+      @RequestParam(required = false) ZonedDateTime inicio,
+      @RequestParam(required = false) ZonedDateTime fim,
+      @RequestParam(required = false) Long clienteId,
+      @RequestParam(required = false) String formaPagamento,
+      @RequestParam(required = false) Long produtoId) {
+    BigDecimal total = vendaService.calcularTotalBrutoVendas(inicio, fim, clienteId, formaPagamento, produtoId);
+    return ResponseEntity.ok(total);
   }
 
   /**

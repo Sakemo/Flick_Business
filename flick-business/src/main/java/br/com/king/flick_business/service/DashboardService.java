@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List; // Para alternativa do produto mais vendido
@@ -35,7 +36,7 @@ public class DashboardService {
   }
 
   @Transactional(readOnly = true)
-  public DashboardSummaryDTO getDashboardSummary(LocalDateTime inicio, LocalDateTime fim) {
+  public DashboardSummaryDTO getDashboardSummary(ZonedDateTime inicio, ZonedDateTime fim) {
     BigDecimal totalVendasBruto = vendaRepository.sumValorTotalByDataVendaBetween(inicio, fim);
     Long quantidadeVendas = vendaRepository.countVendasByDataVendaBetween(inicio, fim);
     List<Object[]> vendasPorFormaPgtoRaw = vendaRepository.sumValorTotalGroupByFormaPagamentoBetween(inicio, fim);

@@ -1,7 +1,8 @@
 package br.com.king.flick_business.service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -65,7 +66,7 @@ public class VendaService {
     Venda novaVenda = new Venda();
     novaVenda.setFormaPagamento(requestDTO.formaPagamento());
     novaVenda.setObservacoes(requestDTO.observacoes());
-    novaVenda.setDataVenda(LocalDateTime.now());
+    novaVenda.setDataVenda(ZonedDateTime.now());
 
     // Setando Cliente
     Cliente cliente = null;
@@ -222,8 +223,8 @@ public class VendaService {
 
   @Transactional(readOnly = true)
   public PageResponse<VendaResponseDTO> listarVendas(
-      LocalDateTime inicio,
-      LocalDateTime fim,
+      ZonedDateTime inicio,
+      ZonedDateTime fim,
       Long clienteId,
       String formaPagamentoString,
       Long produtoId,
@@ -235,7 +236,7 @@ public class VendaService {
 
     // Extrai lógica de conversão e datas padrão
     FormaPagamento formaPagamentoFiltro = VendaMapper.parseFormaPagamento(formaPagamentoString);
-    LocalDateTime[] range = VendaMapper.buildDataRange(inicio, fim);
+    ZonedDateTime[] range = VendaMapper.buildDataRange(inicio, fim);
 
     Sort sort = VendaMapper.buildSort(orderBy);
     Pageable pageable = PageRequest.of(page, size, sort);
@@ -258,9 +259,32 @@ public class VendaService {
     return new PageResponse<>(dtoPage);
   }
 
+  public static FormaPagamento parseFormaPagamento(String formaPagamentoString) {
+    if (formaPagamentoString == null || formaPagamentoString.isEmpty()) {
+      return null;
+    }
+
+    try {
+      return FormaPagamento.valueOf(formaPagamentoString.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      return null;
+    }
+  }
+
+  @Transactional(readOnly = true)
+  public BigDecimal calcularTotalBrutoVendas(ZonedDateTime inicio, ZonedDateTime fim,
+      Long clienteId, String formaPagamentoString, Long produtoId) {
+    FormaPagamento formaPagamentoFiltro = parseFormaPagamento(formaPagamentoString);
+    ZonedDateTime inicioQuery = (inicio != null) ? inicio : ZonedDateTime.parse("1900-01-01T00:00:00Z");
+    ZonedDateTime fimQuery = (fim != null) ? fim : ZonedDateTime.parse("9999-12-31T23:59:59Z");
+
+    return vendaRepository.sumValorTotalComFiltros(
+        inicioQuery, fimQuery, clienteId, formaPagamentoFiltro, produtoId);
+  }
+
   /**
    * Busca uma venda pelo ID, incluindo itens e cliente relacionados.
-   * 
+   *
    * @param id Identificador da venda
    * @return VendaResponseDTO com os dados da venda encontrada
    */
@@ -353,7 +377,7 @@ public class VendaService {
   }
 
   public List<GroupsummaryDTO> getVendassummary(
-      LocalDateTime inicio, LocalDateTime fim, Long clienteId,
+      ZonedDateTime inicio, ZonedDateTime fim, Long clienteId,
       String formaPagamentoString, Long produtoId, String groupBy) {
     System.out.println("LOG: VendaService.getVendassummary - Iniciando resumo de vendas com filtros: "
         + "Inicio: " + inicio + ", Fim: " + fim + ", ClienteId: " + clienteId
@@ -361,8 +385,10 @@ public class VendaService {
         + ", GroupBy: " + groupBy);
 
     FormaPagamento formaPagamentoFiltro = VendaMapper.parseFormaPagamento(formaPagamentoString);
-    LocalDateTime incioQuery = (inicio != null) ? inicio : LocalDateTime.of(1900, 1, 1, 0, 0, 0, 0);
-    LocalDateTime fimQuery = (fim != null) ? fim : LocalDateTime.of(9999, 12, 31, 23, 59, 59);
+    ZonedDateTime incioQuery = (inicio != null) ? inicio
+        : ZonedDateTime.of(1900, 1, 1, 0, 0, 0, 0, java.time.ZoneId.systemDefault());
+    ZonedDateTime fimQuery = (fim != null) ? fim
+        : ZonedDateTime.of(9999, 12, 31, 23, 59, 59, 0, java.time.ZoneId.systemDefault());
 
     if ("dataVenda".equalsIgnoreCase(groupBy)) {
       List<Object[]> results = vendaRepository.sumTotalGroupByDay(incioQuery, fimQuery, clienteId, formaPagamentoFiltro,

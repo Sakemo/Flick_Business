@@ -1,7 +1,7 @@
 package br.com.king.flick_business.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -36,7 +36,7 @@ public class ConfiguracaoGeral {
 
   @UpdateTimestamp
   @Column(name = "data_atualizacao", nullable = false)
-  private LocalDateTime dataAtualizacao;
+  private ZonedDateTime dataAtualizacao;
 
   // TODO: configurar resto do código para lidar com o nome do negócio
   @Column(name = "nome_negocio", nullable = true, length = 100)

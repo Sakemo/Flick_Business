@@ -1,7 +1,7 @@
 package br.com.king.flick_business.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,5 +76,5 @@ public class Venda {
   @PastOrPresent(message = "A data da venda não pode ser futura")
   @Column(name = "data_venda", nullable = false, updatable = false)
   @CreationTimestamp
-  private LocalDateTime dataVenda;
+  private ZonedDateTime dataVenda;
 }

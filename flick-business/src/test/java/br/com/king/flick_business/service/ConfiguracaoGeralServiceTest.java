@@ -1,7 +1,7 @@
 package br.com.king.flick_business.service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals; // Asserções do JUnit
@@ -53,7 +53,7 @@ class ConfiguracaoGeralServiceTest {
         .taxaJurosAtraso(new BigDecimal("5.50"))
         .prazoPagamentoFiado(2)
         .nomeNegocio("Loja Existente") // Incluindo o nome do negócio
-        .dataAtualizacao(LocalDateTime.now().minusHours(1))
+        .dataAtualizacao(ZonedDateTime.now().minusHours(1))
         .build();
 
     // DTO com novos dados para salvar/atualizar
@@ -159,7 +159,7 @@ class ConfiguracaoGeralServiceTest {
     // 2. Simula o save retornando a entidade modificada (que será capturada)
     when(configuracaoRepositoryMock.save(any(ConfiguracaoGeral.class))).thenAnswer(inv -> {
       ConfiguracaoGeral c = inv.getArgument(0);
-      c.setDataAtualizacao(LocalDateTime.now()); // Simula o @UpdateTimestamp
+      c.setDataAtualizacao(ZonedDateTime.now()); // Simula o @UpdateTimestamp
       return c;
     });
 
@@ -197,7 +197,7 @@ class ConfiguracaoGeralServiceTest {
     // 2. Simula o save (retorna o objeto que foi passado, com data atualizada)
     when(configuracaoRepositoryMock.save(any(ConfiguracaoGeral.class))).thenAnswer(inv -> {
       ConfiguracaoGeral c = inv.getArgument(0);
-      c.setDataAtualizacao(LocalDateTime.now()); // Simula @UpdateTimestamp
+      c.setDataAtualizacao(ZonedDateTime.now()); // Simula @UpdateTimestamp
       return c;
     });
 

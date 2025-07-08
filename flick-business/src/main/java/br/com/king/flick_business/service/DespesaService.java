@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,11 +91,15 @@ public class DespesaService {
     if (inicio != null && fim != null) {
       if (tipoFiltro != null) {
         System.out.println("LOG: DespesaService.listarDespesas - Filtrando por TIPO e DATA");
-        despesas = despesaRepository.findByTipoDespesaAndDataDespesaBetweenOrderByDataDespesaDesc(tipoFiltro, inicio,
-            fim);
+        despesas = despesaRepository.findByTipoDespesaAndDataDespesaBetweenOrderByDataDespesaDesc(
+            tipoFiltro,
+            inicio.atZone(java.time.ZoneId.systemDefault()),
+            fim.atZone(java.time.ZoneId.systemDefault()));
       } else {
         System.out.println("LOG: DespesaService.listarDespesas - Filtrando apenas por DATA");
-        despesas = despesaRepository.findByDataDespesaBetweenOrderByDataDespesaDesc(inicio, fim);
+        despesas = despesaRepository.findByDataDespesaBetweenOrderByDataDespesaDesc(
+            inicio.atZone(java.time.ZoneId.systemDefault()),
+            fim.atZone(java.time.ZoneId.systemDefault()));
       }
     } else if (tipoFiltro != null) {
       System.out.println("LOG: DespesaService.listarDespesas - Filtrando apenas por TIPO");
@@ -105,7 +108,9 @@ public class DespesaService {
       System.out.println("LOG: DespesaService.listarDespesas - Mostrando todas as despesas");
       LocalDateTime inicioHoje = LocalDateTime.of(1900, 1, 1, 0, 0);
       LocalDateTime fimHoje = LocalDateTime.of(9999, 12, 31, 23, 59);
-      despesas = despesaRepository.findByDataDespesaBetweenOrderByDataDespesaDesc(inicioHoje, fimHoje);
+      despesas = despesaRepository.findByDataDespesaBetweenOrderByDataDespesaDesc(
+          inicioHoje.atZone(java.time.ZoneId.systemDefault()),
+          fimHoje.atZone(java.time.ZoneId.systemDefault()));
     }
     System.out.println("LOG: DespesaService.listarDespesas - Total de despesas encontradas: " + despesas.size());
     return despesas.stream().map(DespesaResponseDTO::new).collect(Collectors.toList());
@@ -128,7 +133,10 @@ public class DespesaService {
     LocalDateTime beginQuery = (begin != null) ? begin : currentMonthBegin;
     LocalDateTime endQuery = (end != null) ? end : currentMonthEnd;
 
-    BigDecimal value = despesaRepository.sumValorByDataDespesaBetween(beginQuery, endQuery);
+    java.time.ZoneId zoneId = java.time.ZoneId.systemDefault();
+    BigDecimal value = despesaRepository.sumValorByDataDespesaBetween(
+        beginQuery.atZone(zoneId),
+        endQuery.atZone(zoneId));
 
     return value != null ? value : BigDecimal.ZERO;
   }

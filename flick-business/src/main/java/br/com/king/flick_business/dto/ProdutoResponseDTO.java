@@ -1,7 +1,7 @@
 package br.com.king.flick_business.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import br.com.king.flick_business.entity.Categoria;
 import br.com.king.flick_business.entity.Fornecedor;
@@ -20,8 +20,8 @@ public record ProdutoResponseDTO(
     boolean ativo,
     Categoria categoria,
     Fornecedor fornecedor,
-    LocalDateTime criadoEm,
-    LocalDateTime atualizadoEm) {
+    ZonedDateTime criadoEm,
+    ZonedDateTime atualizadoEm) {
   public ProdutoResponseDTO(Produto produto) {
     this(
         produto.getId(),

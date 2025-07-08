@@ -1,7 +1,7 @@
 package br.com.king.flick_business.dto.response;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import br.com.king.flick_business.entity.Despesa;
 import br.com.king.flick_business.enums.TipoDespesa;
@@ -10,10 +10,10 @@ public record DespesaResponseDTO(
     Long id,
     String nome,
     BigDecimal valor,
-    LocalDateTime dataDespesa,
+    ZonedDateTime dataDespesa,
     TipoDespesa tipoDespesa,
-    LocalDateTime dataCriacao,
-    LocalDateTime dataAtualizacao) {
+    ZonedDateTime dataCriacao,
+    ZonedDateTime dataAtualizacao) {
 
   public DespesaResponseDTO(Despesa despesa) {
     this(

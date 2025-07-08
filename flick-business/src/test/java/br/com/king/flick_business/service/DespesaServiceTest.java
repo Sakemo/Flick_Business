@@ -1,7 +1,7 @@
 package br.com.king.flick_business.service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
@@ -52,11 +52,11 @@ class DespesaServiceTest {
   private DespesaRequestDTO despesaRequestAtualizacaoDTO; // Para atualizar
   private final Long idExistente = 1L;
   private final Long idInexistente = 99L;
-  private LocalDateTime dataRef; // Data de referência para os testes
+  private ZonedDateTime dataRef; // Data de referência para os testes
 
   @BeforeEach
   void setUp() {
-    dataRef = LocalDateTime.now().with(LocalTime.NOON); // Meio-dia de hoje como referência
+    dataRef = ZonedDateTime.now().with(LocalTime.NOON); // Meio-dia de hoje como referência
 
     despesaExistente = Despesa.builder()
         .id(idExistente).nome("Almoço Reunião")
@@ -64,8 +64,8 @@ class DespesaServiceTest {
         .valor(new BigDecimal("75.50"))
         .dataDespesa(dataRef.minusDays(1)) // Ontem
         .tipoDespesa(TipoDespesa.EMPRESARIAL)
-        .dataCriacao(LocalDateTime.now().minusDays(2))
-        .dataAtualizacao(LocalDateTime.now().minusDays(1))
+        .dataCriacao(ZonedDateTime.now().minusDays(2))
+        .dataAtualizacao(ZonedDateTime.now().minusDays(1))
         .build();
 
     // DTO para criar uma nova despesa
@@ -96,8 +96,8 @@ class DespesaServiceTest {
     when(despesaRepositoryMock.save(any(Despesa.class))).thenAnswer(invocation -> {
       Despesa d = invocation.getArgument(0);
       d.setId(2L); // Simula novo ID
-      d.setDataCriacao(LocalDateTime.now()); // Simula @CreationTimestamp
-      d.setDataAtualizacao(LocalDateTime.now()); // Simula @UpdateTimestamp
+      d.setDataCriacao(ZonedDateTime.now()); // Simula @CreationTimestamp
+      d.setDataAtualizacao(ZonedDateTime.now()); // Simula @UpdateTimestamp
       return d;
     });
 
@@ -132,7 +132,7 @@ class DespesaServiceTest {
     when(despesaRepositoryMock.findById(idExistente)).thenReturn(Optional.of(despesaExistente));
 
     // 2. Cria um objeto mock *separado* para representar o estado APÓS o save
-    LocalDateTime dataAtualizadaSimulada = despesaExistente.getDataAtualizacao().plusSeconds(5); // Garante 5 segundos
+    ZonedDateTime dataAtualizadaSimulada = despesaExistente.getDataAtualizacao().plusSeconds(5); // Garante 5 segundos
                                                                                                  // depois
     Despesa despesaSalvaMock = Despesa.builder()
         .id(idExistente)
@@ -197,8 +197,8 @@ class DespesaServiceTest {
   @DisplayName("Deve retornar lista filtrada por tipo E data quando todos os filtros são fornecidos")
   void listarDespesas_comFiltroDataETipo_deveChamarMetodoCorretoDoRepo() {
     // Arrange
-    LocalDateTime inicio = dataRef.minusDays(2).with(LocalTime.MIN);
-    LocalDateTime fim = dataRef.minusDays(1).with(LocalTime.MAX);
+    ZonedDateTime inicio = dataRef.minusDays(2).with(LocalTime.MIN);
+    ZonedDateTime fim = dataRef.minusDays(1).with(LocalTime.MAX);
     TipoDespesa tipoFiltroTeste = TipoDespesa.EMPRESARIAL;
 
     when(despesaRepositoryMock.findByTipoDespesaAndDataDespesaBetweenOrderByDataDespesaDesc(eq(tipoFiltroTeste),
@@ -206,7 +206,8 @@ class DespesaServiceTest {
         .thenReturn(List.of(despesaExistente));
 
     // Act
-    List<DespesaResponseDTO> resultado = despesaService.listarDespesas(inicio, fim, tipoFiltroTeste.toString());
+    List<DespesaResponseDTO> resultado = despesaService.listarDespesas(
+        inicio.toLocalDateTime(), fim.toLocalDateTime(), tipoFiltroTeste.toString());
 
     // Assert
     assertNotNull(resultado);
@@ -226,8 +227,8 @@ class DespesaServiceTest {
   @DisplayName("Deve retornar lista do dia atual quando início e fim são nulos")
   void listarDespesas_semFiltroData_deveBuscarPeloDiaAtual() {
     // Arrange
-    LocalDateTime inicioDefault = LocalDateTime.of(1900, 1, 1, 0, 0);
-    LocalDateTime fimDefault = LocalDateTime.of(9999, 12, 31, 23, 59);
+    ZonedDateTime inicioDefault = ZonedDateTime.of(1900, 1, 1, 0, 0, 0, 0, ZonedDateTime.now().getZone());
+    ZonedDateTime fimDefault = ZonedDateTime.of(9999, 12, 31, 23, 59, 0, 0, ZonedDateTime.now().getZone());
 
     when(despesaRepositoryMock.findByDataDespesaBetweenOrderByDataDespesaDesc(eq(inicioDefault), eq(fimDefault)))
         .thenReturn(Collections.emptyList());
@@ -242,7 +243,7 @@ class DespesaServiceTest {
     // Verify
     // Verifica se a busca foi feita com as datas calculadas para hoje
     verify(despesaRepositoryMock).findByDataDespesaBetweenOrderByDataDespesaDesc(eq(inicioDefault),
-        any(LocalDateTime.class));
+        any(ZonedDateTime.class));
     verify(despesaRepositoryMock, never()).findAll();
   }
 

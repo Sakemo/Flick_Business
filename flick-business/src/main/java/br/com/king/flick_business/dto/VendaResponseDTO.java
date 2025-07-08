@@ -1,7 +1,7 @@
 package br.com.king.flick_business.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,7 +12,7 @@ import br.com.king.flick_business.enums.FormaPagamento;
 
 public record VendaResponseDTO(
     Long id,
-    LocalDateTime dataVenda,
+    ZonedDateTime dataVenda,
     BigDecimal valorTotal,
     ClienteResponseDTO cliente,
     List<ItemVendaResponseDTO> itens,

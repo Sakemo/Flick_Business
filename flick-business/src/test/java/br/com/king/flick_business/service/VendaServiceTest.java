@@ -1,7 +1,7 @@
 package br.com.king.flick_business.service;
 
 import java.math.BigDecimal; // Importar DTOs
-import java.time.LocalDateTime; // Importar Entidades
+import java.time.ZonedDateTime; // Importar Entidades
 import java.util.List; // Importar Enum
 import java.util.Optional; // Importar Exceções
 
@@ -156,7 +156,7 @@ class VendaServiceTest {
         when(vendaRepositoryMock.save(any(Venda.class))).thenAnswer(invocation -> {
             Venda v = invocation.getArgument(0);
             v.setId(100L); // Simula ID gerado
-            v.setDataVenda(LocalDateTime.now()); // Simula @CreationTimestamp
+            v.setDataVenda(ZonedDateTime.now()); // Simula @CreationTimestamp
             return v;
         });
 
@@ -205,7 +205,7 @@ class VendaServiceTest {
         when(vendaRepositoryMock.save(any(Venda.class))).thenAnswer(invocation -> {
             Venda v = invocation.getArgument(0);
             v.setId(101L);
-            v.setDataVenda(LocalDateTime.now());
+            v.setDataVenda(ZonedDateTime.now());
             // Simular a associação Cliente->Venda feita no save (para o DTO de resposta)
             v.setCliente(clienteAtivoFiadoPermitido);
             return v;
@@ -375,7 +375,7 @@ class VendaServiceTest {
         when(vendaRepositoryMock.save(any(Venda.class))).thenAnswer(invocation -> {
             Venda v = invocation.getArgument(0);
             v.setId(102L);
-            v.setDataVenda(LocalDateTime.now());
+            v.setDataVenda(ZonedDateTime.now());
             // Associa cliente para a validação posterior
             v.setCliente(clienteAtivoFiadoPermitido);
             // Calcula o valor total que será usado na validação
@@ -417,7 +417,7 @@ class VendaServiceTest {
                 .id(1L)
                 .cliente(clienteAtivoFiadoPermitido)
                 .valorTotal(BigDecimal.TEN)
-                .dataVenda(LocalDateTime.now().minusDays(1))
+                .dataVenda(ZonedDateTime.now().minusDays(1))
                 .formaPagamento(FormaPagamento.FIADO)
                 .build();
 
@@ -425,7 +425,7 @@ class VendaServiceTest {
                 .id(2L)
                 .cliente(null)
                 .valorTotal(BigDecimal.ONE)
-                .dataVenda(LocalDateTime.now())
+                .dataVenda(ZonedDateTime.now())
                 .formaPagamento(FormaPagamento.DINHEIRO)
                 .build();
 
@@ -433,7 +433,7 @@ class VendaServiceTest {
         Pageable pageable = PageRequest.of(0, 8);
         Page<Venda> vendasPageMock = new PageImpl<>(vendas, pageable, vendas.size());
 
-        when(vendaRepositoryMock.findVendasComFiltros(any(LocalDateTime.class), any(LocalDateTime.class), any(), any(),
+        when(vendaRepositoryMock.findVendasComFiltros(any(ZonedDateTime.class), any(ZonedDateTime.class), any(), any(),
                 any(), any(Pageable.class)))
                 .thenReturn(vendasPageMock);
 
@@ -456,7 +456,7 @@ class VendaServiceTest {
                 .cliente(clienteAtivoFiadoPermitido)
                 .valorTotal(BigDecimal.TEN)
                 .formaPagamento(FormaPagamento.FIADO)
-                .dataVenda(LocalDateTime.now())
+                .dataVenda(ZonedDateTime.now())
                 .build();
         // Adicionar itens se o DTO precisar deles para o construtor
         ItemVenda itemMock = ItemVenda.builder().id(1L).produto(produtoComEstoque).quantidade(BigDecimal.ONE)

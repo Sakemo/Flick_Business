@@ -1,7 +1,8 @@
 package br.com.king.flick_business.repository;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,8 +42,8 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
                         + "(:formaPagamento IS NULL OR v.formaPagamento = :formaPagamento) AND "
                         + "(:produtoId IS NULL OR i.produto.id = :produtoId)")
         Page<Venda> findVendasComFiltros(
-                        @Param("inicio") LocalDateTime inicio,
-                        @Param("fim") LocalDateTime fim,
+                        @Param("inicio") ZonedDateTime inicio,
+                        @Param("fim") ZonedDateTime fim,
                         @Param("clienteId") Long clienteId,
                         @Param("formaPagamento") FormaPagamento formaPagamento,
                         @Param("produtoId") Long produtoId,
@@ -56,7 +57,7 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
                         + "(:formaPagamento IS NULL OR v.formaPagamento = :formaPagamento) AND "
                         + "(:produtoId IS NULL OR EXISTS (SELECT 1 FROM ItemVenda i WHERE i.venda = v AND i.produto.id = :produtoId)) "
                         + "GROUP BY FUNCTION('TO_CHAR', v.dataVenda, 'YYYY-MM-DD')")
-        List<Object[]> sumTotalGroupByDay(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim,
+        List<Object[]> sumTotalGroupByDay(@Param("inicio") ZonedDateTime inicio, @Param("fim") ZonedDateTime fim,
                         @Param("clienteId") Long clienteId, @Param("formaPagamento") FormaPagamento formaPagamento,
                         @Param("produtoId") Long produtoId);
 
@@ -70,8 +71,20 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
                         "(:produtoId IS NULL OR EXISTS (SELECT 1 FROM ItemVenda i WHERE i.venda = v AND i.produto.id = :produtoId)) "
                         +
                         "GROUP BY v.cliente.id, v.cliente.nome")
-        List<Object[]> sumTotalGroupByCliente(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim,
+        List<Object[]> sumTotalGroupByCliente(@Param("inicio") ZonedDateTime inicio, @Param("fim") ZonedDateTime fim,
                         @Param("clienteId") Long clienteId, @Param("formaPagamento") FormaPagamento formaPagamento,
+                        @Param("produtoId") Long produtoId);
+
+        @Query("SELECT COALESCE(SUM(v.valorTotal), 0) FROM Venda v " +
+                        "WHERE v.dataVenda BETWEEN :inicio AND :fim " +
+                        "AND (:clienteId IS NULL OR v.cliente.id = :clienteId) " +
+                        "AND (:formaPagamento IS NULL OR v.formaPagamento = :formaPagamento) " +
+                        "AND (:produtoId IS NULL OR EXISTS (SELECT 1 FROM ItemVenda i WHERE i.venda = v AND i.produto.id = :produtoId))")
+        BigDecimal sumValorTotalComFiltros(
+                        @Param("inicio") ZonedDateTime inicio,
+                        @Param("fim") ZonedDateTime fim,
+                        @Param("clienteId") Long clientId,
+                        @Param("formaPagamento") FormaPagamento formaPagamento,
                         @Param("produtoId") Long produtoId);
 
         // =========================
@@ -80,19 +93,19 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
 
         // Soma o valor total das vendas em um determinado período
         @Query("SELECT COALESCE(SUM(v.valorTotal), 0) FROM Venda v WHERE v.dataVenda BETWEEN :inicio AND :fim")
-        BigDecimal sumValorTotalByDataVendaBetween(@Param("inicio") LocalDateTime inicio,
-                        @Param("fim") LocalDateTime fim);
+        BigDecimal sumValorTotalByDataVendaBetween(@Param("inicio") ZonedDateTime inicio,
+                        @Param("fim") ZonedDateTime fim);
 
         // Conta o número de vendas realizadas em um determinado período
         @Query("SELECT COUNT(v) FROM Venda v WHERE v.dataVenda BETWEEN :inicio AND :fim")
-        Long countVendasByDataVendaBetween(@Param("inicio") LocalDateTime inicio,
-                        @Param("fim") LocalDateTime fim);
+        Long countVendasByDataVendaBetween(@Param("inicio") ZonedDateTime inicio,
+                        @Param("fim") ZonedDateTime fim);
 
         // Agrupa e soma o valor total das vendas por forma de pagamento em um período
         // Retorna uma lista de Object[]: [FormaPagamento, BigDecimal]
         @Query("SELECT v.formaPagamento, SUM(v.valorTotal) FROM Venda v WHERE v.dataVenda BETWEEN :inicio AND :fim GROUP BY v.formaPagamento")
-        List<Object[]> sumValorTotalGroupByFormaPagamentoBetween(@Param("inicio") LocalDateTime inicio,
-                        @Param("fim") LocalDateTime fim);
+        List<Object[]> sumValorTotalGroupByFormaPagamentoBetween(@Param("inicio") ZonedDateTime inicio,
+                        @Param("fim") ZonedDateTime fim);
 
         // Retorna dados diários para gráficos: soma do valor total das vendas por dia
         // no período informado
@@ -102,6 +115,6 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
                         "WHERE v.data_venda BETWEEN :inicio AND :fim " +
                         "GROUP BY dias " +
                         "ORDER BY dias ASC", nativeQuery = true)
-        List<Object[]> sumValorTotalGroupByDayBetweenNative(@Param("inicio") LocalDateTime inicio,
-                        @Param("fim") LocalDateTime fim);
+        List<Object[]> sumValorTotalGroupByDayBetweenNative(@Param("inicio") ZonedDateTime inicio,
+                        @Param("fim") ZonedDateTime fim);
 }

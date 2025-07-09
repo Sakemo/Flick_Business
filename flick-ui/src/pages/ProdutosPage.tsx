@@ -215,7 +215,7 @@ const ProdutosPage: React.FC = () => {
               onChange={handleFilterChange}
               disabled={loading}
             >
-              <option value="">Todas as Categorias</option>
+              <option value="">{t('produtos.allCategories')}</option>
               {categorias.map((cat) => (
                 <option key={cat.id} value={cat.id.toString()}>
                   {cat.nome}

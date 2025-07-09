@@ -15,7 +15,8 @@
     "actions": "Actions",
     "details": "Details",
     "client": "Client",
-    "date": "Date"  
+    "date": "Date",
+    "select": "Select..."
   },
   "sidebar": {
     "dashboard": "Dashboard",
@@ -87,7 +88,7 @@
       "fullName": "Full Name",
       "phone": "Phone",
       "address": "Address",
-      "cpf": "CPF",
+      "cpf": "Social Security Number",
       "creditControlTitle": "Credit Control",
       "allowCredit": "Allow purchases on credit for this client?",
       "creditLimit": "Credit Limit",
@@ -192,6 +193,8 @@
     }
   },
   "fornecedores": {
+    "name": "Supplier Name",
+    "person" : "Legal Entity or Individual",
     "form": {
       "title": "Add Provider"
     }

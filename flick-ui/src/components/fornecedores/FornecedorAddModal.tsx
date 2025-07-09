@@ -6,7 +6,7 @@ import Button from '../ui/Button';
 import { createFornecedor } from '../../services/fornecedorService';
 import { FornecedorAddQuickRequest, FornecedorResponse, TipoPessoa } from '../../types/domain';
 import Select from '../ui/Select';
-
+import { useTranslation } from 'react-i18next';
 interface FornecedorAddModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -18,6 +18,7 @@ const FornecedorAddModal: React.FC<FornecedorAddModalProps> = ({
   onClose,
   onFornecedorAdded,
 }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<FornecedorAddQuickRequest>({
     nome: '',
     tipoPessoa: '',
@@ -64,11 +65,11 @@ const FornecedorAddModal: React.FC<FornecedorAddModalProps> = ({
   }, [isOpen]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Adicionar Novo Fornecedor">
+    <Modal isOpen={isOpen} onClose={onClose} title={t('fornecedores.form.title')}>
       <form onSubmit={handleSubmit}>
         <div className="p-2">
           <Input
-            label="Nome do Fornecedor"
+            label={t('fornecedores.name')}
             name="nome"
             value={formData.nome}
             onChange={handleChange}
@@ -78,12 +79,12 @@ const FornecedorAddModal: React.FC<FornecedorAddModalProps> = ({
             className="mb-3"
           />
           <Select
-            label="Tipo de Pessoa"
+            label={t('fornecedores.person')}
             name="tipoPessoa"
             value={formData.tipoPessoa || ''}
             onChange={handleChange}
           >
-            <option value="">Selecione o tipo</option>
+            <option value="">{t('common.select')}</option>
             {Object.values(TipoPessoa).map((tipo) => (
               <option key={tipo} value={tipo}>
                 {tipo === TipoPessoa.FISICA ? 'Pessoa Física' : 'Pessoa Jurídica'}

@@ -7,6 +7,7 @@ import Input from '../ui/Input';
 import Select from '../ui/Select';
 import Textarea from '../ui/Textarea';
 import Button from '../ui/Button';
+import { useTranslation } from 'react-i18next';
 
 interface DespesaFormModalProps {
   isOpen: boolean;
@@ -21,6 +22,8 @@ const DespesaFormModal: React.FC<DespesaFormModalProps> = ({
   onSaveSuccess,
   despesaInicial,
 }) => {
+  const { t } = useTranslation();
+
   const isEditMode = !!despesaInicial;
   const [formData, setFormData] = useState<Partial<DespesaRequest>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -112,7 +115,7 @@ const DespesaFormModal: React.FC<DespesaFormModalProps> = ({
       <form onSubmit={handleSubmit}>
         <div className="p-6 space-y-4">
           <Input
-            label="Nome"
+            label={t('common.name')}
             name="nome"
             value={formData.nome || ''}
             onChange={handleChange}
@@ -120,7 +123,7 @@ const DespesaFormModal: React.FC<DespesaFormModalProps> = ({
             required
           />
           <Input
-            label="Valor (R$)"
+            label={t('common.value')}
             name="valor"
             type="number"
             step="0.01"
@@ -130,7 +133,7 @@ const DespesaFormModal: React.FC<DespesaFormModalProps> = ({
             required
           />
           <Input
-            label="Data da Despesa"
+            label={t("despesas.form.expenseDate")}
             name="dataDespesa"
             type="datetime-local"
             value={formData.dataDespesa || ''}
@@ -139,7 +142,7 @@ const DespesaFormModal: React.FC<DespesaFormModalProps> = ({
             required
           />
           <Select
-            label="Tipo de Despesa"
+            label={t("despesas.form.expenseType")}
             name="tipoDespesa"
             value={formData.tipoDespesa || ''}
             onChange={handleChange}
@@ -147,7 +150,7 @@ const DespesaFormModal: React.FC<DespesaFormModalProps> = ({
             required
           >
             <option value="" disabled>
-              Selecione...
+              {t('common.select')}
             </option>
             {Object.values(TipoDespesa).map((tipo) => (
               <option key={tipo} value={tipo}>
@@ -156,7 +159,7 @@ const DespesaFormModal: React.FC<DespesaFormModalProps> = ({
             ))}
           </Select>
           <Textarea
-            label="Observação"
+            label={t('vendas.form.observations')}
             name="observacao"
             value={formData.observacao || ''}
             onChange={handleChange}

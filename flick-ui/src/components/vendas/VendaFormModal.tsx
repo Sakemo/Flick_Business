@@ -19,6 +19,7 @@ import { formatCurrency } from '../../utils/formatters';
 import Button from '../ui/Button';
 import { LuPlus, LuTrash2 } from 'react-icons/lu';
 import Textarea from '../ui/Textarea';
+import { useTranslation } from 'react-i18next';
 interface VendaFormModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -32,6 +33,8 @@ interface ItemFormState extends ItemVendaRequest {
 }
 
 const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSaveSuccess }) => {
+  const { t } = useTranslation();
+  
   const [clientes, setClientes] = useState<ClienteResponse[]>([]);
   const [produtosDisponiveis, setProdutosDisponiveis] = useState<ProdutoResponse[]>([]);
 
@@ -196,14 +199,14 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
         <div className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select
-              label="Cliente"
+              label={t('clientes.objectName')}
               name="clienteId"
               value={clienteId}
               onChange={(e) => setClienteId(e.target.value)}
               error={errors.clienteId}
             >
               <option value="" className="text-text-secondary dark:text-white">
-                Anônimo
+                {t('vendas.form.anonymous')}
               </option>
               {clientes.map((c) => (
                 <option key={c.id} value={c.id.toString()}>
@@ -212,7 +215,7 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
               ))}
             </Select>
             <Select
-              label="Forma de Pagamento"
+              label={t('common.paymentMethod')}
               name="formaPagamento"
               value={formaPagamento}
               onChange={(e) => setFormaPagamento(e.target.value as FormaPagamento)}
@@ -229,17 +232,17 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
 
           <Card padding="md">
             <h3 className="text-md font-semibold mb-3 text-text-primary dark:text-white">
-              Adiconar item
+              {t('vendas.form.addItem')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
               <Select
-                label="Produto"
+                label={t('produtos.objectName')}
                 name="produtoSelecionadoId"
                 value={produtoSelecionadoId}
                 onChange={(e) => setProdutoSelecionadoId(e.target.value)}
                 error={errors.item}
               >
-                <option value="">Selecione um produto...</option>
+                <option value="">{t('common.select')}</option>
                 {produtosDisponiveis.map((produto) => (
                   <option key={produto.id} value={produto.id.toString()}>
                     {produto.nome} por ({formatCurrency(produto.precoVenda)})
@@ -247,7 +250,7 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
                 ))}
               </Select>
               <Input
-                label="Quantidade"
+                label={t('vendas.form.quantity')}
                 type="number"
                 min="0"
                 step={produtoSelecionado?.tipoUnidadeVenda === TipoUnidadeVenda.UNIDADE ? '1' : '0.001'}
@@ -262,7 +265,7 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
                 iconLeft={<LuPlus />}
                 disabled={isLoading || !produtoSelecionadoId || parseFloat(quantidadeProduto) <= 0}
               >
-                Adicionar
+                {t('userActions.add')}
               </Button>
             </div>
             {errors.item && <p className="text-xs text-red-500 mt-1">{errors.item}</p>}
@@ -319,7 +322,7 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
           {errors.itens && <p className="text-xs text-red-500 mt-1">{errors.itens}</p>}
 
           <Textarea
-            label="Observações"
+            label={t('vendas.form.observations')}
             name="observacoes"
             value={observacoes}
             onChange={(e) => setObservacoes(e.target.value)}
@@ -329,7 +332,7 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
         </div>
         <div className="brand-muted dark:bg-gray-800 px-6 py-4 flex justify-end space-x-2">
           <Button type="button" variant="secondary" onClick={onClose} disabled={isLoading}>
-            Cancelar
+            {t('userActions.cancel')}
           </Button>
           <Button
             type="submit"
@@ -337,7 +340,7 @@ const VendaFormModal: React.FC<VendaFormModalProps> = ({ isOpen, onClose, onSave
             isLoading={isLoading}
             disabled={isLoading || itensVenda.length === 0}
           >
-            Registrar Venda
+            {t('vendas.form.title')}
           </Button>
         </div>
       </form>

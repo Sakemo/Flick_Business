@@ -46,7 +46,7 @@
     "all": "Ver Tudo"
   },
   "userActions": {
-    "add": "Adicionar ",
+    "add": "Adicionar",
     "edit": "Editar",
     "copy": "Copiar",
     "delete": "Deletar",
@@ -194,6 +194,8 @@
     }
   },
   "fornecedores": {
+    "supplieName": "Nome do Fornecedor",
+    "person" : "Tipo de Pessoa",
     "form": {
       "title": "Adicionar Fornecedor"
     }

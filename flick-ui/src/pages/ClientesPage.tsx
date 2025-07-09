@@ -133,7 +133,7 @@ const ClientesPage: React.FC = () => {
     //TODO: Modal de confirmacao
     if (
       window.confirm(
-        `${t('userActions.delete')}${t('clientes.objectName')} ${nomeCliente}? ${t('userActions.no')} ${t('userActions.cancel')}.`
+        `${t('userActions.delete')} + '' + ${t('clientes.objectName')} ${nomeCliente}? ${t('userActions.no')} ${t('userActions.cancel')}.`
       )
     ) {
       try {

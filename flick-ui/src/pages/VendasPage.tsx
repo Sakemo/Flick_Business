@@ -337,7 +337,7 @@ const VendasPage: React.FC = () => {
           {t('vendas.title')}
         </h1>
         <Button onClick={handleOpenNovalVendaModal} iconLeft={<LuPlus className="mr-1" />}>
-          {t('userActions.add') + t('vendas.objectName').replace(/^\w/, c => c.toLowerCase())}
+          {t('userActions.add') + ' ' + t('vendas.objectName').replace(/^\w/, c => c.toLowerCase())}
         </Button>
       </div>
 

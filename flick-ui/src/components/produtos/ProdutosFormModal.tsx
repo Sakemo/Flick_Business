@@ -17,7 +17,7 @@ import { getFornecedores } from '../../services/fornecedorService';
 import { LuPlus } from 'react-icons/lu';
 import CategoriaAddModal from '../categorias/CategoriaAddModal';
 import FornecedorAddModal from '../fornecedores/FornecedorAddModal';
-
+import { useTranslation } from 'react-i18next';
 interface ProdutoFormModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -31,6 +31,7 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
   onSaveSuccess,
   produtoInicial,
 }) => {
+  const { t } = useTranslation();
   const isEditMode = !!produtoInicial;
   const [formData, setFormData] = useState<Partial<ProdutoRequest>>({});
   const [categorias, setCategorias] = useState<CategoriaResponse[]>([]);
@@ -176,7 +177,7 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        title={isEditMode ? 'Editar Produto' : 'Adicionar Produto'}
+        title={isEditMode ? `${t('produtos.form.editTitle')}` : `${t('produtos.form.title')}`}
         className="sm:max-w-2xl md:max-w-3xl"
       >
         <div className="flex items-center mb-2 ml-1 md:col-span-2">
@@ -192,14 +193,14 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
             htmlFor="ativo"
             className="ml-2 block text-sm text-text-secondary dark:text-gray-300"
           >
-            Produto Ativo
+            {t('produtos.form.activeProduct')}
           </label>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-1">
             <Input
-              label="Nome do Produto *"
+              label={t('produtos.form.productName') + '*'}
               name="nome"
               value={formData.nome || ''}
               onChange={handleChange}
@@ -214,14 +215,14 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
               ></label>
               <div className="flex items-center space-x-2">
                 <Select
-                  label="Categoria *"
+                  label={t('common.category') + '*'}
                   name="categoriaId"
                   value={formData.categoriaId || ''}
                   onChange={handleChange}
                   error={errors.categoriaId}
                   required
                 >
-                  <option value="">Selecione...</option>
+                  <option value="">{t('common.select')}</option>
                   {categorias.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.nome}
@@ -242,7 +243,7 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
             </div>
 
             <Input
-              label="Preço de Venda *"
+              label={t('produtos.form.salesPrice')}
               name="precoVenda"
               type="number"
               step="0.01"
@@ -253,7 +254,7 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
               required
             />
             <Input
-              label="Estoque Atual"
+              label={t('produtos.form.currentStock')}
               name="quantidadeEstoque"
               type="number"
               step={1}
@@ -263,7 +264,7 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
               error={errors.quantidadeEstoque}
             />
             <Select
-              label="Unidade de Venda *"
+              label={t('produtos.salesUnit')}
               name="tipoUnidadeVenda"
               value={formData.tipoUnidadeVenda || ''}
               onChange={handleChange}
@@ -284,14 +285,14 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
               ></label>
               <div className="flex items-center space-x-2">
                 <Select
-                  label="Fornecedor"
+                  label={t('produtos.provider')}
                   name="fornecedorId"
                   value={formData.fornecedorId || ''}
                   onChange={handleChange}
                   error={errors.fornecedorId}
                 >
                   <option value="" disabled>
-                    Selecione...
+                    {t('produtos.form.select')}
                   </option>
                   {fornecedores.map((f) => (
                     <option key={f.id} value={f.id}>
@@ -314,7 +315,7 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
               )}
             </div>
             <Input
-              label="Preço de Custo"
+              label={t('produtos.form.costPrice')}
               name="precoCustoUnitario"
               type="number"
               step="0.01"
@@ -324,7 +325,7 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
               error={errors.precoCustoUnitario}
             />
             <Input
-              label="Código de Barras"
+              label={t('produtos.barcode')}
               name="codigoBarras"
               value={formData.codigoBarras || ''}
               onChange={handleChange}
@@ -332,7 +333,7 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
               maxLength={50}
             />
             <Textarea
-              label="Descrição"
+              label={t('common.description')}
               name="descricao"
               value={formData.descricao || ''}
               onChange={handleChange}
@@ -353,10 +354,10 @@ const ProdutosFormModal: React.FC<ProdutoFormModalProps> = ({
               onClick={onClose}
               disabled={isLoading}
             >
-              Cancelar
+              {t('userActions.cancel')}
             </Button>
             <Button type="submit" variant="primary" isLoading={isLoading} disabled={isLoading}>
-              {isEditMode ? 'Salvar Alterações' : 'Criar Produto'}
+              {isEditMode ? `${t('produtos.form.editTitle')}` : `${t('produtos.form.title')}`}
             </Button>
           </div>
         </form>

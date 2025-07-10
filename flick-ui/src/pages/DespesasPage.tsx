@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { DespesaResponse, TipoDespesa } from '../types/domain';
 import { deleteDespesa, getDespesas, GetDespesasParams } from '../services/despesaService';
 import Button from '../components/ui/Button';
-import { LuPlus, LuX } from 'react-icons/lu';
+import { LuPlus, LuSearch, LuX } from 'react-icons/lu';
 import Card from '../components/ui/Card';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
@@ -20,6 +20,7 @@ const DespesaPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [despesaParaEditar, setDespesaParaEditar] = useState<DespesaResponse | null>(null);
 
+  const [filtroNome, setFiltroNome] = useState<string>('');
   const [filtroDataInicio, setFiltroDataInicio] = useState<string>('');
   const [filtroDataFim, setFiltroDataFim] = useState<string>('');
   const [filtroTipoDespesa, setFiltroTipoDespesa] = useState<string>('');
@@ -34,6 +35,7 @@ const DespesaPage: React.FC = () => {
         if (filtroDataInicio) params.inicio = `${filtroDataInicio}T00:00:00`;
         if (filtroDataFim) params.fim = `${filtroDataFim}T23:59:59`;
         if (filtroTipoDespesa) params.tipoDespesa = filtroTipoDespesa;
+        if (filtroNome.trim()) params.nomeContains = filtroNome.trim();
         const data = await getDespesas(params);
         setDespesas(data);
       } catch (err) {
@@ -42,7 +44,7 @@ const DespesaPage: React.FC = () => {
       } finally {
         setLoading(false);
       }
-    }, [filtroDataInicio, filtroDataFim, filtroTipoDespesa, t]);
+    }, [filtroDataInicio, filtroDataFim, filtroTipoDespesa, filtroNome, t]);
 
     useEffect(() => {
       fetchDespesas();
@@ -94,6 +96,7 @@ const DespesaPage: React.FC = () => {
       setFiltroDataInicio('');
       setFiltroDataFim('');
       setFiltroTipoDespesa('');
+      setFiltroNome('');
     };
 
     return (
@@ -109,6 +112,14 @@ const DespesaPage: React.FC = () => {
 
         <Card className="mb-6 p-card-padding">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <Input
+              label={t('userActions.searchBy') + ' ' + t('common.name')}
+              placeholder={t('userActions.searchBy') + '...'}
+              value={filtroNome}
+              onChange={(e) => setFiltroNome(e.target.value)}
+              iconLeft={<LuSearch />}
+            />
+
             <Input
               label={t('filter.dateStart')}
               type="date"

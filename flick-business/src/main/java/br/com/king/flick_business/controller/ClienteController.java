@@ -40,18 +40,18 @@ public class ClienteController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ClienteResponseDTO>> listarTodosOsClientes(
-      @RequestParam(name = "apenasAtivos", required = false) Boolean apenasAtivos,
+  public ResponseEntity<List<ClienteResponseDTO>> listTodosOsClientes(
+      @RequestParam(name = "apenasActives", required = false) Boolean apenasActives,
       @RequestParam(name = "devedores", required = false) Boolean devedores,
       @RequestParam(name = "orderBy", required = false) String orderBy,
-      @RequestParam(name = "nomeContains", required = false) String nomeContains) {
-    System.out.println("LOG: ClienteController - apenasAtivos: " + apenasAtivos + ", devedores: " + devedores
-        + ", orderBy: " + orderBy + ", nomeContains: " + nomeContains);
-    List<ClienteResponseDTO> clientes = clienteService.listarTodos(
-        apenasAtivos,
+      @RequestParam(name = "nameContains", required = false) String nameContains) {
+    System.out.println("LOG: ClienteController - apenasActives: " + apenasActives + ", devedores: " + devedores
+        + ", orderBy: " + orderBy + ", nameContains: " + nameContains);
+    List<ClienteResponseDTO> clientes = clienteService.listTodos(
+        apenasActives,
         devedores,
         orderBy,
-        nomeContains);
+        nameContains);
     return ResponseEntity.ok(clientes);
   }
 
@@ -70,21 +70,21 @@ public class ClienteController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deletarCliente(@PathVariable Long id) {
-    clienteService.deletar(id);
+  public ResponseEntity<Void> deleteCliente(@PathVariable Long id) {
+    clienteService.delete(id);
     return ResponseEntity.noContent().build();
   }
 
   @DeleteMapping("/{id}/permanente")
-  public ResponseEntity<Void> deletarClienteFisicamente(@PathVariable Long id) {
-    clienteService.deletarFisicamente(id);
+  public ResponseEntity<Void> deleteClienteFisicamente(@PathVariable Long id) {
+    clienteService.deleteFisicamente(id);
     return ResponseEntity.noContent().build();
   }
 
-  @PatchMapping("/{id}/ativo")
+  @PatchMapping("/{id}/active")
   public ResponseEntity<ClienteResponseDTO> ativarInativarCliente(
-      @PathVariable Long id, @RequestBody boolean ativo) {
-    ClienteResponseDTO clienteAtualizado = clienteService.ativarInativar(id, ativo);
+      @PathVariable Long id, @RequestBody boolean active) {
+    ClienteResponseDTO clienteAtualizado = clienteService.ativarInativar(id, active);
     return ResponseEntity.ok(clienteAtualizado);
   }
 }

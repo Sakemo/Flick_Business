@@ -16,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import br.com.king.flick_business.dto.response.TotalPorFormaPagamentoDTO;
 import br.com.king.flick_business.dto.VendaRequestDTO;
 import br.com.king.flick_business.dto.VendaResponseDTO;
@@ -26,13 +25,13 @@ import br.com.king.flick_business.dto.response.PageResponse;
 import br.com.king.flick_business.entity.Cliente;
 import br.com.king.flick_business.entity.ConfiguracaoGeral;
 import br.com.king.flick_business.entity.ItemVenda;
-import br.com.king.flick_business.entity.Produto;
+import br.com.king.flick_business.entity.Product;
 import br.com.king.flick_business.entity.Venda;
 import br.com.king.flick_business.enums.FormaPagamento;
 import br.com.king.flick_business.exception.BusinessException;
 import br.com.king.flick_business.exception.RecursoNaoEncontrado;
 import br.com.king.flick_business.repository.ClienteRepository;
-import br.com.king.flick_business.repository.ProdutoRepository;
+import br.com.king.flick_business.repository.ProductRepository;
 import br.com.king.flick_business.repository.VendaRepository;
 import br.com.king.flick_business.mapper.VendaMapper;
 
@@ -41,20 +40,20 @@ public class VendaService {
   // Repositórios e serviços necessários para operações de venda
   private final VendaRepository vendaRepository;
   private final ClienteRepository clienteRepository;
-  private final ProdutoRepository produtoRepository;
+  private final ProductRepository productRepository;
   private final ConfiguracaoGeralService configuracaoService;
 
   // Construtor para injeção de dependências
   public VendaService(VendaRepository vendaRepository, ClienteRepository clienteRepository,
-      ProdutoRepository produtoRepository, ConfiguracaoGeralService configuracaoService) {
+      ProductRepository productRepository, ConfiguracaoGeralService configuracaoService) {
     this.vendaRepository = vendaRepository;
     this.clienteRepository = clienteRepository;
-    this.produtoRepository = produtoRepository;
+    this.productRepository = productRepository;
     this.configuracaoService = configuracaoService;
   }
 
   /**
-   * Registra uma nova venda, atualiza estoque dos produtos e saldo devedor do
+   * Registra uma nova venda, atualiza estoque dos products e saldo devedor do
    * cliente (caso fiado).
    * 
    * @param requestDTO Dados da venda a ser registrada
@@ -78,13 +77,13 @@ public class VendaService {
       cliente = clienteRepository.findById(requestDTO.idCliente())
           .orElseThrow(() -> new RecursoNaoEncontrado("Cliente não encontrado com ID: " + requestDTO.idCliente()));
 
-      if (!cliente.getAtivo()) {
-        System.out.println("LOG: VendaService.registrarVenda - Cliente selecionado está inativo." + cliente.getNome());
+      if (!cliente.getActive()) {
+        System.out.println("LOG: VendaService.registrarVenda - Cliente selecionado está inactive." + cliente.getName());
         // TODO: adicionar reativação rapida a partir desse momento com modal
-        throw new RecursoNaoEncontrado("Não é possível registrar venda para cliente inativo.");
+        throw new RecursoNaoEncontrado("Não é possível registrar venda para cliente inactive.");
       }
       novaVenda.setCliente(cliente);
-      System.out.println("LOG: VendaService.registrarVenda - Cliente associado a venda: " + cliente.getNome());
+      System.out.println("LOG: VendaService.registrarVenda - Cliente associado a venda: " + cliente.getName());
     }
 
     // Validação para vendas a prazo (fiado)
@@ -98,40 +97,40 @@ public class VendaService {
       // Validação se o cliente PODE comprar fiado
       if (cliente.getControleFiado() != null && !cliente.getControleFiado()) {
         System.out
-            .println("LOG: VendaService.registrarVenda - Cliente não habilitado para fiado: " + cliente.getNome());
+            .println("LOG: VendaService.registrarVenda - Cliente não habilitado para fiado: " + cliente.getName());
         throw new RecursoNaoEncontrado("Este cliente não está habilitado para compras fiado.");
       }
-      System.out.println("LOG: VendaService.registrarVenda - Cliente validado para venda FIADO: " + cliente.getNome());
+      System.out.println("LOG: VendaService.registrarVenda - Cliente validado para venda FIADO: " + cliente.getName());
     }
 
     BigDecimal valorTotalCalculado = BigDecimal.ZERO;
-    List<Produto> produtosParaAtualizarEstoque = new ArrayList<>();
+    List<Product> productsParaAtualizarEstoque = new ArrayList<>();
 
     // Processa cada item da venda, valida estoque e calcula valor total
     for (ItemVendaRequestDTO itemDTO : requestDTO.itens()) {
       System.out.println("LOG: VendaService.registrarVenda - Processando item da venda: " + itemDTO);
-      Produto produto = produtoRepository.findById(itemDTO.idProduto())
+      Product product = productRepository.findById(itemDTO.idProduct())
           .orElseThrow(() -> {
             System.out
-                .println("LOG: VendaService.registrarVenda - Produto não encontrado com ID: " + itemDTO.idProduto());
-            return new RecursoNaoEncontrado("Produto não encontrado com ID: " + itemDTO.idProduto());
+                .println("LOG: VendaService.registrarVenda - Product não encontrado com ID: " + itemDTO.idProduct());
+            return new RecursoNaoEncontrado("Product não encontrado com ID: " + itemDTO.idProduct());
           });
 
-      if (!produto.isAtivo()) {
-        System.out.println("LOG: VendaService.registrarVenda - Produto inativo: " + produto.getNome());
-        throw new RecursoNaoEncontrado("Produto inativo: " + produto.getNome());
+      if (!product.isActive()) {
+        System.out.println("LOG: VendaService.registrarVenda - Product inactive: " + product.getName());
+        throw new RecursoNaoEncontrado("Product inactive: " + product.getName());
       }
 
       BigDecimal quantidade = itemDTO.quantidade();
-      BigDecimal precoUnitarioAtual = produto.getPrecoVenda();
+      BigDecimal precoUnitarioAtual = product.getSalePrice();
 
       if (precoUnitarioAtual == null || precoUnitarioAtual.compareTo(BigDecimal.ZERO) <= 0) {
-        System.out.println("LOG: VendaService.registrarVenda - Preço inválido para produto: " + produto.getNome());
-        throw new RecursoNaoEncontrado("Preço inválido ou não definido para o produto: " + produto.getNome());
+        System.out.println("LOG: VendaService.registrarVenda - Preço inválido para product: " + product.getName());
+        throw new RecursoNaoEncontrado("Preço inválido ou não definido para o product: " + product.getName());
       }
 
       ItemVenda itemVenda = ItemVenda.builder()
-          .produto(produto)
+          .product(product)
           .quantidade(quantidade)
           .precoUnitarioVenda(precoUnitarioAtual)
           .build();
@@ -139,28 +138,28 @@ public class VendaService {
       novaVenda.adicionarItem(itemVenda);
 
       valorTotalCalculado = valorTotalCalculado.add(itemVenda.getValorTotalItem());
-      System.out.println("LOG: VendaService.registrarVenda - Item adicionado. Produto: " + produto.getNome()
+      System.out.println("LOG: VendaService.registrarVenda - Item adicionado. Product: " + product.getName()
           + ", Quantidade: " + quantidade
           + ", Preço: " + precoUnitarioAtual + ", Valor total acumulado: " + valorTotalCalculado);
 
-      // Atualiza estoque do produto
-      BigDecimal estoqueAtual = produto.getQuantidadeEstoque();
+      // Atualiza estoque do product
+      BigDecimal estoqueAtual = product.getStockQuantity();
       if (estoqueAtual != null && estoqueAtual.compareTo(BigDecimal.ZERO) > 0) {
         if (estoqueAtual.compareTo(quantidade) < 0) {
-          System.out.println("LOG: VendaService.registrarVenda - Estoque insuficiente para produto: "
-              + produto.getNome() + ". Em estoque: "
+          System.out.println("LOG: VendaService.registrarVenda - Estoque insuficiente para product: "
+              + product.getName() + ". Em estoque: "
               + estoqueAtual + ", Solicitado: " + quantidade);
-          throw new RecursoNaoEncontrado("Estoque insuficiente para o produto: " + produto.getNome() +
+          throw new RecursoNaoEncontrado("Estoque insuficiente para o product: " + product.getName() +
               ". Em estoque: " + estoqueAtual + ", Solicitado: " + quantidade);
         }
-        produto.setQuantidadeEstoque(estoqueAtual.subtract(quantidade));
-        produtosParaAtualizarEstoque.add(produto);
-        System.out.println("LOG: VendaService.registrarVenda - Estoque atualizado para produto: " + produto.getNome()
+        product.setStockQuantity(estoqueAtual.subtract(quantidade));
+        productsParaAtualizarEstoque.add(product);
+        System.out.println("LOG: VendaService.registrarVenda - Estoque atualizado para product: " + product.getName()
             + ". Novo estoque: "
-            + produto.getQuantidadeEstoque());
+            + product.getStockQuantity());
       } else {
-        System.out.println("LOG: VendaService.registrarVenda - Produto sem estoque controlado ou estoque zerado: "
-            + produto.getNome());
+        System.out.println("LOG: VendaService.registrarVenda - Product sem estoque controlado ou estoque zerado: "
+            + product.getName());
       }
     }
 
@@ -170,17 +169,17 @@ public class VendaService {
     Venda vendaSalva = vendaRepository.save(novaVenda);
     System.out.println("LOG: VendaService.registrarVenda - Venda salva com ID: " + vendaSalva.getId());
 
-    // Salva atualização de estoque dos produtos
-    if (!produtosParaAtualizarEstoque.isEmpty()) {
-      produtoRepository.saveAll(produtosParaAtualizarEstoque);
-      System.out.println("LOG: VendaService.registrarVenda - Estoque dos produtos atualizado no banco de dados.");
+    // Salva atualização de estoque dos products
+    if (!productsParaAtualizarEstoque.isEmpty()) {
+      productRepository.saveAll(productsParaAtualizarEstoque);
+      System.out.println("LOG: VendaService.registrarVenda - Estoque dos products atualizado no banco de dados.");
     }
 
     // Atualiza saldo devedor do cliente em caso de venda fiado
     if (vendaSalva.getFormaPagamento() == FormaPagamento.FIADO && cliente != null) {
       System.out
           .println("LOG: VendaService.registrarVenda - Iniciando atualização de saldo devedor para cliente FIADO: "
-              + cliente.getNome());
+              + cliente.getName());
       BigDecimal novoSaldoDevedor = cliente.getSaldoDevedor().add(vendaSalva.getValorTotal());
 
       // Busca configurações globais para cálculo de prazo e juros
@@ -196,9 +195,9 @@ public class VendaService {
 
       if (cliente.getLimiteFiado() != null && novoSaldoDevedor.compareTo(cliente.getLimiteFiado()) > 0) {
         System.out.println(
-            "LOG: VendaService.registrarVenda - Limite fiado excedido para cliente: " + cliente.getNome() + ". Limite: "
+            "LOG: VendaService.registrarVenda - Limite fiado excedido para cliente: " + cliente.getName() + ". Limite: "
                 + cliente.getLimiteFiado() + ", Saldo após venda: " + novoSaldoDevedor);
-        throw new BusinessException("Limite fiado excedido para o cliente: " + cliente.getNome() +
+        throw new BusinessException("Limite fiado excedido para o cliente: " + cliente.getName() +
             ". Limite: " + cliente.getLimiteFiado() + ", Saldo após venda: " + novoSaldoDevedor);
       }
       cliente.setSaldoDevedor(novoSaldoDevedor);
@@ -224,40 +223,40 @@ public class VendaService {
    */
 
   @Transactional(readOnly = true)
-  public PageResponse<VendaResponseDTO> listarVendas(
+  public PageResponse<VendaResponseDTO> listVendas(
       ZonedDateTime inicio,
       ZonedDateTime fim,
       Long clienteId,
       String formaPagamentoString,
-      Long produtoId,
+      Long productId,
       String orderBy,
       int page,
       int size) {
-    System.out.println("LOG: VendaService.listarVendas - inicio: " + inicio + ", fim: " + fim
+    System.out.println("LOG: VendaService.listVendas - inicio: " + inicio + ", fim: " + fim
         + ", clienteId: " + clienteId + ", formaPagamentoString: " + formaPagamentoString);
 
     // Extrai lógica de conversão e datas padrão
-    FormaPagamento formaPagamentoFiltro = VendaMapper.parseFormaPagamento(formaPagamentoString);
+    FormaPagamento formaPagamentoFilter = VendaMapper.parseFormaPagamento(formaPagamentoString);
     ZonedDateTime[] range = VendaMapper.buildDataRange(inicio, fim);
 
     Sort sort = VendaMapper.buildSort(orderBy);
     Pageable pageable = PageRequest.of(page, size, sort);
 
-    System.out.println("SERVICE: VendaService.listarVendas - Usando sort: " + sort);
+    System.out.println("SERVICE: VendaService.listVendas - Usando sort: " + sort);
     System.out.println("SERVICE: Query - Inicio: " + range[0] + ", Fim: " + range[1]
-        + ", ClienteId: " + clienteId + ", FormaPagamento: " + formaPagamentoFiltro
-        + ", Produto: " + produtoId);
+        + ", ClienteId: " + clienteId + ", FormaPagamento: " + formaPagamentoFilter
+        + ", Product: " + productId);
 
-    Page<Venda> vendasPage = vendaRepository.findVendasComFiltros(
+    Page<Venda> vendasPage = vendaRepository.findVendasComFilters(
         range[0],
         range[1],
         clienteId,
-        formaPagamentoFiltro,
-        produtoId,
+        formaPagamentoFilter,
+        productId,
         pageable);
 
     Page<VendaResponseDTO> dtoPage = vendasPage.map(VendaResponseDTO::new);
-    System.out.println("LOG: VendaService.listarVendas - Vendas encontradas: " + vendasPage.getTotalElements());
+    System.out.println("LOG: VendaService.listVendas - Vendas encontradas: " + vendasPage.getTotalElements());
     return new PageResponse<>(dtoPage);
   }
 
@@ -275,29 +274,27 @@ public class VendaService {
 
   @Transactional(readOnly = true)
   public BigDecimal calcularTotalBrutoVendas(ZonedDateTime inicio, ZonedDateTime fim,
-      Long clienteId, String formaPagamentoString, Long produtoId) {
-    FormaPagamento formaPagamentoFiltro = parseFormaPagamento(formaPagamentoString);
+      Long clienteId, String formaPagamentoString, Long productId) {
+    FormaPagamento formaPagamentoFilter = parseFormaPagamento(formaPagamentoString);
     ZonedDateTime inicioQuery = (inicio != null) ? inicio : ZonedDateTime.parse("1900-01-01T00:00:00Z");
     ZonedDateTime fimQuery = (fim != null) ? fim : ZonedDateTime.parse("9999-12-31T23:59:59Z");
 
-    return vendaRepository.sumValorTotalComFiltros(
-        inicioQuery, fimQuery, clienteId, formaPagamentoFiltro, produtoId);
+    return vendaRepository.sumValorTotalComFilters(
+        inicioQuery, fimQuery, clienteId, formaPagamentoFilter, productId);
   }
 
-  @Transactional(readOnly=true)
+  @Transactional(readOnly = true)
   public List<TotalPorFormaPagamentoDTO> calcularTotaisPorFormaPagamento(
-	ZonedDateTime inicio, ZonedDateTime fim) 
-  {
-   	ZonedDateTime inicioQuery = (inicio != null) ? inicio : ZonedDateTime.parse("1900-01-01T00:00:00Z");
-   	ZonedDateTime fimQuery = (fim != null) ? fim: ZonedDateTime.parse("9999-12-31T23:59:59Z");
-   
-   	List<Object[]> results = vendaRepository.sumValorTotalGroupByFormaPagamentoBetween(inicioQuery, fimQuery);
-   
-   	return results.stream()
-   		.map(res -> new TotalPorFormaPagamentoDTO((FormaPagamento) res[0], (BigDecimal) res[1]))
-   		.collect(Collectors.toList());
-  }
+      ZonedDateTime inicio, ZonedDateTime fim) {
+    ZonedDateTime inicioQuery = (inicio != null) ? inicio : ZonedDateTime.parse("1900-01-01T00:00:00Z");
+    ZonedDateTime fimQuery = (fim != null) ? fim : ZonedDateTime.parse("9999-12-31T23:59:59Z");
 
+    List<Object[]> results = vendaRepository.sumValorTotalGroupByFormaPagamentoBetween(inicioQuery, fimQuery);
+
+    return results.stream()
+        .map(res -> new TotalPorFormaPagamentoDTO((FormaPagamento) res[0], (BigDecimal) res[1]))
+        .collect(Collectors.toList());
+  }
 
   /**
    * Busca uma venda pelo ID, incluindo itens e cliente relacionados.
@@ -313,111 +310,111 @@ public class VendaService {
   }
 
   /**
-   * Lógica para buscar a venda, estornar estoque, estornar saldo fiado e deletar
+   * Lógica para buscar a venda, estornar estoque, estornar saldo fiado e delete
    * a venda.
    * 
    * @param id Identificador da venda
    */
   @Transactional
-  public void deletarVendaFisicamente(Long vendaId) {
+  public void deleteVendaFisicamente(Long vendaId) {
     System.out
-        .println("DELETE_START: VendaService.deletarVendaFisicamente - Buscando venda para deleção... - " + vendaId);
+        .println("DELETE_START: VendaService.deleteVendaFisicamente - Buscando venda para deleção... - " + vendaId);
 
-    Venda vendaParaDeletar = vendaRepository.findByIdComItensECliente(vendaId)
+    Venda vendaParaDelete = vendaRepository.findByIdComItensECliente(vendaId)
         .orElseThrow(() -> {
-          System.err.println("ERROR: VendaService.deletarVendaFisicamente - Venda não encontrada: " + vendaId);
+          System.err.println("ERROR: VendaService.deleteVendaFisicamente - Venda não encontrada: " + vendaId);
           return new RecursoNaoEncontrado("Venda não encontrada: " + vendaId);
         });
 
-    System.out.println("DELETE_LOG_01: VendaService.deletarVendaFisicamente - Venda " + vendaId + " encontrada.");
-    System.out.println("DELETE_LOG_02: VendaService.deletarVendaFisicamente - Estornando itens ao estoque... ");
-    List<Produto> produtosParaAtualizarEstoque = new ArrayList<>();
-    if (vendaParaDeletar.getItens() != null) {
-      for (ItemVenda item : vendaParaDeletar.getItens()) {
-        Produto produtoDoItem = item.getProduto();
-        if (produtoDoItem != null) {
-          Produto produtoParaEstornar = produtoRepository.findById(produtoDoItem.getId())
+    System.out.println("DELETE_LOG_01: VendaService.deleteVendaFisicamente - Venda " + vendaId + " encontrada.");
+    System.out.println("DELETE_LOG_02: VendaService.deleteVendaFisicamente - Estornando itens ao estoque... ");
+    List<Product> productsParaAtualizarEstoque = new ArrayList<>();
+    if (vendaParaDelete.getItens() != null) {
+      for (ItemVenda item : vendaParaDelete.getItens()) {
+        Product productDoItem = item.getProduct();
+        if (productDoItem != null) {
+          Product productParaEstornar = productRepository.findById(productDoItem.getId())
               .orElseThrow(() -> new RecursoNaoEncontrado(
-                  "Produo associado ao item da venda não encontrado: ID " + produtoDoItem.getId()));
-          if (produtoParaEstornar.getQuantidadeEstoque() != null) {
-            System.out.println("DELETE_LOG_03: VendaService.deletarVendaFisicamente - Processando estoque do item "
-                + produtoParaEstornar.getNome() + " de ID " + produtoParaEstornar.getId()
+                  "Produo associado ao item da venda não encontrado: ID " + productDoItem.getId()));
+          if (productParaEstornar.getStockQuantity() != null) {
+            System.out.println("DELETE_LOG_03: VendaService.deleteVendaFisicamente - Processando estoque do item "
+                + productParaEstornar.getName() + " de ID " + productParaEstornar.getId()
                 + ". Quantia a ser processada: " + item.getQuantidade());
-            BigDecimal novoEstoque = produtoParaEstornar.getQuantidadeEstoque().add(item.getQuantidade());
-            produtoParaEstornar.setQuantidadeEstoque(novoEstoque);
-            produtosParaAtualizarEstoque.add(produtoParaEstornar);
-            System.out.println("DELETE_LOG_04: VendaService.deletarVendaFisicamente. SUCESSO ao PROCESSAR ESTOQUE de "
-                + produtoDoItem.getNome() + ". Novo Estoque: " + novoEstoque);
+            BigDecimal novoEstoque = productParaEstornar.getStockQuantity().add(item.getQuantidade());
+            productParaEstornar.setStockQuantity(novoEstoque);
+            productsParaAtualizarEstoque.add(productParaEstornar);
+            System.out.println("DELETE_LOG_04: VendaService.deleteVendaFisicamente. SUCESSO ao PROCESSAR ESTOQUE de "
+                + productDoItem.getName() + ". Novo Estoque: " + novoEstoque);
           } else {
-            System.out.println("DELETE_LOG_03_S/ESTOQUE - VendaService.deletarVendaFisicamente - Produto "
-                + produtoParaEstornar.getNome() + "de ID: " + produtoParaEstornar.getId()
+            System.out.println("DELETE_LOG_03_S/ESTOQUE - VendaService.deleteVendaFisicamente - Product "
+                + productParaEstornar.getName() + "de ID: " + productParaEstornar.getId()
                 + ", não possui controle de estoque. SUCESSO AO PROCESSAR.");
           }
         }
       }
     }
-    if (!produtosParaAtualizarEstoque.isEmpty()) {
-      produtoRepository.saveAll(produtosParaAtualizarEstoque);
-      System.out.println("DELETE_LOG: VendaService.deletarVendaFisicamente. SUCESSO ao PROCESSAR ESTOQUE");
+    if (!productsParaAtualizarEstoque.isEmpty()) {
+      productRepository.saveAll(productsParaAtualizarEstoque);
+      System.out.println("DELETE_LOG: VendaService.deleteVendaFisicamente. SUCESSO ao PROCESSAR ESTOQUE");
     }
 
-    if (vendaParaDeletar.getFormaPagamento() == FormaPagamento.FIADO && vendaParaDeletar.getCliente() != null) {
-      Cliente clienteDaVenda = clienteRepository.findById(vendaParaDeletar.getCliente().getId())
+    if (vendaParaDelete.getFormaPagamento() == FormaPagamento.FIADO && vendaParaDelete.getCliente() != null) {
+      Cliente clienteDaVenda = clienteRepository.findById(vendaParaDelete.getCliente().getId())
           .orElse(null);
       System.out
-          .println("DELETE_LOG_FIADO: VendaService.deletarVendaFisicamente. Estornando crédito de fiado ao cliente"
-              + clienteDaVenda.getNome() + "...");
+          .println("DELETE_LOG_FIADO: VendaService.deleteVendaFisicamente. Estornando crédito de fiado ao cliente"
+              + clienteDaVenda.getName() + "...");
       BigDecimal saldoAtual = clienteDaVenda.getSaldoDevedor();
-      BigDecimal valorVenda = vendaParaDeletar.getValorTotal();
+      BigDecimal valorVenda = vendaParaDelete.getValorTotal();
 
       if (clienteDaVenda != null) {
         clienteDaVenda.setSaldoDevedor(saldoAtual.subtract(valorVenda));
 
         System.out.println("DELETE_LOG_FIADO: SUCESSO ao estornar R$" + valorVenda + " para o cliente "
-            + clienteDaVenda.getNome() + " totalizando no SALDO ATUAL: R$" + clienteDaVenda.getSaldoDevedor());
+            + clienteDaVenda.getName() + " totalizando no SALDO ATUAL: R$" + clienteDaVenda.getSaldoDevedor());
 
         if (clienteDaVenda.getSaldoDevedor().compareTo(BigDecimal.ZERO) <= 0
-            && vendaParaDeletar.getDataVenda().equals(clienteDaVenda.getDataUltimaCompraFiado())) {
+            && vendaParaDelete.getDataVenda().equals(clienteDaVenda.getDataUltimaCompraFiado())) {
           System.out.println(
-              "LOG: VendaService.deletarVendaFisicamente - Saldo do cliente zerado ou negativo. Data da última compra fiado pode precisar de reavaliação.");
+              "LOG: VendaService.deleteVendaFisicamente - Saldo do cliente zerado ou negactive. Data da última compra fiado pode precisar de reavaliação.");
         }
         clienteRepository.save(clienteDaVenda);
-        System.out.println("LOG: VendaService.deletarVendaFisicamente - Saldo devedor do cliente ID " +
+        System.out.println("LOG: VendaService.deleteVendaFisicamente - Saldo devedor do cliente ID " +
             clienteDaVenda.getId() + " estornado. Novo saldo: " + clienteDaVenda.getSaldoDevedor());
       }
     }
     System.out.println("DELETE_LOG: Deletando Venda...");
-    vendaRepository.delete(vendaParaDeletar);
+    vendaRepository.delete(vendaParaDelete);
     System.out
-        .println("LOG: VendaService.deletarVendaFisicamente - Venda ID " + vendaId + " deletada permanentemente.");
+        .println("LOG: VendaService.deleteVendaFisicamente - Venda ID " + vendaId + " deletada permanentemente.");
     System.out.println("DELETE_LOG: VENDA DELETADA COM SUCESSO");
   }
 
   public List<GroupsummaryDTO> getVendassummary(
       ZonedDateTime inicio, ZonedDateTime fim, Long clienteId,
-      String formaPagamentoString, Long produtoId, String groupBy) {
+      String formaPagamentoString, Long productId, String groupBy) {
     System.out.println("LOG: VendaService.getVendassummary - Iniciando resumo de vendas com filtros: "
         + "Inicio: " + inicio + ", Fim: " + fim + ", ClienteId: " + clienteId
-        + ", FormaPagamento: " + formaPagamentoString + ", ProdutoId: " + produtoId
+        + ", FormaPagamento: " + formaPagamentoString + ", ProductId: " + productId
         + ", GroupBy: " + groupBy);
 
-    FormaPagamento formaPagamentoFiltro = VendaMapper.parseFormaPagamento(formaPagamentoString);
+    FormaPagamento formaPagamentoFilter = VendaMapper.parseFormaPagamento(formaPagamentoString);
     ZonedDateTime incioQuery = (inicio != null) ? inicio
         : ZonedDateTime.of(1900, 1, 1, 0, 0, 0, 0, java.time.ZoneId.systemDefault());
     ZonedDateTime fimQuery = (fim != null) ? fim
         : ZonedDateTime.of(9999, 12, 31, 23, 59, 59, 0, java.time.ZoneId.systemDefault());
 
     if ("dataVenda".equalsIgnoreCase(groupBy)) {
-      List<Object[]> results = vendaRepository.sumTotalGroupByDay(incioQuery, fimQuery, clienteId, formaPagamentoFiltro,
-          produtoId);
+      List<Object[]> results = vendaRepository.sumTotalGroupByDay(incioQuery, fimQuery, clienteId, formaPagamentoFilter,
+          productId);
       return results.stream()
           .map(res -> new GroupsummaryDTO((String) res[0], (String) res[0], (BigDecimal) res[1]))
           .collect(Collectors.toList());
     }
 
-    if ("cliente.nome".equalsIgnoreCase(groupBy)) {
+    if ("cliente.name".equalsIgnoreCase(groupBy)) {
       List<Object[]> results = vendaRepository.sumTotalGroupByCliente(incioQuery, fimQuery, clienteId,
-          formaPagamentoFiltro, produtoId);
+          formaPagamentoFilter, productId);
       return results.stream()
           .map(res -> new GroupsummaryDTO(String.valueOf(res[0]), (String) res[1], (BigDecimal) res[2]))
           .collect(Collectors.toList());

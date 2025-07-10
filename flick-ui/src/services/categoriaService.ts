@@ -7,7 +7,7 @@ export interface CategoriaRequest {
 
 export const getCategorias = async (): Promise<CategoriaResponse[]> => {
   try{
-    const response = await apiClient.get<CategoriaResponse[]>('/api/categorias');
+    const response = await apiClient.get<CategoriaResponse[]>('/api/categorys');
     return response.data;
   }catch(error){
     console.error("Erro ao buscar categorias: ", error);
@@ -19,7 +19,7 @@ export const getCategorias = async (): Promise<CategoriaResponse[]> => {
 export const createCategoria = async (data:CategoriaRequest):
 Promise<CategoriaResponse> => {
   try{
-    const response = await apiClient.post<CategoriaResponse>('/api/categorias', data);
+    const response = await apiClient.post<CategoriaResponse>('/api/categorys', data);
     return response.data;
   }catch(error) {
     console.error("Erro ao criar categoria: ", error)

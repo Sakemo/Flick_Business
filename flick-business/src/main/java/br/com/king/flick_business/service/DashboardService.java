@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.List; // Para alternativa do produto mais vendido
+import java.util.List; // Para alternativa do product mais vendido
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -16,22 +16,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.king.flick_business.dto.DashboardSummaryDTO; // Para divisão do ticket médio
 import br.com.king.flick_business.dto.DataPointDTO; // Para converter resultado da query nativa
-import br.com.king.flick_business.dto.ProdutoMaisVendidoDTO;
+import br.com.king.flick_business.dto.ProductMaisVendidoDTO;
 import br.com.king.flick_business.enums.FormaPagamento;
-import br.com.king.flick_business.repository.DespesaRepository; // Importar ArrayList
+import br.com.king.flick_business.repository.ExpenseRepository; // Importar ArrayList
 import br.com.king.flick_business.repository.ItemVendaRepository; // Usar EnumMap para performance
 import br.com.king.flick_business.repository.VendaRepository;
 
 @Service
 public class DashboardService {
   private final VendaRepository vendaRepository;
-  private final DespesaRepository despesaRepository;
+  private final ExpenseRepository expenseRepository;
   private final ItemVendaRepository itemVendaRepository;
 
-  public DashboardService(VendaRepository vendaRepository, DespesaRepository despesaRepository,
+  public DashboardService(VendaRepository vendaRepository, ExpenseRepository expenseRepository,
       ItemVendaRepository itemVendaRepository) {
     this.vendaRepository = vendaRepository;
-    this.despesaRepository = despesaRepository;
+    this.expenseRepository = expenseRepository;
     this.itemVendaRepository = itemVendaRepository;
   }
 
@@ -40,13 +40,13 @@ public class DashboardService {
     BigDecimal totalVendasBruto = vendaRepository.sumValorTotalByDataVendaBetween(inicio, fim);
     Long quantidadeVendas = vendaRepository.countVendasByDataVendaBetween(inicio, fim);
     List<Object[]> vendasPorFormaPgtoRaw = vendaRepository.sumValorTotalGroupByFormaPagamentoBetween(inicio, fim);
-    BigDecimal totalDespesas = despesaRepository.sumValorByDataDespesaBetween(inicio, fim);
-    ProdutoMaisVendidoDTO produtoMaisVendido = itemVendaRepository.findProdutoMaisVendidoBetween(inicio.toLocalDate(),
+    BigDecimal totalExpenses = expenseRepository.sumValorByDataExpenseBetween(inicio, fim);
+    ProductMaisVendidoDTO productMaisVendido = itemVendaRepository.findProductMaisVendidoBetween(inicio.toLocalDate(),
         fim.toLocalDate());
     List<Object[]> vendasDiariasRaw = vendaRepository.sumValorTotalGroupByDayBetweenNative(inicio, fim);
 
     // Processar dados e calcular métricas
-    BigDecimal lucroBrutoEstimado = totalVendasBruto.subtract(totalDespesas);
+    BigDecimal lucroBrutoEstimado = totalVendasBruto.subtract(totalExpenses);
 
     BigDecimal ticketMedio = BigDecimal.ZERO;
     if (quantidadeVendas > 0) {
@@ -87,11 +87,11 @@ public class DashboardService {
     return new DashboardSummaryDTO(
         totalVendasBruto,
         totalVendasPorFormaPagamento,
-        totalDespesas,
+        totalExpenses,
         lucroBrutoEstimado,
         ticketMedio,
         quantidadeVendas,
-        produtoMaisVendido,
+        productMaisVendido,
         graficoVendasDiarias);
   }
 }

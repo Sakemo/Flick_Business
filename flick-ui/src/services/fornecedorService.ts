@@ -18,7 +18,7 @@ export interface FornecedorAddQuickRequest {
 
 export const getFornecedores = async (): Promise<FornecedorResponse[]> => {
   try {
-    const response = await apiClient.get<FornecedorResponse[]>('/api/fornecedores');
+    const response = await apiClient.get<FornecedorResponse[]>('/api/providers');
     return response.data;
   }catch(error){
     console.error("Erro ao buscar fornecedores: ", error);
@@ -38,7 +38,7 @@ Promise<FornecedorResponse> => {
       notas: null,
     };
     console.log("Payload para criar fornecedor: ", payload);
-    const response = await apiClient.post<FornecedorResponse>('api/fornecedores', payload);
+    const response = await apiClient.post<FornecedorResponse>('api/providers', payload);
     return response.data;
   }catch(error){
     console.error("Erro ao criar fornecedor: ", error);

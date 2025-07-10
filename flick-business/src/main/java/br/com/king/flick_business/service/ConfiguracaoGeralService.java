@@ -40,7 +40,7 @@ public class ConfiguracaoGeralService {
 
     config.setTaxaJurosAtraso(dto.taxaJuros());
     config.setPrazoPagamentoFiado(dto.prazoPagamento());
-    config.setNomeNegocio(dto.nomeNegocio());
+    config.setNameNegocio(dto.nameNegocio());
     ConfiguracaoGeral configSalva = configuracaoRepository.save(config);
 
     return mapEntityToDto(configSalva);
@@ -52,7 +52,7 @@ public class ConfiguracaoGeralService {
         entity.getTaxaJurosAtraso(),
         entity.getPrazoPagamentoFiado(),
         entity.getDataAtualizacao(),
-        entity.getNomeNegocio());
+        entity.getNameNegocio());
   }
 
 }

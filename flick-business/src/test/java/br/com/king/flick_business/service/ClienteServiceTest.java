@@ -55,10 +55,10 @@ class ClienteServiceTest {
   @BeforeEach
   void setUp() {
     clienteExistente = Cliente.builder()
-        .id(idExistente).nome("Cliente Teste Existente").cpf("11122233344")
+        .id(idExistente).name("Cliente Teste Existente").cpf("11122233344")
         .telefone("11999998888").endereco("Rua Teste, 123")
         .controleFiado(true).limiteFiado(new BigDecimal("100.00"))
-        .saldoDevedor(BigDecimal.ZERO).ativo(true)
+        .saldoDevedor(BigDecimal.ZERO).active(true)
         .dataCadastro(ZonedDateTime.now().minusDays(10))
         .dataUltimaCompraFiado(ZonedDateTime.now().minusDays(5))
         .dataAtualizacao(ZonedDateTime.now().minusDays(1))
@@ -74,8 +74,8 @@ class ClienteServiceTest {
   @DisplayName("salvar: Deve salvar cliente com sucesso quando CPF não existe")
   void salvar_quandoCpfNaoExiste_deveRetornarDtoSalvo() {
     when(clienteRepositoryMock.findByCpf(clienteRequestDTO.cpf())).thenReturn(Optional.empty());
-    Cliente clienteSalvoMock = Cliente.builder().id(2L).nome(clienteRequestDTO.nome()).cpf(clienteRequestDTO.cpf())
-        .ativo(true).saldoDevedor(BigDecimal.ZERO).controleFiado(false).build();
+    Cliente clienteSalvoMock = Cliente.builder().id(2L).name(clienteRequestDTO.name()).cpf(clienteRequestDTO.cpf())
+        .active(true).saldoDevedor(BigDecimal.ZERO).controleFiado(false).build();
     when(clienteRepositoryMock.save(any(Cliente.class))).thenReturn(clienteSalvoMock);
     ClienteResponseDTO resultado = clienteService.salvar(clienteRequestDTO);
     assertNotNull(resultado);
@@ -97,7 +97,7 @@ class ClienteServiceTest {
     when(clienteRepositoryMock.save(any(Cliente.class))).thenAnswer(inv -> inv.getArgument(0));
     ClienteResponseDTO resultado = clienteService.atualizar(idExistente, clienteRequestAtualizacaoDTO);
     assertNotNull(resultado);
-    assertEquals(clienteRequestAtualizacaoDTO.nome(), resultado.nome());
+    assertEquals(clienteRequestAtualizacaoDTO.name(), resultado.name());
   }
 
   @Test
@@ -110,78 +110,78 @@ class ClienteServiceTest {
   }
 
   @Test
-  @DisplayName("deletar: Deve inativar cliente quando sem saldo devedor")
-  void deletar_quandoClienteEncontradoSemSaldo_deveSetarAtivoFalseESalvar() {
+  @DisplayName("delete: Deve inativar cliente quando sem saldo devedor")
+  void delete_quandoClienteEncontradoSemSaldo_deveSetarActiveFalseESalvar() {
     when(clienteRepositoryMock.findById(idExistente)).thenReturn(Optional.of(clienteExistente));
-    clienteService.deletar(idExistente);
+    clienteService.delete(idExistente);
     verify(clienteRepositoryMock).save(clienteCaptor.capture());
-    assertFalse(clienteCaptor.getValue().getAtivo());
+    assertFalse(clienteCaptor.getValue().getActive());
   }
 
   @Test
-  @DisplayName("ativarInativar: Deve ativar um cliente inativo")
-  void ativarInativar_quandoAtivarClienteInativo_deveSetarAtivoTrueESalvar() {
-    Cliente clienteInativo = Cliente.builder().id(idExistente).ativo(false).saldoDevedor(BigDecimal.ZERO).build();
-    when(clienteRepositoryMock.findById(idExistente)).thenReturn(Optional.of(clienteInativo));
+  @DisplayName("ativarInativar: Deve ativar um cliente inactive")
+  void ativarInativar_quandoAtivarClienteInactive_deveSetarActiveTrueESalvar() {
+    Cliente clienteInactive = Cliente.builder().id(idExistente).active(false).saldoDevedor(BigDecimal.ZERO).build();
+    when(clienteRepositoryMock.findById(idExistente)).thenReturn(Optional.of(clienteInactive));
     when(clienteRepositoryMock.save(any(Cliente.class))).thenAnswer(inv -> inv.getArgument(0));
     ClienteResponseDTO resultado = clienteService.ativarInativar(idExistente, true);
-    assertTrue(resultado.ativo());
+    assertTrue(resultado.active());
   }
 
   @Test
-  @DisplayName("listarTodos: Deve chamar findClienteComFiltros com nomeContains nulo e Sort default quando outros filtros são nulos")
-  void listarTodos_semFiltrosEspecificos_deveUsarNomeNullESortDefault() {
-    Boolean apenasAtivos = true;
-    when(clienteRepositoryMock.findClienteComFiltros(eq(""), eq(apenasAtivos), isNull(), any(Sort.class)))
+  @DisplayName("listTodos: Deve chamar findClienteComFilters com nameContains nulo e Sort default quando outros filtros são nulos")
+  void listTodos_semFiltersEspecificos_deveUsarNameNullESortDefault() {
+    Boolean apenasActives = true;
+    when(clienteRepositoryMock.findClienteComFilters(eq(""), eq(apenasActives), isNull(), any(Sort.class)))
         .thenReturn(Collections.emptyList());
 
-    clienteService.listarTodos(apenasAtivos, null, null, null);
+    clienteService.listTodos(apenasActives, null, null, null);
 
-    verify(clienteRepositoryMock).findClienteComFiltros(eq(""), eq(apenasAtivos), isNull(), sortCaptor.capture());
+    verify(clienteRepositoryMock).findClienteComFilters(eq(""), eq(apenasActives), isNull(), sortCaptor.capture());
     Sort capturedSort = sortCaptor.getValue();
     assertNotNull(capturedSort.getOrderFor("dataCadastro"), "Default sort deve ser por dataCadastro");
     assertEquals(Sort.Direction.DESC, capturedSort.getOrderFor("dataCadastro").getDirection());
   }
 
   @Test
-  @DisplayName("listarTodos: Deve chamar findClienteComFiltros com Sort por nome ASC quando orderBy é 'nomeAsc'")
-  void listarTodos_comOrderByNomeAsc_devePassarSortNomeAsc() {
+  @DisplayName("listTodos: Deve chamar findClienteComFilters com Sort por name ASC quando orderBy é 'nameAsc'")
+  void listTodos_comOrderByNameAsc_devePassarSortNameAsc() {
     // Arrange
-    String orderBy = "nomeAsc";
-    Boolean apenasAtivos = true;
-    when(clienteRepositoryMock.findClienteComFiltros(eq(""), eq(apenasAtivos), isNull(), any(Sort.class)))
+    String orderBy = "nameAsc";
+    Boolean apenasActives = true;
+    when(clienteRepositoryMock.findClienteComFilters(eq(""), eq(apenasActives), isNull(), any(Sort.class)))
         .thenReturn(Collections.emptyList());
 
     // Act
-    clienteService.listarTodos(apenasAtivos, null, orderBy, null);
+    clienteService.listTodos(apenasActives, null, orderBy, null);
 
     // Assert / Verify
-    verify(clienteRepositoryMock).findClienteComFiltros(
-        eq(""), // nomeContains
-        eq(apenasAtivos), // apenasAtivos
+    verify(clienteRepositoryMock).findClienteComFilters(
+        eq(""), // nameContains
+        eq(apenasActives), // apenasActives
         isNull(), // devedores
         sortCaptor.capture());
     Sort capturedSort = sortCaptor.getValue();
-    assertNotNull(capturedSort.getOrderFor("nome"), "Sort deve ser por nome");
-    assertEquals(Sort.Direction.ASC, capturedSort.getOrderFor("nome").getDirection());
+    assertNotNull(capturedSort.getOrderFor("name"), "Sort deve ser por name");
+    assertEquals(Sort.Direction.ASC, capturedSort.getOrderFor("name").getDirection());
   }
 
   @Test
-  @DisplayName("listarTodos: Deve chamar findClienteComFiltros com filtro de devedores=true e Sort default")
-  void listarTodos_comFiltroDevedoresTrue_devePassarDevedoresTrueESortDefault() {
+  @DisplayName("listTodos: Deve chamar findClienteComFilters com filtro de devedores=true e Sort default")
+  void listTodos_comFilterDevedoresTrue_devePassarDevedoresTrueESortDefault() {
     // Arrange
     Boolean devedores = true;
-    Boolean apenasAtivos = true;
-    when(clienteRepositoryMock.findClienteComFiltros(eq(""), eq(apenasAtivos), eq(devedores), any(Sort.class)))
+    Boolean apenasActives = true;
+    when(clienteRepositoryMock.findClienteComFilters(eq(""), eq(apenasActives), eq(devedores), any(Sort.class)))
         .thenReturn(Collections.emptyList());
 
     // Act
-    clienteService.listarTodos(apenasAtivos, devedores, null, null); // orderBy é null
+    clienteService.listTodos(apenasActives, devedores, null, null); // orderBy é null
 
     // Assert / Verify
-    verify(clienteRepositoryMock).findClienteComFiltros(
+    verify(clienteRepositoryMock).findClienteComFilters(
         eq(""),
-        eq(apenasAtivos), // apenasAtivos
+        eq(apenasActives), // apenasActives
         eq(true), // devedores
         sortCaptor.capture());
     Sort capturedSort = sortCaptor.getValue(); // Verifica o sort default
@@ -190,64 +190,64 @@ class ClienteServiceTest {
   }
 
   @Test
-  @DisplayName("listarTodos: Deve chamar findClienteComFiltros com filtro apenasAtivos=false e Sort especificado")
-  void listarTodos_comApenasAtivosFalseEOrderBy_devePassarFiltrosCorretos() {
+  @DisplayName("listTodos: Deve chamar findClienteComFilters com filtro apenasActives=false e Sort especificado")
+  void listTodos_comApenasActivesFalseEOrderBy_devePassarFiltersCorretos() {
     // Arrange
-    Boolean apenasAtivos = false;
-    String orderBy = "nomeDesc";
-    when(clienteRepositoryMock.findClienteComFiltros(eq(""), eq(apenasAtivos), isNull(), any(Sort.class)))
+    Boolean apenasActives = false;
+    String orderBy = "nameDesc";
+    when(clienteRepositoryMock.findClienteComFilters(eq(""), eq(apenasActives), isNull(), any(Sort.class)))
         .thenReturn(Collections.emptyList());
 
     // Act
-    clienteService.listarTodos(apenasAtivos, null, orderBy, null);
+    clienteService.listTodos(apenasActives, null, orderBy, null);
 
     // Assert / Verify
-    verify(clienteRepositoryMock).findClienteComFiltros(
-        eq(""), // nomeContains
-        eq(false), // apenasAtivos
+    verify(clienteRepositoryMock).findClienteComFilters(
+        eq(""), // nameContains
+        eq(false), // apenasActives
         isNull(), // devedores
         sortCaptor.capture());
     Sort capturedSort = sortCaptor.getValue();
-    assertNotNull(capturedSort.getOrderFor("nome"));
-    assertEquals(Sort.Direction.DESC, capturedSort.getOrderFor("nome").getDirection());
+    assertNotNull(capturedSort.getOrderFor("name"));
+    assertEquals(Sort.Direction.DESC, capturedSort.getOrderFor("name").getDirection());
   }
 
   @Test
-  @DisplayName("listarTodos: Deve passar nomeContains corretamente para o repositório")
-  void listarTodos_comNomeContains_devePassarNomeCorretamente() {
+  @DisplayName("listTodos: Deve passar nameContains corretamente para o repositório")
+  void listTodos_comNameContains_devePassarNameCorretamente() {
     // Arrange
-    String nomeBusca = "Teste";
-    Boolean apenasAtivos = true;
-    when(clienteRepositoryMock.findClienteComFiltros(eq(nomeBusca), eq(apenasAtivos), isNull(), any(Sort.class)))
+    String nameBusca = "Teste";
+    Boolean apenasActives = true;
+    when(clienteRepositoryMock.findClienteComFilters(eq(nameBusca), eq(apenasActives), isNull(), any(Sort.class)))
         .thenReturn(List.of(clienteExistente));
 
     // Act
-    clienteService.listarTodos(apenasAtivos, null, null, nomeBusca);
+    clienteService.listTodos(apenasActives, null, null, nameBusca);
 
     // Assert / Verify
-    verify(clienteRepositoryMock).findClienteComFiltros(
-        eq(nomeBusca), // nomeContains
-        eq(apenasAtivos), // apenasAtivos
+    verify(clienteRepositoryMock).findClienteComFilters(
+        eq(nameBusca), // nameContains
+        eq(apenasActives), // apenasActives
         isNull(), // devedores
         any(Sort.class) // Para o Sort default
     );
   }
 
   @Test
-  @DisplayName("listarTodos: Deve passar nomeContains como null se string vazia ou só espaços")
-  void listarTodos_comNomeContainsVazioOuEspacos_devePassarStringVazia() {
+  @DisplayName("listTodos: Deve passar nameContains como null se string vazia ou só espaços")
+  void listTodos_comNameContainsVazioOuEspacos_devePassarStringVazia() {
     // Arrange
-    Boolean apenasAtivos = true;
-    when(clienteRepositoryMock.findClienteComFiltros(eq(""), eq(apenasAtivos), isNull(), any(Sort.class)))
+    Boolean apenasActives = true;
+    when(clienteRepositoryMock.findClienteComFilters(eq(""), eq(apenasActives), isNull(), any(Sort.class)))
         .thenReturn(Collections.emptyList());
 
     // Act
-    clienteService.listarTodos(apenasAtivos, null, null, "   "); // nomeContains com espaços
+    clienteService.listTodos(apenasActives, null, null, "   "); // nameContains com espaços
 
     // Assert / Verify
-    verify(clienteRepositoryMock).findClienteComFiltros(
-        eq(""), // nomeContains deve ser convertido para null
-        eq(apenasAtivos),
+    verify(clienteRepositoryMock).findClienteComFilters(
+        eq(""), // nameContains deve ser convertido para null
+        eq(apenasActives),
         isNull(),
         any(Sort.class));
   }

@@ -9,7 +9,7 @@ public record ClienteResponseDTO(
     Long id,
 
     // -- IDENTIFICAÇÃO -- //
-    String nome,
+    String name,
     String cpf,
     String telefone,
     String endereco,
@@ -23,13 +23,13 @@ public record ClienteResponseDTO(
     // -- METADADOS -- //
     ZonedDateTime dataCadastro,
     ZonedDateTime dataAtualizacao,
-    Boolean ativo)
+    Boolean active)
 
 {
   public ClienteResponseDTO(Cliente cliente) {
     this(
         cliente.getId(),
-        cliente.getNome(),
+        cliente.getName(),
         cliente.getCpf(),
         cliente.getTelefone(),
         cliente.getEndereco(),
@@ -39,7 +39,7 @@ public record ClienteResponseDTO(
         cliente.getDataUltimaCompraFiado(),
         cliente.getDataCadastro(),
         cliente.getDataAtualizacao(),
-        cliente.getAtivo() != null && cliente.getAtivo());
+        cliente.getActive() != null && cliente.getActive());
 
   }
 }

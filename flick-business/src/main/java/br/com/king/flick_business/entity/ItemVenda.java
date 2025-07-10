@@ -52,11 +52,11 @@ public class ItemVenda {
   @JoinColumn(name = "venda_id", nullable = false)
   private Venda venda;
 
-  // Produto associado
-  @NotNull(message = "O produto é obrigatório.")
+  // Product associado
+  @NotNull(message = "O product é obrigatório.")
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "produto_id", nullable = false)
-  private Produto produto;
+  @JoinColumn(name = "product_id", nullable = false)
+  private Product product;
 
   // -- AUXILIAR -- //
   @Transient

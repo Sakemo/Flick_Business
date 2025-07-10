@@ -21,21 +21,21 @@ import org.springframework.test.context.ActiveProfiles;
 
 import br.com.king.flick_business.dto.DashboardSummaryDTO;
 import br.com.king.flick_business.dto.DataPointDTO;
-import br.com.king.flick_business.entity.Categoria;
+import br.com.king.flick_business.entity.Category;
 import br.com.king.flick_business.entity.Cliente;
-import br.com.king.flick_business.entity.Despesa;
-import br.com.king.flick_business.entity.Fornecedor;
+import br.com.king.flick_business.entity.Expense;
+import br.com.king.flick_business.entity.Provider;
 import br.com.king.flick_business.entity.ItemVenda;
-import br.com.king.flick_business.entity.Produto;
+import br.com.king.flick_business.entity.Product;
 import br.com.king.flick_business.entity.Venda;
 import br.com.king.flick_business.enums.FormaPagamento;
-import br.com.king.flick_business.enums.TipoDespesa;
-import br.com.king.flick_business.repository.CategoriaRepository;
+import br.com.king.flick_business.enums.TipoExpense;
+import br.com.king.flick_business.repository.CategoryRepository;
 import br.com.king.flick_business.repository.ClienteRepository;
-import br.com.king.flick_business.repository.DespesaRepository;
-import br.com.king.flick_business.repository.FornecedorRepository;
+import br.com.king.flick_business.repository.ExpenseRepository;
+import br.com.king.flick_business.repository.ProviderRepository;
 import br.com.king.flick_business.repository.ItemVendaRepository;
-import br.com.king.flick_business.repository.ProdutoRepository;
+import br.com.king.flick_business.repository.ProductRepository;
 import br.com.king.flick_business.repository.VendaRepository;
 
 @SpringBootTest // Carrega o contexto completo da aplicação Spring Boot
@@ -51,19 +51,19 @@ class DashboardServiceIT {
         @Autowired
         private ItemVendaRepository itemVendaRepository;
         @Autowired
-        private ProdutoRepository produtoRepository;
+        private ProductRepository productRepository;
         @Autowired
         private ClienteRepository clienteRepository;
         @Autowired
-        private CategoriaRepository categoriaRepository;
+        private CategoryRepository categoryRepository;
         @Autowired
-        private FornecedorRepository fornecedorRepository;
+        private ProviderRepository providerRepository;
         @Autowired
-        private DespesaRepository despesaRepository;
+        private ExpenseRepository expenseRepository;
 
         // Dados de referência
         private Cliente cliente1;
-        private Produto produtoA, produtoB, produtoC;
+        private Product productA, productB, productC;
         private ZonedDateTime hojeMeioDia, ontemMeioDia, inicioMesPassado, fimMesPassado;
 
         @BeforeEach
@@ -72,11 +72,11 @@ class DashboardServiceIT {
                 // ser explícito)
                 itemVendaRepository.deleteAll();
                 vendaRepository.deleteAll();
-                produtoRepository.deleteAll();
+                productRepository.deleteAll();
                 clienteRepository.deleteAll();
-                categoriaRepository.deleteAll();
-                fornecedorRepository.deleteAll();
-                despesaRepository.deleteAll();
+                categoryRepository.deleteAll();
+                providerRepository.deleteAll();
+                expenseRepository.deleteAll();
 
                 // Datas de referência
                 LocalDate hoje = LocalDate.now();
@@ -88,55 +88,55 @@ class DashboardServiceIT {
                                 .atTime(LocalTime.MAX).atZone(java.time.ZoneId.systemDefault());
 
                 // Criar entidades base
-                Categoria categoriaEletronicos = categoriaRepository
-                                .save(Categoria.builder().nome("Eletrônicos").build());
-                Fornecedor fornecedorX = fornecedorRepository.save(Fornecedor.builder().nome("Fornecedor X").build());
+                Category categoryEletronicos = categoryRepository
+                                .save(Category.builder().name("Eletrônicos").build());
+                Provider providerX = providerRepository.save(Provider.builder().name("Provider X").build());
 
-                cliente1 = clienteRepository.save(Cliente.builder().nome("Cliente Teste 1").cpf("111").ativo(true)
+                cliente1 = clienteRepository.save(Cliente.builder().name("Cliente Teste 1").cpf("111").active(true)
                                 .controleFiado(true).limiteFiado(new BigDecimal("200")).saldoDevedor(BigDecimal.ZERO)
                                 .build());
                 Cliente cliente2 = clienteRepository
-                                .save(Cliente.builder().nome("Cliente Teste 2").cpf("222").ativo(true)
+                                .save(Cliente.builder().name("Cliente Teste 2").cpf("222").active(true)
                                                 .controleFiado(false).saldoDevedor(BigDecimal.ZERO).build());
 
-                produtoA = produtoRepository
-                                .save(Produto.builder().nome("Produto A").categoria(categoriaEletronicos)
-                                                .fornecedor(fornecedorX)
-                                                .precoVenda(new BigDecimal("100.00"))
-                                                .quantidadeEstoque(new BigDecimal("10")).ativo(true)
+                productA = productRepository
+                                .save(Product.builder().name("Product A").category(categoryEletronicos)
+                                                .provider(providerX)
+                                                .salePrice(new BigDecimal("100.00"))
+                                                .stockQuantity(new BigDecimal("10")).active(true)
                                                 .build());
-                produtoB = produtoRepository
-                                .save(Produto.builder().nome("Produto B").categoria(categoriaEletronicos)
-                                                .fornecedor(fornecedorX)
-                                                .precoVenda(new BigDecimal("50.00"))
-                                                .quantidadeEstoque(new BigDecimal("5")).ativo(true)
+                productB = productRepository
+                                .save(Product.builder().name("Product B").category(categoryEletronicos)
+                                                .provider(providerX)
+                                                .salePrice(new BigDecimal("50.00"))
+                                                .stockQuantity(new BigDecimal("5")).active(true)
                                                 .build());
-                produtoC = produtoRepository
-                                .save(Produto.builder().nome("Produto C").categoria(categoriaEletronicos)
-                                                .fornecedor(fornecedorX)
-                                                .precoVenda(new BigDecimal("20.00"))
-                                                .quantidadeEstoque(new BigDecimal("20")).ativo(true)
+                productC = productRepository
+                                .save(Product.builder().name("Product C").category(categoryEletronicos)
+                                                .provider(providerX)
+                                                .salePrice(new BigDecimal("20.00"))
+                                                .stockQuantity(new BigDecimal("20")).active(true)
                                                 .build());
 
                 // --- VENDAS ---
-                // Venda 1: Hoje, PIX, Produto A (2 unidades), Produto B (1 unidade)
+                // Venda 1: Hoje, PIX, Product A (2 unidades), Product B (1 unidade)
                 Venda venda1 = Venda.builder().cliente(null).formaPagamento(FormaPagamento.PIX).dataVenda(hojeMeioDia)
                                 .observacoes("Venda PIX hoje").build();
-                ItemVenda item1_1 = ItemVenda.builder().produto(produtoA).quantidade(new BigDecimal("2.000"))
-                                .precoUnitarioVenda(produtoA.getPrecoVenda()).build(); // 200.00
-                ItemVenda item1_2 = ItemVenda.builder().produto(produtoB).quantidade(new BigDecimal("1.000"))
-                                .precoUnitarioVenda(produtoB.getPrecoVenda()).build(); // 50.00
+                ItemVenda item1_1 = ItemVenda.builder().product(productA).quantidade(new BigDecimal("2.000"))
+                                .precoUnitarioVenda(productA.getSalePrice()).build(); // 200.00
+                ItemVenda item1_2 = ItemVenda.builder().product(productB).quantidade(new BigDecimal("1.000"))
+                                .precoUnitarioVenda(productB.getSalePrice()).build(); // 50.00
                 venda1.adicionarItem(item1_1);
                 venda1.adicionarItem(item1_2);
                 venda1.setValorTotal(item1_1.getValorTotalItem().add(item1_2.getValorTotalItem())); // 250.00
                 vendaRepository.save(venda1);
 
-                // Venda 2: Ontem, FIADO (Cliente 1), Produto B (3 unidades)
+                // Venda 2: Ontem, FIADO (Cliente 1), Product B (3 unidades)
                 Venda venda2 = Venda.builder().cliente(cliente1).formaPagamento(FormaPagamento.FIADO)
                                 .dataVenda(ontemMeioDia)
                                 .observacoes("Venda Fiado ontem").build();
-                ItemVenda item2_1 = ItemVenda.builder().produto(produtoB).quantidade(new BigDecimal("3.000"))
-                                .precoUnitarioVenda(produtoB.getPrecoVenda()).build(); // 150.00
+                ItemVenda item2_1 = ItemVenda.builder().product(productB).quantidade(new BigDecimal("3.000"))
+                                .precoUnitarioVenda(productB.getSalePrice()).build(); // 150.00
                 venda2.adicionarItem(item2_1);
                 venda2.setValorTotal(item2_1.getValorTotalItem()); // 150.00
                 vendaRepository.save(venda2);
@@ -144,23 +144,23 @@ class DashboardServiceIT {
                 cliente1.setDataUltimaCompraFiado(venda2.getDataVenda());
                 clienteRepository.save(cliente1);
 
-                // Venda 3: Mês passado, DINHEIRO, Produto C (5 unidades)
+                // Venda 3: Mês passado, DINHEIRO, Product C (5 unidades)
                 Venda venda3 = Venda.builder().cliente(null).formaPagamento(FormaPagamento.DINHEIRO)
                                 .dataVenda(inicioMesPassado.plusDays(5)).observacoes("Venda Dinheiro mês passado")
                                 .build();
-                ItemVenda item3_1 = ItemVenda.builder().produto(produtoC).quantidade(new BigDecimal("5.000"))
-                                .precoUnitarioVenda(produtoC.getPrecoVenda()).build(); // 100.00
+                ItemVenda item3_1 = ItemVenda.builder().product(productC).quantidade(new BigDecimal("5.000"))
+                                .precoUnitarioVenda(productC.getSalePrice()).build(); // 100.00
                 venda3.adicionarItem(item3_1);
                 venda3.setValorTotal(item3_1.getValorTotalItem()); // 100.00
                 vendaRepository.save(venda3);
 
                 // --- DESPESAS ---
-                despesaRepository.save(Despesa.builder().nome("Aluguel Loja").valor(new BigDecimal("50.00"))
-                                .tipoDespesa(TipoDespesa.EMPRESARIAL).dataDespesa(hojeMeioDia.minusDays(2)).build());
-                despesaRepository.save(Despesa.builder().nome("Material Escritório").valor(new BigDecimal("20.00"))
-                                .tipoDespesa(TipoDespesa.EMPRESARIAL).dataDespesa(ontemMeioDia).build());
-                despesaRepository.save(Despesa.builder().nome("Marketing").valor(new BigDecimal("30.00"))
-                                .tipoDespesa(TipoDespesa.INVESTIMENTO).dataDespesa(inicioMesPassado.plusDays(10))
+                expenseRepository.save(Expense.builder().name("Aluguel Loja").valor(new BigDecimal("50.00"))
+                                .tipoExpense(TipoExpense.EMPRESARIAL).dataExpense(hojeMeioDia.minusDays(2)).build());
+                expenseRepository.save(Expense.builder().name("Material Escritório").valor(new BigDecimal("20.00"))
+                                .tipoExpense(TipoExpense.EMPRESARIAL).dataExpense(ontemMeioDia).build());
+                expenseRepository.save(Expense.builder().name("Marketing").valor(new BigDecimal("30.00"))
+                                .tipoExpense(TipoExpense.INVESTIMENTO).dataExpense(inicioMesPassado.plusDays(10))
                                 .build());
         }
 
@@ -180,8 +180,8 @@ class DashboardServiceIT {
                 assertEquals(1L, summary.quantidadeVendas());
                 // Ticket Médio: 250.00 / 1 = 250.00
                 assertEquals(0, new BigDecimal("250.00").compareTo(summary.ticketMedio()));
-                // Despesas: Nenhuma hoje
-                assertEquals(0, BigDecimal.ZERO.compareTo(summary.totalDespesas()));
+                // Expenses: Nenhuma hoje
+                assertEquals(0, BigDecimal.ZERO.compareTo(summary.totalExpenses()));
                 // Lucro: 250.00 - 0 = 250.00
                 assertEquals(0, new BigDecimal("250.00").compareTo(summary.lucroBrutoEstimado()));
                 // Vendas por Forma de Pagamento
@@ -189,11 +189,11 @@ class DashboardServiceIT {
                 assertEquals(0, new BigDecimal("250.00").compareTo(vendasPorForma.get(FormaPagamento.PIX)));
                 assertEquals(0, BigDecimal.ZERO.compareTo(vendasPorForma.get(FormaPagamento.FIADO)));
                 assertEquals(0, BigDecimal.ZERO.compareTo(vendasPorForma.get(FormaPagamento.DINHEIRO)));
-                // Produto Mais Vendido: Produto A (2 unidades)
-                assertNotNull(summary.produtoMaisVendido());
-                assertEquals(produtoA.getId(), summary.produtoMaisVendido().produtoId());
+                // Product Mais Vendido: Product A (2 unidades)
+                assertNotNull(summary.productMaisVendido());
+                assertEquals(productA.getId(), summary.productMaisVendido().productId());
                 assertEquals(0, new BigDecimal("2.000")
-                                .compareTo(summary.produtoMaisVendido().quantidadeTotalVendida()));
+                                .compareTo(summary.productMaisVendido().quantidadeTotalVendida()));
                 // Gráfico Vendas Diárias: 1 ponto para hoje com valor 250.00
                 assertFalse(summary.graficoVendasDiarias().isEmpty());
                 assertEquals(1, summary.graficoVendasDiarias().size());
@@ -218,19 +218,19 @@ class DashboardServiceIT {
                 assertEquals(1L, summary.quantidadeVendas());
                 // Ticket Médio: 150.00
                 assertEquals(0, new BigDecimal("150.00").compareTo(summary.ticketMedio()));
-                // Despesas: Material Escritório (20.00)
-                assertEquals(0, new BigDecimal("20.00").compareTo(summary.totalDespesas()));
+                // Expenses: Material Escritório (20.00)
+                assertEquals(0, new BigDecimal("20.00").compareTo(summary.totalExpenses()));
                 // Lucro: 150.00 - 20.00 = 130.00
                 assertEquals(0, new BigDecimal("130.00").compareTo(summary.lucroBrutoEstimado()));
                 // Vendas por Forma de Pagamento
                 Map<FormaPagamento, BigDecimal> vendasPorForma = summary.totalVendasPorFormaPagamento();
                 assertEquals(0, BigDecimal.ZERO.compareTo(vendasPorForma.get(FormaPagamento.PIX)));
                 assertEquals(0, new BigDecimal("150.00").compareTo(vendasPorForma.get(FormaPagamento.FIADO)));
-                // Produto Mais Vendido: Produto B (3 unidades)
-                assertNotNull(summary.produtoMaisVendido());
-                assertEquals(produtoB.getId(), summary.produtoMaisVendido().produtoId());
+                // Product Mais Vendido: Product B (3 unidades)
+                assertNotNull(summary.productMaisVendido());
+                assertEquals(productB.getId(), summary.productMaisVendido().productId());
                 assertEquals(0, new BigDecimal("3.000")
-                                .compareTo(summary.produtoMaisVendido().quantidadeTotalVendida()));
+                                .compareTo(summary.productMaisVendido().quantidadeTotalVendida()));
                 // Gráfico Vendas Diárias
                 assertEquals(1, summary.graficoVendasDiarias().size());
                 assertEquals(LocalDate.now().minusDays(1), summary.graficoVendasDiarias().get(0).data());
@@ -239,7 +239,7 @@ class DashboardServiceIT {
         @Test
         @DisplayName("getDashboardSummary: Deve calcular corretamente para TODO O PERÍODO (Mês Passado até Hoje)")
         void getDashboardSummary_todoPeriodo_deveRetornarValoresGlobais() {
-                // Abrange todas as vendas e despesas criadas
+                // Abrange todas as vendas e expenses criadas
                 ZonedDateTime inicioGlobal = inicioMesPassado.minusDays(1); // Um pouco antes do início do mês passado
                 ZonedDateTime fimGlobal = hojeMeioDia.plusDays(1); // Um pouco depois de hoje
 
@@ -252,8 +252,8 @@ class DashboardServiceIT {
                 assertEquals(3L, summary.quantidadeVendas());
                 // Ticket Médio: 500.00 / 3 = 166.67 (arredondado)
                 assertEquals(0, new BigDecimal("166.67").compareTo(summary.ticketMedio()));
-                // Total Despesas: 50 (Aluguel) + 20 (Material) + 30 (Marketing) = 100.00
-                assertEquals(0, new BigDecimal("100.00").compareTo(summary.totalDespesas()));
+                // Total Expenses: 50 (Aluguel) + 20 (Material) + 30 (Marketing) = 100.00
+                assertEquals(0, new BigDecimal("100.00").compareTo(summary.totalExpenses()));
                 // Lucro Bruto: 500.00 - 100.00 = 400.00
                 assertEquals(0, new BigDecimal("400.00").compareTo(summary.lucroBrutoEstimado()));
 
@@ -263,12 +263,12 @@ class DashboardServiceIT {
                 assertEquals(0, new BigDecimal("150.00").compareTo(vendasPorForma.get(FormaPagamento.FIADO)));
                 assertEquals(0, new BigDecimal("100.00").compareTo(vendasPorForma.get(FormaPagamento.DINHEIRO)));
 
-                // Produto Mais Vendido: Produto B (1 de V1 + 3 de V2 = 4 unidades)
-                // Produto C (5 de V3), Produto A (2 de V1) -> Produto C é o mais vendido
-                assertNotNull(summary.produtoMaisVendido());
-                assertEquals(produtoC.getId(), summary.produtoMaisVendido().produtoId());
+                // Product Mais Vendido: Product B (1 de V1 + 3 de V2 = 4 unidades)
+                // Product C (5 de V3), Product A (2 de V1) -> Product C é o mais vendido
+                assertNotNull(summary.productMaisVendido());
+                assertEquals(productC.getId(), summary.productMaisVendido().productId());
                 assertEquals(0, new BigDecimal("5.000")
-                                .compareTo(summary.produtoMaisVendido().quantidadeTotalVendida()));
+                                .compareTo(summary.productMaisVendido().quantidadeTotalVendida()));
 
                 // Gráfico Vendas Diárias: 3 pontos distintos
                 assertEquals(3, summary.graficoVendasDiarias().size());
@@ -287,9 +287,9 @@ class DashboardServiceIT {
                 assertEquals(0, BigDecimal.ZERO.compareTo(summary.totalVendasBruto()));
                 assertEquals(0L, summary.quantidadeVendas());
                 assertEquals(0, BigDecimal.ZERO.compareTo(summary.ticketMedio()));
-                assertEquals(0, BigDecimal.ZERO.compareTo(summary.totalDespesas()));
+                assertEquals(0, BigDecimal.ZERO.compareTo(summary.totalExpenses()));
                 assertEquals(0, BigDecimal.ZERO.compareTo(summary.lucroBrutoEstimado()));
-                assertNull(summary.produtoMaisVendido()); // Espera-se nulo
+                assertNull(summary.productMaisVendido()); // Espera-se nulo
                 assertTrue(summary.graficoVendasDiarias().isEmpty());
                 // Verifica se todas as formas de pagamento estão zeradas
                 summary.totalVendasPorFormaPagamento().forEach((forma, valor) -> {

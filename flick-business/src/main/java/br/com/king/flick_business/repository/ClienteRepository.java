@@ -16,7 +16,7 @@ import br.com.king.flick_business.entity.Cliente;
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
         Optional<Cliente> findByCpf(String cpf);
 
-        List<Cliente> findByAtivoTrue(Sort sort);
+        List<Cliente> findByActiveTrue(Sort sort);
 
         @Override
         List<Cliente> findAll(Sort sort);
@@ -25,30 +25,30 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
         List<Cliente> findBySaldoDevedorLessThanEqual(BigDecimal valor, Sort sort);
 
-        List<Cliente> findByNomeContainingIgnoreCaseAndAtivoTrue(String nome, Sort sort);
+        List<Cliente> findByNameContainingIgnoreCaseAndActiveTrue(String name, Sort sort);
 
-        List<Cliente> findByNomeContainingIgnoreCaseAndAtivoFalse(String nome, Sort sort);
+        List<Cliente> findByNameContainingIgnoreCaseAndActiveFalse(String name, Sort sort);
 
-        List<Cliente> findByNomeContainingIgnoreCaseAndSaldoDevedorGreaterThan(String nome, BigDecimal valor,
+        List<Cliente> findByNameContainingIgnoreCaseAndSaldoDevedorGreaterThan(String name, BigDecimal valor,
                         Sort sort);
 
-        List<Cliente> findByNomeContainingIgnoreCaseAndSaldoDevedorLessThanEqual(String nome, BigDecimal valor,
+        List<Cliente> findByNameContainingIgnoreCaseAndSaldoDevedorLessThanEqual(String name, BigDecimal valor,
                         Sort sort);
 
-        List<Cliente> findByAtivoTrueAndSaldoDevedorGreaterThan(BigDecimal valor, Sort sort);
+        List<Cliente> findByActiveTrueAndSaldoDevedorGreaterThan(BigDecimal valor, Sort sort);
 
-        List<Cliente> findByAtivoTrueAndSaldoDevedorLessThanEqual(BigDecimal valor, Sort sort);
+        List<Cliente> findByActiveTrueAndSaldoDevedorLessThanEqual(BigDecimal valor, Sort sort);
 
         @Query("SELECT c FROM Cliente c WHERE " +
-                        "(:nomeContains IS NULL OR LOWER(c.nome) LIKE LOWER(CONCAT('%', :nomeContains, '%'))) AND "
+                        "(:nameContains IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :nameContains, '%'))) AND "
                         +
-                        "(:apenasAtivos IS NULL OR c.ativo = :apenasAtivos) AND " +
+                        "(:apenasActives IS NULL OR c.active = :apenasActives) AND " +
                         "(:isDevedor IS NULL OR " +
                         "(:isDevedor = true AND c.saldoDevedor > 0) OR " +
                         "(:isDevedor = false AND c.saldoDevedor <= 0))")
-        List<Cliente> findClienteComFiltros(
-                        @Param("nomeContains") String nomeContains,
-                        @Param("apenasAtivos") Boolean apenasAtivos,
+        List<Cliente> findClienteComFilters(
+                        @Param("nameContains") String nameContains,
+                        @Param("apenasActives") Boolean apenasActives,
                         @Param("isDevedor") Boolean isDevedor,
                         Sort sort);
 }

@@ -10,7 +10,7 @@ interface GetProdutosParams {
 export const getProdutos = async (params?: GetProdutosParams) :
 Promise<ProdutoResponse[]> => {
   try {
-    const response = await apiClient.get<ProdutoResponse[]>('/api/produtos', { params });
+    const response = await apiClient.get<ProdutoResponse[]>('/api/products', { params });
     return response.data;
   } catch(error){
     console.error("Erro ao buscar produtos: ", error);
@@ -21,7 +21,7 @@ Promise<ProdutoResponse[]> => {
 export const getProdutoById = async (id:number): Promise<ProdutoResponse> =>
 {
   try{
-    const response = await apiClient.get<ProdutoResponse>(`/api/produtos/${id}`)
+    const response = await apiClient.get<ProdutoResponse>(`/api/products/${id}`)
     return response.data;
   } catch (error){
     console.error(`Erro ao buscar produto ${id}: `, error)
@@ -32,7 +32,7 @@ export const getProdutoById = async (id:number): Promise<ProdutoResponse> =>
 export const createProduto = async (data:ProdutoRequest):
 Promise<ProdutoResponse> => {
   try{
-    const response = await apiClient.post<ProdutoResponse>('/api/produtos', data);
+    const response = await apiClient.post<ProdutoResponse>('/api/products', data);
     return response.data;
   } catch(error){
     console.error('Erro ao criar o produto: ', error)
@@ -43,7 +43,7 @@ Promise<ProdutoResponse> => {
 export const updateProduto = async(id:number, data:ProdutoRequest):
 Promise<ProdutoResponse> => {
   try{
-    const response = await apiClient.put<ProdutoResponse>(`/api/produtos/${id}`, data);
+    const response = await apiClient.put<ProdutoResponse>(`/api/products/${id}`, data);
     return response.data;
   } catch(error){
     console.error(`Erro ao atualizar produto ${id}: `, error);
@@ -54,7 +54,7 @@ Promise<ProdutoResponse> => {
 // Copiar Produto
 export const copyProduto = async (id: number): Promise<ProdutoResponse> => {
   try {
-    const response = await apiClient.post<ProdutoResponse>(`/api/produtos/${id}/copiar`);
+    const response = await apiClient.post<ProdutoResponse>(`/api/products/${id}/copiar`);
     return response.data;
   } catch (error){
     console.error(`Erro ao copiar produto ${id}: `, error);
@@ -64,7 +64,7 @@ export const copyProduto = async (id: number): Promise<ProdutoResponse> => {
 
 export const deleteProduto = async (id:number) : Promise<void> => {
   try{
-    await apiClient.delete(`/api/produtos/${id}`)
+    await apiClient.delete(`/api/products/${id}`)
   }catch(error){
     console.error(`Erro ao deletar produto ${id}: `, error);
     throw error;
@@ -73,7 +73,7 @@ export const deleteProduto = async (id:number) : Promise<void> => {
 
 export const deleteProdutoFisicamente = async (id:number): Promise<void> =>{
   try{
-    await apiClient.delete(`/api/produtos/${id}/permanente`);
+    await apiClient.delete(`/api/products/${id}/permanente`);
   }catch(error){
     console.error(`Erro ao deletear fisicamente produto ${id}: `, error);
     throw error;

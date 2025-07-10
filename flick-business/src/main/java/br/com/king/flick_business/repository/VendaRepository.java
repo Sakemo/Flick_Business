@@ -40,13 +40,13 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
                         + "(v.dataVenda <= :fim) AND "
                         + "(:clienteId IS NULL OR c.id = :clienteId) AND "
                         + "(:formaPagamento IS NULL OR v.formaPagamento = :formaPagamento) AND "
-                        + "(:produtoId IS NULL OR i.produto.id = :produtoId)")
-        Page<Venda> findVendasComFiltros(
+                        + "(:productId IS NULL OR i.product.id = :productId)")
+        Page<Venda> findVendasComFilters(
                         @Param("inicio") ZonedDateTime inicio,
                         @Param("fim") ZonedDateTime fim,
                         @Param("clienteId") Long clienteId,
                         @Param("formaPagamento") FormaPagamento formaPagamento,
-                        @Param("produtoId") Long produtoId,
+                        @Param("productId") Long productId,
                         Pageable pageable);
 
         // Retorna uma lista de Object[], onde cada array é [Data (como String), Total
@@ -55,37 +55,37 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
                         "FROM Venda v WHERE     " + "v.dataVenda BETWEEN :inicio AND :fim AND "
                         + "(:clienteId IS NULL OR v.cliente.id = :clienteId) AND "
                         + "(:formaPagamento IS NULL OR v.formaPagamento = :formaPagamento) AND "
-                        + "(:produtoId IS NULL OR EXISTS (SELECT 1 FROM ItemVenda i WHERE i.venda = v AND i.produto.id = :produtoId)) "
+                        + "(:productId IS NULL OR EXISTS (SELECT 1 FROM ItemVenda i WHERE i.venda = v AND i.product.id = :productId)) "
                         + "GROUP BY FUNCTION('TO_CHAR', v.dataVenda, 'YYYY-MM-DD')")
         List<Object[]> sumTotalGroupByDay(@Param("inicio") ZonedDateTime inicio, @Param("fim") ZonedDateTime fim,
                         @Param("clienteId") Long clienteId, @Param("formaPagamento") FormaPagamento formaPagamento,
-                        @Param("produtoId") Long produtoId);
+                        @Param("productId") Long productId);
 
-        // Retorna uma lista de Object[], onde cada array é [ID do Cliente (Long), Nome
+        // Retorna uma lista de Object[], onde cada array é [ID do Cliente (Long), Name
         // do Cliente (String), Total (BigDecimal)]
-        @Query("SELECT v.cliente.id, v.cliente.nome, SUM(v.valorTotal) " +
+        @Query("SELECT v.cliente.id, v.cliente.name, SUM(v.valorTotal) " +
                         "FROM Venda v WHERE " +
                         "v.dataVenda BETWEEN :inicio AND :fim AND " +
                         "(:clienteId IS NULL OR v.cliente.id = :clienteId) AND " +
                         "(:formaPagamento IS NULL OR v.formaPagamento = :formaPagamento) AND " +
-                        "(:produtoId IS NULL OR EXISTS (SELECT 1 FROM ItemVenda i WHERE i.venda = v AND i.produto.id = :produtoId)) "
+                        "(:productId IS NULL OR EXISTS (SELECT 1 FROM ItemVenda i WHERE i.venda = v AND i.product.id = :productId)) "
                         +
-                        "GROUP BY v.cliente.id, v.cliente.nome")
+                        "GROUP BY v.cliente.id, v.cliente.name")
         List<Object[]> sumTotalGroupByCliente(@Param("inicio") ZonedDateTime inicio, @Param("fim") ZonedDateTime fim,
                         @Param("clienteId") Long clienteId, @Param("formaPagamento") FormaPagamento formaPagamento,
-                        @Param("produtoId") Long produtoId);
+                        @Param("productId") Long productId);
 
         @Query("SELECT COALESCE(SUM(v.valorTotal), 0) FROM Venda v " +
                         "WHERE v.dataVenda BETWEEN :inicio AND :fim " +
                         "AND (:clienteId IS NULL OR v.cliente.id = :clienteId) " +
                         "AND (:formaPagamento IS NULL OR v.formaPagamento = :formaPagamento) " +
-                        "AND (:produtoId IS NULL OR EXISTS (SELECT 1 FROM ItemVenda i WHERE i.venda = v AND i.produto.id = :produtoId))")
-        BigDecimal sumValorTotalComFiltros(
+                        "AND (:productId IS NULL OR EXISTS (SELECT 1 FROM ItemVenda i WHERE i.venda = v AND i.product.id = :productId))")
+        BigDecimal sumValorTotalComFilters(
                         @Param("inicio") ZonedDateTime inicio,
                         @Param("fim") ZonedDateTime fim,
                         @Param("clienteId") Long clientId,
                         @Param("formaPagamento") FormaPagamento formaPagamento,
-                        @Param("produtoId") Long produtoId);
+                        @Param("productId") Long productId);
 
         // =========================
         // MÉTODOS PARA RELATÓRIOS

@@ -36,7 +36,7 @@ public class VendaMapper {
             Sort.Direction direction = (parts.length > 1 && parts[1].equals("desc")) ? Sort.Direction.DESC
                     : Sort.Direction.ASC;
             switch (property) {
-                case "dataVenda", "valorTotal", "cliente.nome" -> {
+                case "dataVenda", "valorTotal", "cliente.name" -> {
                 }
                 default -> {
                     System.out.println("SERVICE LOG: orderBy não reconhecida: " + property + ". Usando padrão.");

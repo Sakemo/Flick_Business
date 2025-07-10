@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record ClienteRequestDTO(
-        @NotBlank(message = "O nome é obrigatório.") @Size(min = 2, max = 100, message = "O nome deve ter entre 2 e 100 caracteres.") String nome,
+        @NotBlank(message = "O name é obrigatório.") @Size(min = 2, max = 100, message = "O name deve ter entre 2 e 100 caracteres.") String name,
 
         @Size(max = 20, message = "O CPF deve ter no máximo 20 caracteres.") String cpf,
 
@@ -17,7 +17,7 @@ public record ClienteRequestDTO(
 
         Boolean controleFiado,
 
-        @DecimalMin(value = "0.00", message = "O limite de fiado não pode ser negativo.") BigDecimal limiteFiado,
+        @DecimalMin(value = "0.00", message = "O limite de fiado não pode ser negactive.") BigDecimal limiteFiado,
 
-        Boolean ativo) {
+        Boolean active) {
 }

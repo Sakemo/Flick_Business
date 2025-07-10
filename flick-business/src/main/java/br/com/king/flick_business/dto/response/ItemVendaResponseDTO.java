@@ -2,12 +2,12 @@ package br.com.king.flick_business.dto.response;
 
 import java.math.BigDecimal;
 
-import br.com.king.flick_business.dto.ProdutoResponseDTO;
+import br.com.king.flick_business.dto.ProductResponseDTO;
 import br.com.king.flick_business.entity.ItemVenda;
 
 public record ItemVendaResponseDTO(
     Long id,
-    ProdutoResponseDTO produto,
+    ProductResponseDTO product,
     BigDecimal quantidade,
     BigDecimal precoUnitarioVenda,
     BigDecimal valorTotalItem) {
@@ -15,7 +15,7 @@ public record ItemVendaResponseDTO(
   public ItemVendaResponseDTO(ItemVenda item) {
     this(
         item.getId(),
-        item.getProduto() != null ? new ProdutoResponseDTO(item.getProduto()) : null,
+        item.getProduct() != null ? new ProductResponseDTO(item.getProduct()) : null,
         item.getQuantidade(),
         item.getPrecoUnitarioVenda(),
         item.getValorTotalItem());

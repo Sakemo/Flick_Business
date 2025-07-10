@@ -38,7 +38,7 @@ public class ConfiguracaoGeral {
   @Column(name = "data_atualizacao", nullable = false)
   private ZonedDateTime dataAtualizacao;
 
-  // TODO: configurar resto do código para lidar com o nome do negócio
-  @Column(name = "nome_negocio", nullable = true, length = 100)
-  private String nomeNegocio;
+  // TODO: configurar resto do código para lidar com o name do negócio
+  @Column(name = "name_negocio", nullable = true, length = 100)
+  private String nameNegocio;
 }

@@ -34,11 +34,11 @@ public class Cliente {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  // Nome
-  @NotBlank(message = "O nome é obrigatório.")
-  @Size(min = 2, max = 100, message = "O nome deve ter entre 2 e 100 caracteres.")
+  // Name
+  @NotBlank(message = "O name é obrigatório.")
+  @Size(min = 2, max = 100, message = "O name deve ter entre 2 e 100 caracteres.")
   @Column(nullable = false, length = 100, columnDefinition = "VARCHAR(100)")
-  private String nome;
+  private String name;
 
   // CPF
   @Size(max = 11, message = "O CPF deve conter exatamente 11 dígitos numéricos.")
@@ -88,7 +88,7 @@ public class Cliente {
 
   // Exclusão Lógica
   @Builder.Default
-  @Column(name = "ativo", nullable = false)
-  private Boolean ativo = true;
+  @Column(name = "active", nullable = false)
+  private Boolean active = true;
 
 }

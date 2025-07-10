@@ -52,7 +52,7 @@ class ConfiguracaoGeralServiceTest {
         .id(CONFIG_ID)
         .taxaJurosAtraso(new BigDecimal("5.50"))
         .prazoPagamentoFiado(2)
-        .nomeNegocio("Loja Existente") // Incluindo o nome do negócio
+        .nameNegocio("Loja Existente") // Incluindo o name do negócio
         .dataAtualizacao(ZonedDateTime.now().minusHours(1))
         .build();
 
@@ -61,7 +61,7 @@ class ConfiguracaoGeralServiceTest {
         new BigDecimal("7.00"), // Nova taxa
         3, // Novo prazo
         null, // Data de atualização não vem no DTO de request
-        "Loja Atualizada LTDA" // Novo nome
+        "Loja Atualizada LTDA" // Novo name
     );
   }
 
@@ -83,7 +83,7 @@ class ConfiguracaoGeralServiceTest {
     assertNotNull(resultado);
     assertEquals(configExistente.getTaxaJurosAtraso(), resultado.taxaJuros());
     assertEquals(configExistente.getPrazoPagamentoFiado(), resultado.prazoPagamento());
-    assertEquals(configExistente.getNomeNegocio(), resultado.nomeNegocio()); // Verificar nome
+    assertEquals(configExistente.getNameNegocio(), resultado.nameNegocio()); // Verificar name
     assertEquals(configExistente.getDataAtualizacao(), resultado.dataAtualizacao());
 
     // Verify
@@ -107,7 +107,7 @@ class ConfiguracaoGeralServiceTest {
     // Verifica se os campos que podem ser nulos estão nulos
     assertNull(resultado.taxaJuros());
     assertNull(resultado.prazoPagamento());
-    assertNull(resultado.nomeNegocio()); // Verificar nome
+    assertNull(resultado.nameNegocio()); // Verificar name
     // Data de atualização também será nula pois veio do builder default
     assertNull(resultado.dataAtualizacao());
 
@@ -170,7 +170,7 @@ class ConfiguracaoGeralServiceTest {
     assertNotNull(resultadoDTO);
     assertEquals(configDtoParaSalvar.taxaJuros(), resultadoDTO.taxaJuros());
     assertEquals(configDtoParaSalvar.prazoPagamento(), resultadoDTO.prazoPagamento());
-    assertEquals(configDtoParaSalvar.nomeNegocio(), resultadoDTO.nomeNegocio()); // Verificar nome
+    assertEquals(configDtoParaSalvar.nameNegocio(), resultadoDTO.nameNegocio()); // Verificar name
     assertNotNull(resultadoDTO.dataAtualizacao()); // Data deve ter sido atualizada
 
     // Assert Entidade Salva usando Captor
@@ -180,7 +180,7 @@ class ConfiguracaoGeralServiceTest {
     assertEquals(CONFIG_ID, configSalva.getId()); // ID deve ser 1L
     assertEquals(configDtoParaSalvar.taxaJuros(), configSalva.getTaxaJurosAtraso());
     assertEquals(configDtoParaSalvar.prazoPagamento(), configSalva.getPrazoPagamentoFiado());
-    assertEquals(configDtoParaSalvar.nomeNegocio(), configSalva.getNomeNegocio()); // Verificar nome
+    assertEquals(configDtoParaSalvar.nameNegocio(), configSalva.getNameNegocio()); // Verificar name
     // Verifica se a entidade existente foi modificada (opcional, mas bom)
     assertSame(configExistente, configSalva, "A entidade existente deveria ter sido atualizada");
 
@@ -208,7 +208,7 @@ class ConfiguracaoGeralServiceTest {
     assertNotNull(resultadoDTO);
     assertEquals(configDtoParaSalvar.taxaJuros(), resultadoDTO.taxaJuros());
     assertEquals(configDtoParaSalvar.prazoPagamento(), resultadoDTO.prazoPagamento());
-    assertEquals(configDtoParaSalvar.nomeNegocio(), resultadoDTO.nomeNegocio()); // Verificar nome
+    assertEquals(configDtoParaSalvar.nameNegocio(), resultadoDTO.nameNegocio()); // Verificar name
     assertNotNull(resultadoDTO.dataAtualizacao());
 
     // Assert Entidade Salva usando Captor
@@ -218,7 +218,7 @@ class ConfiguracaoGeralServiceTest {
     assertEquals(CONFIG_ID, configSalva.getId()); // Garante que o ID é 1L
     assertEquals(configDtoParaSalvar.taxaJuros(), configSalva.getTaxaJurosAtraso());
     assertEquals(configDtoParaSalvar.prazoPagamento(), configSalva.getPrazoPagamentoFiado());
-    assertEquals(configDtoParaSalvar.nomeNegocio(), configSalva.getNomeNegocio()); // Verificar nome
+    assertEquals(configDtoParaSalvar.nameNegocio(), configSalva.getNameNegocio()); // Verificar name
 
     // Verify
     verify(configuracaoRepositoryMock).findConfig(); // Verifica se tentou buscar antes

@@ -40,9 +40,9 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(body, HttpStatus.CONFLICT);
   }
 
-  // Exceção para registro inativo
-  @ExceptionHandler(RegistroInativo.class)
-  public ResponseEntity<Object> handleRegistroInativoException(RegistroInativo ex, WebRequest request) {
+  // Exceção para registro inactive
+  @ExceptionHandler(RegistroInactive.class)
+  public ResponseEntity<Object> handleRegistroInactiveException(RegistroInactive ex, WebRequest request) {
     Map<String, Object> body = new HashMap<>();
     body.put("message", ex.getMessage());
     body.put("status", HttpStatus.BAD_REQUEST.value());

@@ -47,19 +47,19 @@ public class ClienteService {
   }
 
   @Transactional(readOnly = true)
-  public List<ClienteResponseDTO> listarTodos(
-      Boolean apenasAtivosParam,
+  public List<ClienteResponseDTO> listTodos(
+      Boolean apenasActivesParam,
       Boolean devedores,
       String orderBy,
-      String nomeContains) {
+      String nameContains) {
     System.out
-        .println("LOG: ClienteService.listarTodos - apenasAtivos: " + apenasAtivosParam + ", devedores: " + devedores
-            + ", orderBy: " + orderBy + ", nomeContains: " + nomeContains);
+        .println("LOG: ClienteService.listTodos - apenasActives: " + apenasActivesParam + ", devedores: " + devedores
+            + ", orderBy: " + orderBy + ", nameContains: " + nameContains);
     Sort sort;
     if (orderBy != null && !orderBy.isBlank()) {
       sort = switch (orderBy) {
-        case "nomeAsc" -> Sort.by(Sort.Direction.ASC, "nome");
-        case "nomeDesc" -> Sort.by(Sort.Direction.DESC, "nome");
+        case "nameAsc" -> Sort.by(Sort.Direction.ASC, "name");
+        case "nameDesc" -> Sort.by(Sort.Direction.DESC, "name");
         case "saldoDesc" -> Sort.by(Sort.Direction.DESC, "saldoDevedor");
         case "saldoAsc" -> Sort.by(Sort.Direction.ASC, "saldoDevedor");
         case "cadastroRecente" -> Sort.by(Sort.Direction.DESC, "dataCadastro");
@@ -70,13 +70,13 @@ public class ClienteService {
       sort = Sort.by(Sort.Direction.DESC, "dataCadastro");
     }
 
-    // Boolean filtrarPorAtivo = apenasAtivosParam;
+    // Boolean filtrarPorActive = apenasActivesParam;
 
-    String filtroNome = (nomeContains != null && !nomeContains.trim().isEmpty()) ? nomeContains.trim() : "";
+    String filtroName = (nameContains != null && !nameContains.trim().isEmpty()) ? nameContains.trim() : "";
 
-    List<Cliente> clientes = clienteRepository.findClienteComFiltros(
-        filtroNome, apenasAtivosParam, devedores, sort);
-    System.out.println("LOG: ClienteService.listarTodos - Clientes encontrados após filtros: " + clientes.size());
+    List<Cliente> clientes = clienteRepository.findClienteComFilters(
+        filtroName, apenasActivesParam, devedores, sort);
+    System.out.println("LOG: ClienteService.listTodos - Clientes encontrados após filtros: " + clientes.size());
     return ClienteMapper.toDtoList(clientes);
 
   }
@@ -89,7 +89,7 @@ public class ClienteService {
   }
 
   @Transactional
-  public void deletar(Long id) {
+  public void delete(Long id) {
     Cliente cliente = clienteRepository.findById(id)
         .orElseThrow(() -> new RecursoNaoEncontrado("Cliente não encontrado com o ID: " + id));
 
@@ -97,17 +97,17 @@ public class ClienteService {
       throw new RecursoNaoDeletavel("Cliente com saldo devedor não pode ser deletado");
     }
 
-    cliente.setAtivo(false);
+    cliente.setActive(false);
     clienteRepository.save(cliente);
   }
 
   @Transactional
-  public void deletarFisicamente(Long id) {
+  public void deleteFisicamente(Long id) {
     if (!clienteRepository.existsById(id)) {
-      throw new RecursoNaoEncontrado("Produto não encontrado com ID: " + id + "para deleção física");
+      throw new RecursoNaoEncontrado("Product não encontrado com ID: " + id + "para deleção física");
     }
     clienteRepository.deleteById(id);
-    // TODO: Adicionar validações ANTES de deletar caso ele esteja associado a uma
+    // TODO: Adicionar validações ANTES de delete caso ele esteja associado a uma
     // venda
   }
 
@@ -121,7 +121,7 @@ public class ClienteService {
   }
 
   @Transactional
-  public ClienteResponseDTO ativarInativar(Long id, boolean ativo) {
+  public ClienteResponseDTO ativarInativar(Long id, boolean active) {
     Cliente cliente = clienteRepository.findById(id)
         .orElseThrow(() -> new RecursoNaoEncontrado("Cliente não encontrado com o ID: " + id));
 
@@ -129,7 +129,7 @@ public class ClienteService {
       throw new RecursoNaoDeletavel("Cliente com saldo devedor não pode ser inativado");
     }
 
-    cliente.setAtivo(ativo);
+    cliente.setActive(active);
     Cliente clienteAtualizado = clienteRepository.save(cliente);
     return ClienteMapper.toDto(clienteAtualizado);
   }

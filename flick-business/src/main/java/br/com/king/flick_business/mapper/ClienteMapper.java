@@ -13,7 +13,7 @@ public class ClienteMapper {
       return null;
 
     return Cliente.builder()
-        .nome(dto.nome())
+        .name(dto.name())
         .cpf(dto.cpf())
         .telefone(dto.telefone())
         .endereco(dto.endereco())
@@ -26,15 +26,15 @@ public class ClienteMapper {
     if (dto == null || clienteExistente == null)
       return;
 
-    clienteExistente.setNome(dto.nome());
+    clienteExistente.setName(dto.name());
     clienteExistente.setCpf(dto.cpf());
     clienteExistente.setTelefone(dto.telefone());
     clienteExistente.setEndereco(dto.endereco());
     clienteExistente.setControleFiado(dto.controleFiado());
     clienteExistente.setLimiteFiado(dto.limiteFiado());
 
-    if (dto.ativo() != null) {
-      clienteExistente.setAtivo(dto.ativo());
+    if (dto.active() != null) {
+      clienteExistente.setActive(dto.active());
     }
   }
 

@@ -57,7 +57,7 @@ public class VendaController {
   }
 
   /**
-   * Endpoint para listar vendas com filtros opcionais.
+   * Endpoint para list vendas com filtros opcionais.
    * 
    * @param inicio         Data/hora inicial do filtro.
    * @param fim            Data/hora final do filtro.
@@ -67,29 +67,29 @@ public class VendaController {
    * @return Lista de vendas encontradas.
    */
   @GetMapping
-  public ResponseEntity<PageResponse<VendaResponseDTO>> listarVendas(
+  public ResponseEntity<PageResponse<VendaResponseDTO>> listVendas(
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime inicio,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime fim,
       @RequestParam(required = false) Long clienteId,
       @RequestParam(required = false) String formaPagamento,
-      @RequestParam(required = false) Long produtoId,
+      @RequestParam(required = false) Long productId,
       @RequestParam(required = false) String orderBy,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "8") int size) {
-    System.out.println("LOG: VendaController.listarVendas - Listando vendas com filtros - inicio: " + inicio + ", fim: "
+    System.out.println("LOG: VendaController.listVendas - Listando vendas com filtros - inicio: " + inicio + ", fim: "
         + fim + ", clienteId: " + clienteId + ", formaPagamento: " + formaPagamento);
-    System.out.println("PAGINATION: VendaController.listarVendas - " + page + " : " + size);
-    PageResponse<VendaResponseDTO> paginatedResponse = vendaService.listarVendas(
+    System.out.println("PAGINATION: VendaController.listVendas - " + page + " : " + size);
+    PageResponse<VendaResponseDTO> paginatedResponse = vendaService.listVendas(
         inicio,
         fim,
         clienteId,
         formaPagamento,
-        produtoId,
+        productId,
         orderBy,
         page,
         size);
     System.out.println(
-        "LOG: VendaController.listarVendas - Quantidade de vendas encontradas: " + paginatedResponse.getSize());
+        "LOG: VendaController.listVendas - Quantidade de vendas encontradas: " + paginatedResponse.getSize());
     return ResponseEntity.ok(paginatedResponse);
   }
 
@@ -99,9 +99,9 @@ public class VendaController {
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime fim,
       @RequestParam(required = false) Long clienteId,
       @RequestParam(required = false) String formaPagamento,
-      @RequestParam(required = false) Long produtoId,
+      @RequestParam(required = false) Long productId,
       @RequestParam(required = true) String groupBy) {
-    List<GroupsummaryDTO> summary = vendaService.getVendassummary(inicio, fim, clienteId, formaPagamento, produtoId,
+    List<GroupsummaryDTO> summary = vendaService.getVendassummary(inicio, fim, clienteId, formaPagamento, productId,
         groupBy);
     return ResponseEntity.ok(summary);
   }
@@ -112,8 +112,8 @@ public class VendaController {
       @RequestParam(required = false) ZonedDateTime fim,
       @RequestParam(required = false) Long clienteId,
       @RequestParam(required = false) String formaPagamento,
-      @RequestParam(required = false) Long produtoId) {
-    BigDecimal total = vendaService.calcularTotalBrutoVendas(inicio, fim, clienteId, formaPagamento, produtoId);
+      @RequestParam(required = false) Long productId) {
+    BigDecimal total = vendaService.calcularTotalBrutoVendas(inicio, fim, clienteId, formaPagamento, productId);
     return ResponseEntity.ok(total);
   }
 
@@ -140,9 +140,9 @@ public class VendaController {
   }
 
   @DeleteMapping("/{id}/permanente")
-  public ResponseEntity<Void> deletarVendaFisicamente(@PathVariable Long id) {
-    System.out.println("LOG: VendaController.deletarVendaFisicamente - Recebida requisição de deleção de ID: " + id);
-    vendaService.deletarVendaFisicamente(id);
+  public ResponseEntity<Void> deleteVendaFisicamente(@PathVariable Long id) {
+    System.out.println("LOG: VendaController.deleteVendaFisicamente - Recebida requisição de deleção de ID: " + id);
+    vendaService.deleteVendaFisicamente(id);
     return ResponseEntity.noContent().build();
   }
 }

@@ -1,0 +1,208 @@
+{
+  "common": {
+    "name": "Name",
+    "category": "Category",
+    "description": "Description",
+    "value": "Value",
+    "price": "Price",
+    "cost": "Cost",
+    "status": "Status",
+    "stock": "Stock",
+    "unit": "Unit",
+    "payment": "Payment",
+    "items": "Items",
+    "paymentMethod": "Payment Method",
+    "actions": "Actions",
+    "details": "Details",
+    "client": "Client",
+    "date": "Date",
+    "select": "Select..."
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "sales": "Sales",
+    "products": "Products",
+    "clients": "Clients",
+    "expenses": "Expenses",
+    "settings": "Settings",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "filter": {
+    "filterBy": "Filter by",
+    "orderBy": "Order by",
+    "dateStart": "Start Date",
+    "dateEnd": "End Date",
+    "mostRecent": "Most Recent",
+    "mostSold": "Most Sold",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "highestValue": "Highest Value",
+    "lowestValue": "Lowest Value",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "month": "This Month",
+    "year": "This Year",
+    "all": "View All"
+  },
+  "userActions": {
+    "add": "Add ",
+    "edit": "Edit",
+    "copy": "Copy",
+    "delete": "Delete",
+    "searchBy": "Search by ",
+    "viewAll": "View All",
+    "daySells": "Today's Sales",
+    "yesterdayTotal": "Yesterday's Sales",
+    "clearFilter": "Clear Filter",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saveChanges": "Save Changes",
+    "close": "Close",
+    "confirm": "Confirm",
+    "all": "All",
+    "no": "No",
+    "permanently": "Permanently",
+    "inactivate": "Disable",
+    "activate": "Enable"
+  },
+  "siteFeedback": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "deleteError": "Error while deleting",
+    "noData": "No data found",
+    "confirmDelete": "Are you sure you want to delete?",
+    "inactive": "Inactive",
+    "active": "Active"
+  },
+  "clientes": {
+    "title": "Clients",
+    "objectName": "Client",
+    "onCredit": "On Credit",
+    "debtors": "Debtors",
+    "notDebtors": "Not Debtors",
+    "manage": "Client Management",
+    "form": {
+      "title": "Add New Client",
+      "editTitle": "Edit Client",
+      "fullName": "Full Name",
+      "phone": "Phone",
+      "address": "Address",
+      "cpf": "Social Security Number",
+      "creditControlTitle": "Credit Control",
+      "allowCredit": "Allow purchases on credit for this client?",
+      "creditLimit": "Credit Limit",
+      "activeClient": "Active Client",
+      "debtBalance": "Debt Balance",
+      "validation": {
+        "nameRequired": "Name is required (minimum 2 characters)",
+        "limitNonNegative": "Credit limit cannot be negative"
+      },
+      "error": {
+        "createFailed": "Error creating client",
+        "updateFailed": "Error updating client"
+      }
+    }
+  },
+    "dueDate": "Due Date",
+    "notSet": "Not set",
+    "status": {
+      "overdue": "Overdue ({{count}} day)",
+      "overdue_plural": "Overdue ({{count}} days)",
+      "dueToday": "Due Today",
+      "dueSoon": "Due Soon",
+      "dueIn": "Due in {{count}} day",
+      "dueIn_plural": "Due in {{count}} days",
+      "paid": "PAID"
+  },
+  "produtos": {
+    "title": "Products",
+    "objectName": "Product",
+    "manage": "Product Management",
+    "filterByCategory": "Filter by Category",
+    "allCategories": "All Categories",
+    "detailsTitle": "Product Details",
+    "salesUnit": "Sales Unit",
+    "barcode": "Barcode",
+    "lastUpdate": "Last Update",
+    "createdAt": "Created At",
+    "provider": "Provider",
+    "form": {
+      "title": "Add Product",
+      "editTitle": "Edit Product",
+      "productName": "Product Name",
+      "salesPrice": "Sales Price",
+      "costPrice": "Cost Price",
+      "currentStock": "Current Stock",
+      "activeProduct": "Active Product",
+      "select": "Select..."
+    }
+  },
+  "vendas": {
+    "title": "Sales",
+    "objectName": "Sale",
+    "registerNewSale": "Register New Sale",
+    "searchProductPlaceholder": "Type to search for a product...",
+    "allClients": "All clients",
+    "allMethods": "All methods",
+    "grossTotal": "Gross Total",
+    "netTotal": "Net Profit",
+    "grossTotalDescription": "Total value of the sale before expenses",
+    "netTotalDescription": "Profit after expenses",
+    "selectPaymentMethod": "Select a payment method",
+    "totalForSelectedMethod": "Total for selected method",
+  "form": {
+      "title": "Register Sale",
+      "anonymous": "Anonymous",
+      "addItem": "Add Item",
+      "selectProduct": "Select a product...",
+      "quantity": "Quantity",
+      "itemsInSale": "Items in Sale",
+      "totalValue": "Total Value",
+      "observations": "Observations"
+    },
+    "details": {
+      "title": "Sale Details",
+      "saleDate": "Sale Date"
+    },
+    "paymentMethods": {
+      "dinheiro": "Cash",
+      "debito": "Debit",
+      "credito": "Credit",
+      "fiado": "Credit Sale",
+      "pix": "Pix"
+    }
+  },
+  "despesas": {
+    "title": "Expenses",
+    "objectName": "Expense",
+    "manage": "Expense Management",
+    "totalExpenses": "Total Expenses",
+    "addExpense": "Add Expense",
+    "form": {
+      "title": "Register New Expense",
+      "editTitle": "Edit Expense",
+      "expenseDate": "Expense Date",
+      "expenseType": "Expense Type"
+    }
+  },
+  "categorias": {
+    "form": {
+      "title": "Add Category",
+      "name": "Category Name"
+    }
+  },
+  "fornecedores": {
+    "name": "Supplier Name",
+    "person" : "Legal Entity or Individual",
+    "form": {
+      "title": "Add Provider"
+    }
+  },
+  "expenseCategories": {
+    "EMPRESARIAL": "Business",
+    "PESSOAL": "Personal",
+    "INVESTIMENTO": "Investment",
+    "OUTROS": "Others"
+  }
+}

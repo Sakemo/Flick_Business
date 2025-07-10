@@ -1,0 +1,112 @@
+/* Importa as camadas base do Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Camada Base: Estilos Globais e Reset */
+@layer base {
+  /* Define a fonte padrão para todo o corpo, usando a configuração do Tailwind */
+  body {
+    @apply font-sans antialiased; /* Usa 'Inter' como principal, com fallbacks. Anti-aliasing para suavidade. */
+    @apply bg-bg-light text-text-primary; /* Cor de fundo e texto padrão para modo claro */
+    @apply transition-colors duration-300 ease-in-out; /* Transição suave de cores ao mudar tema */
+  }
+
+  /* Estilos base para o modo escuro (aplicados quando a classe 'dark' está no <html>) */
+  .dark body {
+    @apply bg-bg-dark text-gray-100; /* Fundo escuro, texto claro */
+  }
+
+  /* Remove margens padrão de alguns elementos para melhor controle com Tailwind */
+  body,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  blockquote,
+  figure,
+  ol,
+  ul {
+    @apply m-0;
+  }
+
+  /* Define paddings padrão (opcional, pode ser feito por componente) */
+  body {
+    @apply p-0;
+  }
+
+  /* Estilos base para links */
+  a {
+    @apply text-brand-primary no-underline; /* Cor primária, sem sublinhado */
+    @apply transition-colors duration-200; /* Transição suave no hover */
+  }
+  a:hover {
+    @apply text-brand-primary/80; /* Cor primária com 80% de opacidade no hover */
+  }
+  .dark a {
+    @apply text-brand-accent; /* Cor de destaque no modo escuro */
+  }
+  .dark a:hover {
+    @apply text-brand-accent/80; /* Cor de destaque com 80% de opacidade no hover */
+  }
+
+  /* Garante que elementos de formulário herdem fontes do body ou da pilha sans-serif definida */
+  input,
+  button,
+  textarea,
+  select {
+    @apply font-sans; /* Ou use 'font-family: inherit;' se preferir a herança direta */
+  }
+
+  button {
+    @apply p-3;
+  }
+
+  /* Adiciona um outline sutil para foco (acessibilidade) */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-offset-2 dark:ring-offset-bg-dark;
+    /* Aplica a cor base e depois a opacidade para light mode */
+    @apply ring-brand-primary ring-opacity-50;
+    /* Aplica a cor base e depois a opacidade para dark mode */
+    @apply dark:ring-brand-accent dark:ring-opacity-50;
+  }
+}
+
+/* Camada de Componentes: Estilos reutilizáveis para componentes customizados */
+@layer components {
+  /* Estilo base para um card, usando valores do tema */
+  .card-base {
+    @apply bg-card-light dark:bg-card-dark rounded-card shadow-card p-card-padding border border-gray-200 dark:border-gray-700;
+  }
+
+  /* Estilo base para um botão primário */
+  .btn-primary {
+    @apply bg-brand-primary text-white font-semibold py-2 px-5 rounded-btn;
+    /* Usa cor/opacidade separadas para o anel de foco */
+    @apply hover:bg-brand-primary/90 focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 focus:outline-none;
+    @apply transition-all duration-200 ease-in-out;
+  }
+  .dark .btn-primary {
+    /* Exemplo se quiser que o botão primário no dark mode use o accent color */
+    @apply bg-brand-accent text-bg-dark;
+    @apply hover:bg-brand-accent/90 focus:ring-brand-accent focus:ring-opacity-50;
+  }
+
+  /* Estilo base para um botão secundário/outline */
+  .btn-secondary {
+    @apply bg-transparent border border-brand-muted dark:border-gray-600 text-brand-primary dark:text-gray-200 font-semibold py-2 px-5 rounded-btn;
+    @apply hover:bg-brand-muted/30 dark:hover:bg-gray-700 focus:ring-2 focus:ring-brand-primary focus:ring-opacity-50 focus:outline-none;
+    @apply transition-all duration-200 ease-in-out;
+  }
+}
+
+/* Camada de Utilitários: O Tailwind gera as classes utilitárias aqui */
+@layer utilities {
+  /* Você pode adicionar utilitários customizados aqui, se necessário */
+  .text-shadow-soft {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}

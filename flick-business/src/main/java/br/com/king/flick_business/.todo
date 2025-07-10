@@ -1,0 +1,38 @@
+// Estrutura base
+
+- [x] Criar Enums
+
+  - [x] Definir constantes necessárias (status, tipos, categorias, etc.)
+
+- [x] Criar Entities
+  - [x] Definir propriedades principais
+  - [x] Adicionar relacionamentos
+  - [x] Anotações de ORM (se necessário)
+
+// Estrutura de dados
+
+- [x] Criar DTOs
+
+  - [x] DTOs de entrada (Create, Update)
+  - [x] DTOs de saída (Response/View)
+
+- [x] Criar Exceptions
+  - [ ] Exceptions genéricas (e.g., NotFoundException, BusinessException)
+  - [ ] Exceptions específicas do domínio
+
+// Transformações e persistência
+
+- [x] Criar Mappers
+
+  - [x] Mapear DTO → Entity
+  - [x] Mapear Entity → DTO
+
+- [x] Criar Repositories
+  - [x] Interface do repositório
+  - [x] Implementação (se necessário)
+
+// Lógica de negócio
+
+- [x] Criar Services
+  - [x] Métodos de negócio (create, update, find, delete)
+  - [x] Uso de DTOs, Mapper, Repository e Exceptions

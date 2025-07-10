@@ -1,0 +1,209 @@
+{
+  "common": {
+    "name": "Nome",
+    "category": "Categoria",
+    "description": "Descrição",
+    "value": "Valor",
+    "price": "Preço",
+    "cost": "Custo",
+    "status": "Status",
+    "stock": "Estoque",
+    "unit": "Unidade",
+    "payment": "Pagamento",
+    "items": "Itens",
+    "paymentMethod": "Forma de Pagamento",
+    "actions": "Ações",
+    "details": "Detalhes",
+    "client": "Cliente",
+    "date": "Data",
+    "totalOf": "Total de"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "sales": "Vendas",
+    "products": "Produtos",
+    "clients": "Clientes",
+    "expenses": "Despesas",
+    "settings": "Configurações",
+    "darkMode": "Modo Escuro",
+    "lightMode": "Modo Claro"
+  },
+  "filter": {
+    "filterBy": "Filtrar por",
+    "orderBy": "Ordenar por",
+    "dateStart": "Data Início",
+    "dateEnd": "Data Fim",
+    "mostRecent": "Mais Recente",
+    "mostSold": "Mais Vendido",
+    "newest": "Mais Novo",
+    "oldest": "Mais Antigo",
+    "highestValue": "Maior Valor",
+    "lowestValue": "Menor Valor",
+    "today": "Hoje",
+    "yesterday": "Ontem",
+    "month": "Este Mês",
+    "year": "Este Ano",
+    "all": "Ver Tudo"
+  },
+  "userActions": {
+    "add": "Adicionar",
+    "edit": "Editar",
+    "copy": "Copiar",
+    "delete": "Deletar",
+    "searchBy": "Buscar por ",
+    "viewAll": "Ver Tudo",
+    "daySells": "Vendas do Dia",
+    "clearFilter": "Limpar Filtro",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "saveChanges": "Salvar Alterações",
+    "close": "Fechar",
+    "confirm": "Confirmar",
+    "all": "Todos",
+    "no": "Não",
+    "permanently": "Permanentemente",
+    "inactivate": "Desativar",
+    "activate": "Ativar"
+  },
+  "siteFeedback": {
+    "loang": "Carregando...",
+    "error": "Ocorreu um erro",
+    "deleteError": "Erro ao deletar",
+    "copyError": "Erro ao copiar",
+    "noData": "Nenhum dado encontrado",
+    "confirmDelete": "Tem certeza que deseja deletar?",
+    "inactive": "Inativo",
+    "active": "Ativo"
+  },
+  "clientes": {
+    "title": "Clientes",
+    "objectName": "Cliente",
+    "onCredit": "Fiado",
+    "debtors": "Devedores",
+    "notDebtors": "Não Devedores",
+    "manage": "Gerenciamento de Clientes",
+    "form": {
+      "title": "Adicionar Novo Cliente",
+      "editTitle": "Editar Cliente",
+      "fullName": "Nome Completo",
+      "phone": "Telefone",
+      "address": "Endereço",
+      "cpf": "CPF",
+      "creditControlTitle": "Controle de Fiado",
+      "allowCredit": "Permitir compras no fiado para este cliente?",
+      "creditLimit": "Limite de Crédito Fiado",
+      "activeClient": "Cliente Ativo",
+      "debtBalance": "Saldo Devedor"
+
+    },
+    "dueDate": "Vencimento",
+    "notSet": "Não definido",
+    "status": {
+      "overdue": "Atrasado ({{count}} dia)",
+      "overdue_plural": "Atrasado ({{count}} dias)",
+      "dueToday": "Vence Hoje",
+      "dueSoon": "A Vencer",
+      "dueIn": "Vence em {{count}} dia",
+      "dueIn_plural": "Vence em {{count}} dias",
+      "paid": "EM DIA"
+    }
+  },
+  "produtos": {
+    "title": "Produtos",
+    "objectName": "Produto",
+    "manage": "Gerenciamento de Produtos",
+    "filterByCategory": "Filtrar por Categoria",
+    "allCategories": "Todas as Categorias",
+    "detailsTitle": "Detalhes do Produto",
+    "salesUnit": "Unidade de Venda",
+    "barcode": "Código de Barras",
+    "lastUpdate": "Última Atualização",
+    "createdAt": "Criado Em",
+    "provider": "Fornecedor",
+    "form": {
+      "title": "Adicionar Produto",
+      "editTitle": "Editar Produto",
+      "productName": "Nome do Produto",
+      "salesPrice": "Preço de Venda",
+      "costPrice": "Preço de Custo",
+      "currentStock": "Estoque Atual",
+      "activeProduct": "Produto Ativo",
+      "select": "Selecione...",
+      "validation": {
+        "nameRequired": "Nome é obrigatório (mínimo 2 caracteres)",
+        "limitNonNegative": "Limite de fiado não pode ser negativo"
+      },
+      "error": {
+        "createFailed": "Erro ao criar cliente",
+        "updateFailed": "Erro ao atualizar cliente"
+      }
+    }
+  },
+  "vendas": {
+    "title": "Vendas",
+    "objectName": "Venda",
+    "registerNewSale": "Registrar Nova Venda",
+    "searchProductPlaceholder": "Digite para buscar produto...",
+    "allClients": "Todos os clientes",
+    "allMethods": "Todas as formas",
+    "grossTotal": "Total Bruto",
+    "netTotal": "Lucro",
+    "grossTotalDescription": "Valor total da venda antes das despesas",
+    "netTotalDescription": "Lucro após despesas",
+    "selectPaymentMethod": "Selecione um pagamento",
+    "totalForSelectedMethod": "Total para a forma selecionada",
+    "form": {
+      "title": "Registrar Venda",
+      "anonymous": "Anônimo",
+      "addItem": "Adicionar Item",
+      "selectProduct": "Selecione um produto...",
+      "quantity": "Quantidade",
+      "itemsInSale": "Itens na Venda",
+      "totalValue": "Valor Total",
+      "observations": "Observações"
+    },
+    "details": {
+      "title": "Detalhes da Venda",
+      "saleDate": "Data da Venda"
+    },
+    "paymentMethods": {
+      "dinheiro": "Dinheiro",
+      "debito": "Débito",
+      "credito": "Crédito",
+      "fiado": "Venda Fiado",
+      "pix": "Pix"
+    }
+  },
+  "despesas": {
+    "title": "Despesas",
+    "objectName": "Despesa",
+    "manage": "Gerenciamento de Despesas",
+    "totalExpenses": "Total de Despesas",
+    "addExpense": "Adicionar Despesa",
+    "form": {
+      "title": "Registrar Nova Despesa",
+      "editTitle": "Editar Despesa",
+      "expenseDate": "Data da Despesa",
+      "expenseType": "Tipo de Despesa"
+    }
+  },
+  "categorias": {
+    "form": {
+      "title": "Adicionar Categoria",
+      "name": "Nome da Categoria"
+    }
+  },
+  "fornecedores": {
+    "supplieName": "Nome do Fornecedor",
+    "person" : "Tipo de Pessoa",
+    "form": {
+      "title": "Adicionar Fornecedor"
+    }
+  },
+  "expenseCategories": {
+    "EMPRESARIAL": "Empresarial",
+    "PESSOAL": "Pessoal",
+    "INVESTIMENTO": "Investimento",
+    "OUTROS": "Outros"
+  }
+}

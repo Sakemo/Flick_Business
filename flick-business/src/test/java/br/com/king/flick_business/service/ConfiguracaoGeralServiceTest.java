@@ -53,10 +53,10 @@ class ConfiguracaoGeralServiceTest {
         .taxaJurosAtraso(new BigDecimal("5.50"))
         .prazoPagamentoFiado(2)
         .nameNegocio("Loja Existente") // Incluindo o name do negócio
-        .dataAtualizacao(ZonedDateTime.now().minusHours(1))
+        .updatedAt(ZonedDateTime.now().minusHours(1))
         .build();
 
-    // DTO com novos dados para salvar/atualizar
+    // DTO com novos dados para save/atualizar
     configDtoParaSalvar = new ConfiguracaoGeralDTO(
         new BigDecimal("7.00"), // Nova taxa
         3, // Novo prazo
@@ -84,7 +84,7 @@ class ConfiguracaoGeralServiceTest {
     assertEquals(configExistente.getTaxaJurosAtraso(), resultado.taxaJuros());
     assertEquals(configExistente.getPrazoPagamentoFiado(), resultado.prazoPagamento());
     assertEquals(configExistente.getNameNegocio(), resultado.nameNegocio()); // Verificar name
-    assertEquals(configExistente.getDataAtualizacao(), resultado.dataAtualizacao());
+    assertEquals(configExistente.getUpdatedAt(), resultado.updatedAt());
 
     // Verify
     verify(configuracaoRepositoryMock).findConfig(); // Verifica a chamada ao método default
@@ -109,7 +109,7 @@ class ConfiguracaoGeralServiceTest {
     assertNull(resultado.prazoPagamento());
     assertNull(resultado.nameNegocio()); // Verificar name
     // Data de atualização também será nula pois veio do builder default
-    assertNull(resultado.dataAtualizacao());
+    assertNull(resultado.updatedAt());
 
     // Verify
     verify(configuracaoRepositoryMock).findConfig();
@@ -148,30 +148,30 @@ class ConfiguracaoGeralServiceTest {
     verify(configuracaoRepositoryMock).findConfig();
   }
 
-  // --- Testes para salvarOuAtualizarConfiguracao ---
+  // --- Testes para saveOuAtualizarConfiguracao ---
 
   @Test
-  @DisplayName("salvarOuAtualizar: Deve ATUALIZAR configuração existente com dados do DTO")
-  void salvarOuAtualizarConfiguracao_quandoExiste_deveAtualizarCamposESalvar() {
+  @DisplayName("saveOuAtualizar: Deve ATUALIZAR configuração existente com dados do DTO")
+  void saveOuAtualizarConfiguracao_quandoExiste_deveAtualizarCamposESalvar() {
     // Arrange
     // 1. Simula que a configuração já existe
     when(configuracaoRepositoryMock.findConfig()).thenReturn(Optional.of(configExistente));
     // 2. Simula o save retornando a entidade modificada (que será capturada)
     when(configuracaoRepositoryMock.save(any(ConfiguracaoGeral.class))).thenAnswer(inv -> {
       ConfiguracaoGeral c = inv.getArgument(0);
-      c.setDataAtualizacao(ZonedDateTime.now()); // Simula o @UpdateTimestamp
+      c.setUpdatedAt(ZonedDateTime.now()); // Simula o @UpdateTimestamp
       return c;
     });
 
     // Act
-    ConfiguracaoGeralDTO resultadoDTO = configuracaoService.salvarOuAtualizarConfiguracao(configDtoParaSalvar);
+    ConfiguracaoGeralDTO resultadoDTO = configuracaoService.saveOuAtualizarConfiguracao(configDtoParaSalvar);
 
     // Assert DTO Retornado
     assertNotNull(resultadoDTO);
     assertEquals(configDtoParaSalvar.taxaJuros(), resultadoDTO.taxaJuros());
     assertEquals(configDtoParaSalvar.prazoPagamento(), resultadoDTO.prazoPagamento());
     assertEquals(configDtoParaSalvar.nameNegocio(), resultadoDTO.nameNegocio()); // Verificar name
-    assertNotNull(resultadoDTO.dataAtualizacao()); // Data deve ter sido atualizada
+    assertNotNull(resultadoDTO.updatedAt()); // Data deve ter sido atualizada
 
     // Assert Entidade Salva usando Captor
     verify(configuracaoRepositoryMock).save(configCaptor.capture());
@@ -185,31 +185,31 @@ class ConfiguracaoGeralServiceTest {
     assertSame(configExistente, configSalva, "A entidade existente deveria ter sido atualizada");
 
     // Verify
-    verify(configuracaoRepositoryMock).findConfig(); // Verifica se buscou antes de salvar
+    verify(configuracaoRepositoryMock).findConfig(); // Verifica se buscou antes de save
   }
 
   @Test
-  @DisplayName("salvarOuAtualizar: Deve CRIAR configuração com ID 1 quando não existe")
-  void salvarOuAtualizarConfiguracao_quandoNaoExiste_deveCriarComId1ESalvar() {
+  @DisplayName("saveOuAtualizar: Deve CRIAR configuração com ID 1 quando não existe")
+  void saveOuAtualizarConfiguracao_quandoNaoExiste_deveCriarComId1ESalvar() {
     // Arrange
     // 1. Simula que a configuração NÃO existe
     when(configuracaoRepositoryMock.findConfig()).thenReturn(Optional.empty());
     // 2. Simula o save (retorna o objeto que foi passado, com data atualizada)
     when(configuracaoRepositoryMock.save(any(ConfiguracaoGeral.class))).thenAnswer(inv -> {
       ConfiguracaoGeral c = inv.getArgument(0);
-      c.setDataAtualizacao(ZonedDateTime.now()); // Simula @UpdateTimestamp
+      c.setUpdatedAt(ZonedDateTime.now()); // Simula @UpdateTimestamp
       return c;
     });
 
     // Act
-    ConfiguracaoGeralDTO resultadoDTO = configuracaoService.salvarOuAtualizarConfiguracao(configDtoParaSalvar);
+    ConfiguracaoGeralDTO resultadoDTO = configuracaoService.saveOuAtualizarConfiguracao(configDtoParaSalvar);
 
     // Assert DTO Retornado
     assertNotNull(resultadoDTO);
     assertEquals(configDtoParaSalvar.taxaJuros(), resultadoDTO.taxaJuros());
     assertEquals(configDtoParaSalvar.prazoPagamento(), resultadoDTO.prazoPagamento());
     assertEquals(configDtoParaSalvar.nameNegocio(), resultadoDTO.nameNegocio()); // Verificar name
-    assertNotNull(resultadoDTO.dataAtualizacao());
+    assertNotNull(resultadoDTO.updatedAt());
 
     // Assert Entidade Salva usando Captor
     verify(configuracaoRepositoryMock).save(configCaptor.capture());

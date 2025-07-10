@@ -34,7 +34,7 @@ public class ClienteController {
   public ResponseEntity<ClienteResponseDTO> criarCliente(
       @Valid @RequestBody ClienteRequestDTO requestDTO,
       UriComponentsBuilder uriBuilder) {
-    ClienteResponseDTO clienteSalvo = clienteService.salvar(requestDTO);
+    ClienteResponseDTO clienteSalvo = clienteService.save(requestDTO);
     URI uri = uriBuilder.path("/api/clientes/{id}").buildAndExpand(clienteSalvo.id()).toUri();
     return ResponseEntity.created(uri).body(clienteSalvo);
   }
@@ -57,7 +57,7 @@ public class ClienteController {
 
   @GetMapping("/{id}")
   public ResponseEntity<ClienteResponseDTO> buscarClientePorId(@PathVariable Long id) {
-    ClienteResponseDTO cliente = clienteService.buscarPorId(id);
+    ClienteResponseDTO cliente = clienteService.searchById(id);
     return ResponseEntity.ok(cliente);
   }
 

@@ -21,23 +21,23 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
         @Override
         List<Cliente> findAll(Sort sort);
 
-        List<Cliente> findBySaldoDevedorGreaterThan(BigDecimal valor, Sort sort);
+        List<Cliente> findBySaldoDevedorGreaterThan(BigDecimal value, Sort sort);
 
-        List<Cliente> findBySaldoDevedorLessThanEqual(BigDecimal valor, Sort sort);
+        List<Cliente> findBySaldoDevedorLessThanEqual(BigDecimal value, Sort sort);
 
         List<Cliente> findByNameContainingIgnoreCaseAndActiveTrue(String name, Sort sort);
 
         List<Cliente> findByNameContainingIgnoreCaseAndActiveFalse(String name, Sort sort);
 
-        List<Cliente> findByNameContainingIgnoreCaseAndSaldoDevedorGreaterThan(String name, BigDecimal valor,
+        List<Cliente> findByNameContainingIgnoreCaseAndSaldoDevedorGreaterThan(String name, BigDecimal value,
                         Sort sort);
 
-        List<Cliente> findByNameContainingIgnoreCaseAndSaldoDevedorLessThanEqual(String name, BigDecimal valor,
+        List<Cliente> findByNameContainingIgnoreCaseAndSaldoDevedorLessThanEqual(String name, BigDecimal value,
                         Sort sort);
 
-        List<Cliente> findByActiveTrueAndSaldoDevedorGreaterThan(BigDecimal valor, Sort sort);
+        List<Cliente> findByActiveTrueAndSaldoDevedorGreaterThan(BigDecimal value, Sort sort);
 
-        List<Cliente> findByActiveTrueAndSaldoDevedorLessThanEqual(BigDecimal valor, Sort sort);
+        List<Cliente> findByActiveTrueAndSaldoDevedorLessThanEqual(BigDecimal value, Sort sort);
 
         @Query("SELECT c FROM Cliente c WHERE " +
                         "(:nameContains IS NULL OR LOWER(c.name) LIKE LOWER(CONCAT('%', :nameContains, '%'))) AND "

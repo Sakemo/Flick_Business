@@ -36,7 +36,7 @@ public class ConfiguracaoGeral {
 
   @UpdateTimestamp
   @Column(name = "data_atualizacao", nullable = false)
-  private ZonedDateTime dataAtualizacao;
+  private ZonedDateTime updatedAt;
 
   // TODO: configurar resto do código para lidar com o name do negócio
   @Column(name = "name_negocio", nullable = true, length = 100)

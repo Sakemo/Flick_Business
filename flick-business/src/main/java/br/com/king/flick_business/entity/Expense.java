@@ -6,7 +6,7 @@ import java.time.ZonedDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import br.com.king.flick_business.enums.TipoExpense;
+import br.com.king.flick_business.enums.ExpenseType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -38,11 +38,11 @@ public class Expense {
    *
    * @Name - Name da expense
    *
-   * @Valor - Valor da expense
+   * @Value - Value da expense
    *
    * @DataExpense - Data da expense
    *
-   * @TipoExpense - Tipo da expense (ex: alimentação, transporte, etc)
+   * @ExpenseType - Tipo da expense (ex: alimentação, transporte, etc)
    *
    * @CreationTimestamp - Data de criação da expense (METADADOS)
    *
@@ -58,32 +58,32 @@ public class Expense {
   @Column(nullable = false, length = 100)
   private String name;
 
-  // Valor da expense
-  @NotNull(message = "O valor da expense não pode ser nulo")
-  @DecimalMin(value = "0.01", message = "O valor da expense deve ser maior que zero")
-  @Digits(integer = 10, fraction = 2, message = "O valor da expense deve ter no máximo 10 dígitos inteiros e 2 dígitos decimais")
+  // Value da expense
+  @NotNull(message = "O value da expense não pode ser nulo")
+  @DecimalMin(value = "0.01", message = "O value da expense deve ser maior que zero")
+  @Digits(integer = 10, fraction = 2, message = "O value da expense deve ter no máximo 10 dígitos inteiros e 2 dígitos decimais")
   @Column(nullable = false, precision = 12, scale = 2)
-  private BigDecimal valor;
+  private BigDecimal value;
 
   // Data da expense
   @NotNull(message = "A data da expense não pode ser nula")
   @PastOrPresent(message = "A data da expense deve ser no passado ou presente")
   @Column(nullable = false, name = "data_expense")
-  private ZonedDateTime dataExpense;
+  private ZonedDateTime dateExpense;
 
   // Tipo de expense
   @NotNull(message = "O tipo de expense não pode ser nulo")
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, name = "tipo_expense", length = 20)
-  private TipoExpense tipoExpense;
+  private ExpenseType expenseType;
 
   // -- METADADOS -- //
   @CreationTimestamp
   @Column(name = "data_criacao", updatable = false, nullable = false)
-  private ZonedDateTime dataCriacao;
+  private ZonedDateTime createdAt;
 
   @UpdateTimestamp
   @Column(name = "data_atualizacao", nullable = false)
-  private ZonedDateTime dataAtualizacao;
+  private ZonedDateTime updatedAt;
 
 }

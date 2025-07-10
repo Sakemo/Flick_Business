@@ -7,12 +7,12 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 import br.com.king.flick_business.entity.Expense;
-import br.com.king.flick_business.enums.TipoExpense;
+import br.com.king.flick_business.enums.ExpenseType;
 import jakarta.persistence.criteria.Predicate;
 
 public class ExpenseSpecification {
     public static Specification<Expense> withFilter(
-            String name, ZonedDateTime start, ZonedDateTime end, TipoExpense tipoExpense) {
+            String name, ZonedDateTime start, ZonedDateTime end, ExpenseType expenseType) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
 
@@ -22,15 +22,15 @@ public class ExpenseSpecification {
             }
 
             if (start != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("dataExpense"), start));
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("dateExpense"), start));
             }
 
             if (end != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("dataExpense"), end));
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("dateExpense"), end));
             }
 
-            if (tipoExpense != null) {
-                predicates.add(criteriaBuilder.equal(root.get("tipoExpense"), tipoExpense));
+            if (expenseType != null) {
+                predicates.add(criteriaBuilder.equal(root.get("expenseType"), expenseType));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

@@ -34,7 +34,7 @@ public class ConfiguracaoGeralService {
 
   // Salvar ou Atualizar Configuração Geral //
   @Transactional
-  public ConfiguracaoGeralDTO salvarOuAtualizarConfiguracao(ConfiguracaoGeralDTO dto) {
+  public ConfiguracaoGeralDTO saveOuAtualizarConfiguracao(ConfiguracaoGeralDTO dto) {
     ConfiguracaoGeral config = configuracaoRepository.findConfig()
         .orElseGet(() -> ConfiguracaoGeral.builder().id(1L).build());
 
@@ -51,7 +51,7 @@ public class ConfiguracaoGeralService {
     return new ConfiguracaoGeralDTO(
         entity.getTaxaJurosAtraso(),
         entity.getPrazoPagamentoFiado(),
-        entity.getDataAtualizacao(),
+        entity.getUpdatedAt(),
         entity.getNameNegocio());
   }
 

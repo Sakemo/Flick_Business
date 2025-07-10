@@ -17,7 +17,7 @@ public class ProductMapper {
         .description(requestDTO.description())
         .barcode(requestDTO.barcode())
         .active(requestDTO.active())
-        .salePrice(requestDTO.precoVenda())
+        .salePrice(requestDTO.salePrice())
         .costPrice(requestDTO.precoCustoUnitario())
         .stockQuantity(requestDTO.stockQuantity())
         .unitOfSale(requestDTO.UnitOfSale())
@@ -32,7 +32,7 @@ public class ProductMapper {
     productExtistente.setDescription(requestDTO.description());
     productExtistente.setBarcode(requestDTO.barcode());
     productExtistente.setActive(requestDTO.active());
-    productExtistente.setSalePrice(requestDTO.precoVenda());
+    productExtistente.setSalePrice(requestDTO.salePrice());
     productExtistente.setCostPrice(requestDTO.precoCustoUnitario());
     productExtistente.setStockQuantity(requestDTO.stockQuantity());
     productExtistente.setUnitOfSale(requestDTO.UnitOfSale());

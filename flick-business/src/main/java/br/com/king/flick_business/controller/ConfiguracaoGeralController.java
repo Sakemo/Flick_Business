@@ -29,7 +29,7 @@ public class ConfiguracaoGeralController {
   @PutMapping
   public ResponseEntity<ConfiguracaoGeralDTO> atualizarConfiguracao(
       @Valid @RequestBody ConfiguracaoGeralDTO dto) {
-    ConfiguracaoGeralDTO configAtualizada = configuracaoGeralService.salvarOuAtualizarConfiguracao(dto);
+    ConfiguracaoGeralDTO configAtualizada = configuracaoGeralService.saveOuAtualizarConfiguracao(dto);
     return ResponseEntity.ok(configAtualizada);
   }
 }

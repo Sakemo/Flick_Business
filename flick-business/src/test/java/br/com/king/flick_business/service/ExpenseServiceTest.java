@@ -30,7 +30,7 @@ import org.springframework.data.jpa.domain.Specification;
 import br.com.king.flick_business.dto.request.ExpenseRequestDTO;
 import br.com.king.flick_business.dto.response.ExpenseResponseDTO;
 import br.com.king.flick_business.entity.Expense;
-import br.com.king.flick_business.enums.TipoExpense;
+import br.com.king.flick_business.enums.ExpenseType;
 import br.com.king.flick_business.exception.RecursoNaoEncontrado;
 import br.com.king.flick_business.repository.ExpenseRepository;
 
@@ -62,9 +62,9 @@ class ExpenseServiceTest {
     expenseExistente = Expense.builder()
         .id(idExistente)
         .name("Almoço Reunião")
-        .valor(new BigDecimal("75.50"))
-        .dataExpense(dataRef.minusDays(1))
-        .tipoExpense(TipoExpense.EMPRESARIAL)
+        .value(new BigDecimal("75.50"))
+        .dateExpense(dataRef.minusDays(1))
+        .expenseType(ExpenseType.EMPRESARIAL)
         .build();
 
     // CORREÇÃO: O DTO de requisição agora usa ZonedDateTime diretamente.
@@ -72,27 +72,27 @@ class ExpenseServiceTest {
         "Café da Manhã",
         new BigDecimal("15.80"),
         dataRef, // Passando o objeto ZonedDateTime
-        TipoExpense.PESSOAL,
+        ExpenseType.PESSOAL,
         "Observação café");
   }
 
   @Test
-  @DisplayName("Deve salvar expense com dados válidos e retornar DTO")
-  void salvarExpense_comDadosValidos_deveRetornarDtoSalvo() {
+  @DisplayName("Deve save expense com dados válidos e retornar DTO")
+  void saveExpense_comDadosValidos_deveRetornarDtoSalvo() {
     when(expenseRepository.save(any(Expense.class))).thenAnswer(invocation -> {
       Expense d = invocation.getArgument(0);
       d.setId(2L);
       return d;
     });
 
-    ExpenseResponseDTO resultado = expenseService.salvarExpense(expenseRequestDTO);
+    ExpenseResponseDTO resultado = expenseService.saveExpense(expenseRequestDTO);
 
     assertNotNull(resultado);
     assertEquals(2L, resultado.id());
     assertEquals("Café da Manhã", resultado.name());
 
     // A comparação agora é direta, ZonedDateTime com ZonedDateTime.
-    assertEquals(expenseRequestDTO.dataExpense(), resultado.dataExpense());
+    assertEquals(expenseRequestDTO.dateExpense(), resultado.dateExpense());
 
     verify(expenseRepository).save(any(Expense.class));
   }
@@ -100,7 +100,7 @@ class ExpenseServiceTest {
   @Test
   @DisplayName("Deve chamar findAll com Specification e Sort quando listar expenses")
   void listarExpenses_comFiltros_deveChamarFindAllComSpecESort() {
-    String nomeFiltro = "almoço";
+    String nameFiltro = "almoço";
     ZonedDateTime inicioFiltro = dataRef.minusDays(5);
     ZonedDateTime fimFiltro = dataRef.plusDays(5);
     String tipoFiltroString = "EMPRESARIAL";
@@ -110,7 +110,7 @@ class ExpenseServiceTest {
 
     // A chamada ao serviço agora está correta, pois a assinatura foi corrigida.
     List<ExpenseResponseDTO> resultado = expenseService.listExpenses(inicioFiltro, fimFiltro, tipoFiltroString,
-        nomeFiltro);
+        nameFiltro);
 
     assertEquals(1, resultado.size());
     assertEquals("Almoço Reunião", resultado.get(0).name());

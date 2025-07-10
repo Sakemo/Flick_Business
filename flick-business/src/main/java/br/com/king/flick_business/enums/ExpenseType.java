@@ -1,6 +1,6 @@
 package br.com.king.flick_business.enums;
 
-public enum TipoExpense {
+public enum ExpenseType {
   PESSOAL,
   EMPRESARIAL,
   INVESTIMENTO,

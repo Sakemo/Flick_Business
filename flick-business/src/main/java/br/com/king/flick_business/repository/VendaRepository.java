@@ -51,7 +51,7 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
 
         // Retorna uma lista de Object[], onde cada array é [Data (como String), Total
         // (BigDecimal)]
-        @Query("SELECT FUNCTION('TO_CHAR', v.dataVenda, 'YYYY-MM-DD'), SUM(v.valorTotal) " +
+        @Query("SELECT FUNCTION('TO_CHAR', v.dataVenda, 'YYYY-MM-DD'), SUM(v.valueTotal) " +
                         "FROM Venda v WHERE     " + "v.dataVenda BETWEEN :inicio AND :fim AND "
                         + "(:clienteId IS NULL OR v.cliente.id = :clienteId) AND "
                         + "(:formaPagamento IS NULL OR v.formaPagamento = :formaPagamento) AND "
@@ -63,7 +63,7 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
 
         // Retorna uma lista de Object[], onde cada array é [ID do Cliente (Long), Name
         // do Cliente (String), Total (BigDecimal)]
-        @Query("SELECT v.cliente.id, v.cliente.name, SUM(v.valorTotal) " +
+        @Query("SELECT v.cliente.id, v.cliente.name, SUM(v.valueTotal) " +
                         "FROM Venda v WHERE " +
                         "v.dataVenda BETWEEN :inicio AND :fim AND " +
                         "(:clienteId IS NULL OR v.cliente.id = :clienteId) AND " +
@@ -75,12 +75,12 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
                         @Param("clienteId") Long clienteId, @Param("formaPagamento") FormaPagamento formaPagamento,
                         @Param("productId") Long productId);
 
-        @Query("SELECT COALESCE(SUM(v.valorTotal), 0) FROM Venda v " +
+        @Query("SELECT COALESCE(SUM(v.valueTotal), 0) FROM Venda v " +
                         "WHERE v.dataVenda BETWEEN :inicio AND :fim " +
                         "AND (:clienteId IS NULL OR v.cliente.id = :clienteId) " +
                         "AND (:formaPagamento IS NULL OR v.formaPagamento = :formaPagamento) " +
                         "AND (:productId IS NULL OR EXISTS (SELECT 1 FROM ItemVenda i WHERE i.venda = v AND i.product.id = :productId))")
-        BigDecimal sumValorTotalComFilters(
+        BigDecimal sumValueTotalComFilters(
                         @Param("inicio") ZonedDateTime inicio,
                         @Param("fim") ZonedDateTime fim,
                         @Param("clienteId") Long clientId,
@@ -91,9 +91,9 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
         // MÉTODOS PARA RELATÓRIOS
         // =========================
 
-        // Soma o valor total das vendas em um determinado período
-        @Query("SELECT COALESCE(SUM(v.valorTotal), 0) FROM Venda v WHERE v.dataVenda BETWEEN :inicio AND :fim")
-        BigDecimal sumValorTotalByDataVendaBetween(@Param("inicio") ZonedDateTime inicio,
+        // Soma o value total das vendas em um determinado período
+        @Query("SELECT COALESCE(SUM(v.valueTotal), 0) FROM Venda v WHERE v.dataVenda BETWEEN :inicio AND :fim")
+        BigDecimal sumValueTotalByDataVendaBetween(@Param("inicio") ZonedDateTime inicio,
                         @Param("fim") ZonedDateTime fim);
 
         // Conta o número de vendas realizadas em um determinado período
@@ -101,20 +101,20 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
         Long countVendasByDataVendaBetween(@Param("inicio") ZonedDateTime inicio,
                         @Param("fim") ZonedDateTime fim);
 
-        // Agrupa e soma o valor total das vendas por forma de pagamento em um período
+        // Agrupa e soma o value total das vendas por forma de pagamento em um período
         // Retorna uma lista de Object[]: [FormaPagamento, BigDecimal]
-        @Query("SELECT v.formaPagamento, SUM(v.valorTotal) FROM Venda v WHERE v.dataVenda BETWEEN :inicio AND :fim GROUP BY v.formaPagamento")
-        List<Object[]> sumValorTotalGroupByFormaPagamentoBetween(@Param("inicio") ZonedDateTime inicio,
+        @Query("SELECT v.formaPagamento, SUM(v.valueTotal) FROM Venda v WHERE v.dataVenda BETWEEN :inicio AND :fim GROUP BY v.formaPagamento")
+        List<Object[]> sumValueTotalGroupByFormaPagamentoBetween(@Param("inicio") ZonedDateTime inicio,
                         @Param("fim") ZonedDateTime fim);
 
-        // Retorna dados diários para gráficos: soma do valor total das vendas por dia
+        // Retorna dados diários para gráficos: soma do value total das vendas por dia
         // no período informado
         // Cada Object[] contém: [data (DATE), soma (BigDecimal)]
-        @Query(value = "SELECT CAST(v.data_venda AS DATE) as dias, SUM(v.valor_total) as total " +
+        @Query(value = "SELECT CAST(v.data_venda AS DATE) as dias, SUM(v.value_total) as total " +
                         "FROM vendas v " +
                         "WHERE v.data_venda BETWEEN :inicio AND :fim " +
                         "GROUP BY dias " +
                         "ORDER BY dias ASC", nativeQuery = true)
-        List<Object[]> sumValorTotalGroupByDayBetweenNative(@Param("inicio") ZonedDateTime inicio,
+        List<Object[]> sumValueTotalGroupByDayBetweenNative(@Param("inicio") ZonedDateTime inicio,
                         @Param("fim") ZonedDateTime fim);
 }

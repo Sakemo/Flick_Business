@@ -21,8 +21,8 @@ public record ClienteResponseDTO(
     ZonedDateTime dataUltimaCompraFiado,
 
     // -- METADADOS -- //
-    ZonedDateTime dataCadastro,
-    ZonedDateTime dataAtualizacao,
+    ZonedDateTime createdAt,
+    ZonedDateTime updatedAt,
     Boolean active)
 
 {
@@ -37,8 +37,8 @@ public record ClienteResponseDTO(
         cliente.getLimiteFiado(),
         cliente.getSaldoDevedor(),
         cliente.getDataUltimaCompraFiado(),
-        cliente.getDataCadastro(),
-        cliente.getDataAtualizacao(),
+        cliente.getCreatedAt(),
+        cliente.getUpdatedAt(),
         cliente.getActive() != null && cliente.getActive());
 
   }

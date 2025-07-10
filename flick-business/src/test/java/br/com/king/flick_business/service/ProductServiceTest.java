@@ -63,7 +63,7 @@ class ProductServiceTest {
   private Provider mockProvider;
   private Product mockProduct;
   private ProductRequestDTO mockRequestDTO;
-  private ProductResponseDTO mockResponseDTO; // Para buscarPorId e mock do mapper
+  private ProductResponseDTO mockResponseDTO; // Para searchById e mock do mapper
   private final Long existingId = 1L;
   private final Long nonExistingId = 99L;
   private final Long categoryId = 1L;
@@ -95,7 +95,7 @@ class ProductServiceTest {
         "Desc Nova", // description
         "789012", // codigoBarras
         BigDecimal.valueOf(20), // quantidadeEstoque
-        BigDecimal.valueOf(15.50), // precoVenda
+        BigDecimal.valueOf(15.50), // salePrice
         BigDecimal.valueOf(7.25), // precoCustoUnitario
         UnitOfSale.UNIDADE, // UnitOfSale
         true, // active
@@ -108,12 +108,12 @@ class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("buscarPorId: Deve retornar ProductResponseDTO quando ID existe")
-  void buscarPorId_quandoIdExiste_deveRetornarProductResponseDTO() {
+  @DisplayName("searchById: Deve retornar ProductResponseDTO quando ID existe")
+  void searchById_quandoIdExiste_deveRetornarProductResponseDTO() {
     when(productRepositoryMock.findById(existingId)).thenReturn(Optional.of(mockProduct));
     when(productMapperMock.toResponseDTO(mockProduct)).thenReturn(mockResponseDTO);
 
-    ProductResponseDTO resultado = productService.buscarPorId(existingId);
+    ProductResponseDTO resultado = productService.searchById(existingId);
 
     assertNotNull(resultado);
     assertEquals(mockResponseDTO.id(), resultado.id());
@@ -132,26 +132,26 @@ class ProductServiceTest {
   }
 
   @Test
-  @DisplayName("buscarPorId: Deve lançar RecursoNaoEncontrado quando ID não existe")
-  void buscarPorId_quandoIdNaoExiste_deveLancarRecursoNaoEncontrado() {
+  @DisplayName("searchById: Deve lançar RecursoNaoEncontrado quando ID não existe")
+  void searchById_quandoIdNaoExiste_deveLancarRecursoNaoEncontrado() {
     when(productRepositoryMock.findById(nonExistingId)).thenReturn(Optional.empty());
     RecursoNaoEncontrado exception = assertThrows(RecursoNaoEncontrado.class,
-        () -> productService.buscarPorId(nonExistingId));
+        () -> productService.searchById(nonExistingId));
     assertEquals("Product não encontrado com ID: " + nonExistingId, exception.getMessage());
     verify(productRepositoryMock).findById(nonExistingId);
     verify(productMapperMock, never()).toResponseDTO(any());
   }
 
   @Test
-  @DisplayName("salvar: Deve salvar e retornar ProductResponseDTO quando dados válidos")
-  void salvar_quandoDadosValidos_deveRetornarProductResponseDTOSalvo() {
-    when(categoryServiceMock.buscarEntidadePorId(categoryId)).thenReturn(mockCategory);
-    when(providerServiceMock.buscarEntidadePorId(providerId)).thenReturn(mockProvider);
+  @DisplayName("save: Deve save e retornar ProductResponseDTO quando dados válidos")
+  void save_quandoDadosValidos_deveRetornarProductResponseDTOSalvo() {
+    when(categoryServiceMock.searchEntityById(categoryId)).thenReturn(mockCategory);
+    when(providerServiceMock.searchEntityById(providerId)).thenReturn(mockProvider);
 
     Product productParaSalvar = // ... (criação do productParaSalvar como antes)
         Product.builder().name(mockRequestDTO.name()).description(mockRequestDTO.description())
             .barcode(mockRequestDTO.barcode()).stockQuantity(mockRequestDTO.stockQuantity())
-            .salePrice(mockRequestDTO.precoVenda()).costPrice(mockRequestDTO.precoCustoUnitario())
+            .salePrice(mockRequestDTO.salePrice()).costPrice(mockRequestDTO.precoCustoUnitario())
             .unitOfSale(mockRequestDTO.UnitOfSale()).active(mockRequestDTO.active())
             .category(mockCategory).provider(mockProvider).build();
     when(productMapperMock.toEntity(eq(mockRequestDTO), eq(mockCategory), eq(mockProvider)))
@@ -170,7 +170,7 @@ class ProductServiceTest {
     ProductResponseDTO dtoEsperado = new ProductResponseDTO(productSalvoComId);
     when(productMapperMock.toResponseDTO(eq(productSalvoComId))).thenReturn(dtoEsperado);
 
-    ProductResponseDTO resultado = productService.salvar(mockRequestDTO);
+    ProductResponseDTO resultado = productService.save(mockRequestDTO);
 
     assertNotNull(resultado);
     assertEquals(dtoEsperado.id(), resultado.id());
@@ -178,32 +178,32 @@ class ProductServiceTest {
     assertNotNull(resultado.category());
     assertEquals(dtoEsperado.category().getName(), resultado.category().getName());
 
-    verify(categoryServiceMock).buscarEntidadePorId(categoryId);
-    verify(providerServiceMock).buscarEntidadePorId(providerId);
+    verify(categoryServiceMock).searchEntityById(categoryId);
+    verify(providerServiceMock).searchEntityById(providerId);
     verify(productMapperMock).toEntity(mockRequestDTO, mockCategory, mockProvider);
     verify(productRepositoryMock).save(productParaSalvar);
     verify(productMapperMock).toResponseDTO(productSalvoComId);
   }
 
-  // ... (Testes para salvar com category/provider não encontrado permanecem os
+  // ... (Testes para save com category/provider não encontrado permanecem os
   // mesmos) ...
   @Test
-  @DisplayName("salvar: Deve lançar RecursoNaoEncontrado se Category não existe")
-  void salvar_quandoCategoryNaoExiste_deveLancarRecursoNaoEncontrado() {
-    when(categoryServiceMock.buscarEntidadePorId(categoryId))
+  @DisplayName("save: Deve lançar RecursoNaoEncontrado se Category não existe")
+  void save_quandoCategoryNaoExiste_deveLancarRecursoNaoEncontrado() {
+    when(categoryServiceMock.searchEntityById(categoryId))
         .thenThrow(new RecursoNaoEncontrado("Category não encontrada"));
-    assertThrows(RecursoNaoEncontrado.class, () -> productService.salvar(mockRequestDTO));
-    verify(providerServiceMock, never()).buscarEntidadePorId(anyLong());
+    assertThrows(RecursoNaoEncontrado.class, () -> productService.save(mockRequestDTO));
+    verify(providerServiceMock, never()).searchEntityById(anyLong());
   }
 
   @Test
   @DisplayName("atualizar: Deve atualizar e retornar DTO quando dados válidos e ID existe")
   void atualizar_quandoDadosValidos_deveRetornarProductResponseDTOAtualizado() {
     when(productRepositoryMock.findById(existingId)).thenReturn(Optional.of(mockProduct)); // Product a ser atualizado
-    when(categoryServiceMock.buscarEntidadePorId(mockRequestDTO.categoryId())).thenReturn(mockCategory); // Nova/mesma
-                                                                                                         // category
-    when(providerServiceMock.buscarEntidadePorId(mockRequestDTO.providerId())).thenReturn(mockProvider); // Novo/mesmo
-                                                                                                         // provider
+    when(categoryServiceMock.searchEntityById(mockRequestDTO.categoryId())).thenReturn(mockCategory); // Nova/mesma
+                                                                                                      // category
+    when(providerServiceMock.searchEntityById(mockRequestDTO.providerId())).thenReturn(mockProvider); // Novo/mesmo
+                                                                                                      // provider
 
     // O mockProduct será modificado por updateEntityFromDTO
     doNothing().when(productMapperMock).updateEntityFromDTO(eq(mockRequestDTO), eq(mockProduct), eq(mockCategory),
@@ -212,16 +212,16 @@ class ProductServiceTest {
 
     // O DTO esperado deve refletir o estado de mockProduct APÓS a simulação da
     // atualização
-    // (se os valores do mockRequestDTO fossem diferentes do mockProduct inicial)
-    // Para este teste, vamos assumir que mockRequestDTO tem os valores atualizados
+    // (se os valuees do mockRequestDTO fossem diferentes do mockProduct inicial)
+    // Para este teste, vamos assumir que mockRequestDTO tem os valuees atualizados
     Product productAposUpdateSimulado = Product.builder()
-        .id(existingId).name(mockRequestDTO.name()).description(mockRequestDTO.description()) // Usar valores do DTO
+        .id(existingId).name(mockRequestDTO.name()).description(mockRequestDTO.description()) // Usar valuees do DTO
         // ... outros campos do DTO ...
         .category(mockCategory).provider(mockProvider)
         .createdAt(mockProduct.getCreatedAt()) // Mantém criadoEm original
         .updatedAt(ZonedDateTime.now()) // Simula atualização
         .active(mockRequestDTO.active())
-        .salePrice(mockRequestDTO.precoVenda())
+        .salePrice(mockRequestDTO.salePrice())
         .stockQuantity(mockRequestDTO.stockQuantity())
         .unitOfSale(mockRequestDTO.UnitOfSale())
         .barcode(mockRequestDTO.barcode())
@@ -239,8 +239,8 @@ class ProductServiceTest {
     assertEquals(mockProvider.getName(), resultado.provider().getName());
 
     verify(productRepositoryMock).findById(existingId);
-    verify(categoryServiceMock).buscarEntidadePorId(mockRequestDTO.categoryId());
-    verify(providerServiceMock).buscarEntidadePorId(mockRequestDTO.providerId());
+    verify(categoryServiceMock).searchEntityById(mockRequestDTO.categoryId());
+    verify(providerServiceMock).searchEntityById(mockRequestDTO.providerId());
     verify(productMapperMock).updateEntityFromDTO(mockRequestDTO, mockProduct, mockCategory, mockProvider);
     verify(productRepositoryMock).save(mockProduct);
     verify(productMapperMock).toResponseDTO(mockProduct);
@@ -267,7 +267,7 @@ class ProductServiceTest {
 
     productService.deleteLogicamente(existingId); // Chama de novo
 
-    // O captor já tem o valor da última chamada, precisamos verificar o novo save
+    // O captor já tem o value da última chamada, precisamos verificar o novo save
     // Para isso, podemos usar times(2) na verificação do save ou resetar o mock
     // (menos comum)
     // Ou usar um novo captor, mas vamos simplificar verificando o estado final do

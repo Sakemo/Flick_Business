@@ -32,7 +32,7 @@ public class CategoryController {
   @PostMapping
   public ResponseEntity<CategoryDTO> criarCategory(@Valid @RequestBody CategoryDTO dto,
       UriComponentsBuilder uriBuilder) {
-    CategoryDTO categorySalva = categoryService.salvar(dto);
+    CategoryDTO categorySalva = categoryService.save(dto);
     URI uri = uriBuilder.path("/{id}").buildAndExpand(categorySalva.id()).toUri();
     return ResponseEntity.created(uri).body(categorySalva);
   }

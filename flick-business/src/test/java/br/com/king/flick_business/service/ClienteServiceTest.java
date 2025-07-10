@@ -59,9 +59,9 @@ class ClienteServiceTest {
         .telefone("11999998888").endereco("Rua Teste, 123")
         .controleFiado(true).limiteFiado(new BigDecimal("100.00"))
         .saldoDevedor(BigDecimal.ZERO).active(true)
-        .dataCadastro(ZonedDateTime.now().minusDays(10))
+        .createdAt(ZonedDateTime.now().minusDays(10))
         .dataUltimaCompraFiado(ZonedDateTime.now().minusDays(5))
-        .dataAtualizacao(ZonedDateTime.now().minusDays(1))
+        .updatedAt(ZonedDateTime.now().minusDays(1))
         .build();
 
     clienteRequestDTO = new ClienteRequestDTO("Novo Cliente", "55566677788", "22888887777", "Avenida Nova, 456", false,
@@ -71,22 +71,22 @@ class ClienteServiceTest {
   }
 
   @Test
-  @DisplayName("salvar: Deve salvar cliente com sucesso quando CPF não existe")
-  void salvar_quandoCpfNaoExiste_deveRetornarDtoSalvo() {
+  @DisplayName("save: Deve save cliente com sucesso quando CPF não existe")
+  void save_quandoCpfNaoExiste_deveRetornarDtoSalvo() {
     when(clienteRepositoryMock.findByCpf(clienteRequestDTO.cpf())).thenReturn(Optional.empty());
     Cliente clienteSalvoMock = Cliente.builder().id(2L).name(clienteRequestDTO.name()).cpf(clienteRequestDTO.cpf())
         .active(true).saldoDevedor(BigDecimal.ZERO).controleFiado(false).build();
     when(clienteRepositoryMock.save(any(Cliente.class))).thenReturn(clienteSalvoMock);
-    ClienteResponseDTO resultado = clienteService.salvar(clienteRequestDTO);
+    ClienteResponseDTO resultado = clienteService.save(clienteRequestDTO);
     assertNotNull(resultado);
     assertEquals(2L, resultado.id());
   }
 
   @Test
-  @DisplayName("salvar: Deve lançar exceção ao salvar se CPF já existe")
-  void salvar_quandoCpfJaExiste_deveLancarRecursoJaCadastrado() {
+  @DisplayName("save: Deve lançar exceção ao save se CPF já existe")
+  void save_quandoCpfJaExiste_deveLancarRecursoJaCadastrado() {
     when(clienteRepositoryMock.findByCpf(clienteRequestDTO.cpf())).thenReturn(Optional.of(clienteExistente));
-    assertThrows(RecursoJaCadastrado.class, () -> clienteService.salvar(clienteRequestDTO));
+    assertThrows(RecursoJaCadastrado.class, () -> clienteService.save(clienteRequestDTO));
   }
 
   @Test
@@ -101,10 +101,10 @@ class ClienteServiceTest {
   }
 
   @Test
-  @DisplayName("buscarPorId: Deve retornar cliente quando ID existe")
-  void buscarPorId_quandoIdExiste_deveRetornarClienteResponseDTO() {
+  @DisplayName("searchById: Deve retornar cliente quando ID existe")
+  void searchById_quandoIdExiste_deveRetornarClienteResponseDTO() {
     when(clienteRepositoryMock.findById(idExistente)).thenReturn(Optional.of(clienteExistente));
-    ClienteResponseDTO resultado = clienteService.buscarPorId(idExistente);
+    ClienteResponseDTO resultado = clienteService.searchById(idExistente);
     assertNotNull(resultado);
     assertEquals(idExistente, resultado.id());
   }
@@ -139,8 +139,8 @@ class ClienteServiceTest {
 
     verify(clienteRepositoryMock).findClienteComFilters(eq(""), eq(apenasActives), isNull(), sortCaptor.capture());
     Sort capturedSort = sortCaptor.getValue();
-    assertNotNull(capturedSort.getOrderFor("dataCadastro"), "Default sort deve ser por dataCadastro");
-    assertEquals(Sort.Direction.DESC, capturedSort.getOrderFor("dataCadastro").getDirection());
+    assertNotNull(capturedSort.getOrderFor("createdAt"), "Default sort deve ser por createdAt");
+    assertEquals(Sort.Direction.DESC, capturedSort.getOrderFor("createdAt").getDirection());
   }
 
   @Test
@@ -185,8 +185,8 @@ class ClienteServiceTest {
         eq(true), // devedores
         sortCaptor.capture());
     Sort capturedSort = sortCaptor.getValue(); // Verifica o sort default
-    assertNotNull(capturedSort.getOrderFor("dataCadastro"));
-    assertEquals(Sort.Direction.DESC, capturedSort.getOrderFor("dataCadastro").getDirection());
+    assertNotNull(capturedSort.getOrderFor("createdAt"));
+    assertEquals(Sort.Direction.DESC, capturedSort.getOrderFor("createdAt").getDirection());
   }
 
   @Test

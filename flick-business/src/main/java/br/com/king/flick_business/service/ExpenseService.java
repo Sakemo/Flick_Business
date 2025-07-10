@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.king.flick_business.dto.request.ExpenseRequestDTO;
 import br.com.king.flick_business.dto.response.ExpenseResponseDTO;
 import br.com.king.flick_business.entity.Expense;
-import br.com.king.flick_business.enums.ExpenseType;
+import br.com.king.flick_business.enums.TipoExpense;
 import br.com.king.flick_business.exception.BusinessException;
 import br.com.king.flick_business.exception.RecursoNaoEncontrado;
 import br.com.king.flick_business.repository.ExpenseRepository;
@@ -37,12 +37,12 @@ public class ExpenseService {
    * @return DTO de resposta com os dados da expense salva
    */
   @Transactional
-  public ExpenseResponseDTO saveExpense(ExpenseRequestDTO dto) {
-    System.out.println("LOG: ExpenseService.saveExpense - Iniciando salvamento de expense");
+  public ExpenseResponseDTO salvarExpense(ExpenseRequestDTO dto) {
+    System.out.println("LOG: ExpenseService.salvarExpense - Iniciando salvamento de expense");
     Expense expense = mapDtoToEntity(dto);
 
     Expense expenseSalva = expenseRepository.save(expense);
-    System.out.println("LOG: ExpenseService.saveExpense - Expense salva com ID: " + expenseSalva.getId());
+    System.out.println("LOG: ExpenseService.salvarExpense - Expense salva com ID: " + expenseSalva.getId());
     return new ExpenseResponseDTO(expenseSalva);
   }
 
@@ -54,14 +54,14 @@ public class ExpenseService {
    * @return DTO de resposta com os dados atualizados
    */
   @Transactional
-  public ExpenseResponseDTO updateExpense(Long id, ExpenseRequestDTO dto) {
-    System.out.println("LOG: ExpenseService.updateExpense - Buscando expense para atualizar, ID: " + id);
+  public ExpenseResponseDTO atualizarExpense(Long id, ExpenseRequestDTO dto) {
+    System.out.println("LOG: ExpenseService.atualizarExpense - Buscando expense para atualizar, ID: " + id);
     Expense expenseExistente = expenseRepository.findById(id)
         .orElseThrow(() -> new RecursoNaoEncontrado("Expense não encontrada com o ID: " + id));
 
     updateEntityFromDto(dto, expenseExistente);
     Expense expenseAtualizada = expenseRepository.save(expenseExistente);
-    System.out.println("LOG: ExpenseService.updateExpense - Expense atualizada com sucesso, ID: " + id);
+    System.out.println("LOG: ExpenseService.atualizarExpense - Expense atualizada com sucesso, ID: " + id);
 
     return new ExpenseResponseDTO(expenseAtualizada);
   }
@@ -71,28 +71,28 @@ public class ExpenseService {
    * 
    * @param start             Data/hora inicial do filtro
    * @param end               Data/hora final do filtro
-   * @param expenseTypeString Tipo da expense (opcional)
+   * @param tipoExpenseString Tipo da expense (opcional)
    * @return Lista de DTOs de resposta das expenses filtradas
    */
   @Transactional(readOnly = true)
-  public List<ExpenseResponseDTO> listExpenses(ZonedDateTime start, ZonedDateTime end, String expenseTypeString,
+  public List<ExpenseResponseDTO> listExpenses(ZonedDateTime start, ZonedDateTime end, String tipoExpenseString,
       String name) {
     System.out.println("LOG: ExpenseService.listExpenses - Iniciando listagem de expenses");
 
-    ExpenseType tipoFilter = null;
-    if (expenseTypeString != null && !expenseTypeString.isEmpty()) {
+    TipoExpense tipoFilter = null;
+    if (tipoExpenseString != null && !tipoExpenseString.isEmpty()) {
       try {
-        tipoFilter = ExpenseType.valueOf(expenseTypeString.toUpperCase());
+        tipoFilter = TipoExpense.valueOf(tipoExpenseString.toUpperCase());
       } catch (IllegalArgumentException e) {
         System.err.println(
-            "LOG: ExpenseService.listExpenses - Tipo de expense inválido recebido no filtro: " + expenseTypeString);
-        throw new BusinessException("Tipo de expense inválido: " + expenseTypeString);
+            "LOG: ExpenseService.listExpenses - Tipo de expense inválido recebido no filtro: " + tipoExpenseString);
+        throw new BusinessException("Tipo de expense inválido: " + tipoExpenseString);
       }
     }
 
     Specification<Expense> spec = ExpenseSpecification.withFilter(name, start, end, tipoFilter);
 
-    Sort sort = Sort.by(Sort.Direction.DESC, "dateExpense");
+    Sort sort = Sort.by(Sort.Direction.DESC, "dataExpense");
 
     List<Expense> expenses = expenseRepository.findAll(spec, sort);
 
@@ -117,7 +117,7 @@ public class ExpenseService {
     LocalDateTime endQuery = (end != null) ? end : currentMonthEnd;
 
     java.time.ZoneId zoneId = java.time.ZoneId.systemDefault();
-    BigDecimal value = expenseRepository.sumValueByDataExpenseBetween(
+    BigDecimal value = expenseRepository.sumValorByDataExpenseBetween(
         beginQuery.atZone(zoneId),
         endQuery.atZone(zoneId));
 
@@ -167,9 +167,9 @@ public class ExpenseService {
     System.out.println("LOG: ExpenseService.mapDtoToEntity - Convertendo DTO para entidade");
     return Expense.builder()
         .name(dto.name())
-        .value(dto.value())
-        .dateExpense(dto.dateExpense())
-        .expenseType(dto.expenseType())
+        .valor(dto.valor())
+        .dataExpense(dto.dataExpense())
+        .tipoExpense(dto.tipoExpense())
         .build();
   }
 
@@ -182,8 +182,8 @@ public class ExpenseService {
   private void updateEntityFromDto(ExpenseRequestDTO dto, Expense entity) {
     System.out.println("LOG: ExpenseService.updateEntityFromDto - Atualizando entidade com dados do DTO");
     entity.setName(dto.name());
-    entity.setValue(dto.value());
-    entity.setDateExpense(dto.dateExpense());
-    entity.setExpenseType(dto.expenseType());
+    entity.setValor(dto.valor());
+    entity.setDataExpense(dto.dataExpense());
+    entity.setTipoExpense(dto.tipoExpense());
   }
 }

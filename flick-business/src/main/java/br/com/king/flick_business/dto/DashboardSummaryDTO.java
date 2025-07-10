@@ -7,12 +7,12 @@ import java.util.Map;
 import br.com.king.flick_business.enums.FormaPagamento;
 
 public record DashboardSummaryDTO(
-        BigDecimal totalVendasBruto,
-        Map<FormaPagamento, BigDecimal> totalVendasPorFormaPagamento,
-        BigDecimal totalExpenses, // Soma de expense.value
-        BigDecimal lucroBrutoEstimado, // Vendas - Despsas
-        BigDecimal ticketMedio,
-        Long quantidadeVendas,
-        ProductMaisVendidoDTO productMaisVendido,
-        List<DataPointDTO> graficoVendasDiarias) {
+                BigDecimal totalVendasBruto,
+                Map<FormaPagamento, BigDecimal> totalVendasPorFormaPagamento,
+                BigDecimal totalExpenses, // Soma de expense.valor
+                BigDecimal lucroBrutoEstimado, // Vendas - Despsas
+                BigDecimal ticketMedio,
+                Long quantidadeVendas,
+                ProductMaisVendidoDTO productMaisVendido,
+                List<DataPointDTO> graficoVendasDiarias) {
 }

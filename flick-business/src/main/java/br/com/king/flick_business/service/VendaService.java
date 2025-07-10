@@ -103,10 +103,10 @@ public class VendaService {
       System.out.println("LOG: VendaService.registrarVenda - Cliente validado para venda FIADO: " + cliente.getName());
     }
 
-    BigDecimal valueTotalCalculado = BigDecimal.ZERO;
+    BigDecimal valorTotalCalculado = BigDecimal.ZERO;
     List<Product> productsParaAtualizarEstoque = new ArrayList<>();
 
-    // Processa cada item da venda, valida estoque e calcula value total
+    // Processa cada item da venda, valida estoque e calcula valor total
     for (ItemVendaRequestDTO itemDTO : requestDTO.itens()) {
       System.out.println("LOG: VendaService.registrarVenda - Processando item da venda: " + itemDTO);
       Product product = productRepository.findById(itemDTO.idProduct())
@@ -137,10 +137,10 @@ public class VendaService {
 
       novaVenda.adicionarItem(itemVenda);
 
-      valueTotalCalculado = valueTotalCalculado.add(itemVenda.getValueTotalItem());
+      valorTotalCalculado = valorTotalCalculado.add(itemVenda.getValorTotalItem());
       System.out.println("LOG: VendaService.registrarVenda - Item adicionado. Product: " + product.getName()
           + ", Quantidade: " + quantidade
-          + ", Preço: " + precoUnitarioAtual + ", Value total acumulado: " + valueTotalCalculado);
+          + ", Preço: " + precoUnitarioAtual + ", Valor total acumulado: " + valorTotalCalculado);
 
       // Atualiza estoque do product
       BigDecimal estoqueAtual = product.getStockQuantity();
@@ -163,8 +163,8 @@ public class VendaService {
       }
     }
 
-    novaVenda.setValueTotal(valueTotalCalculado);
-    System.out.println("LOG: VendaService.registrarVenda - Value total da venda calculado: " + valueTotalCalculado);
+    novaVenda.setValorTotal(valorTotalCalculado);
+    System.out.println("LOG: VendaService.registrarVenda - Valor total da venda calculado: " + valorTotalCalculado);
 
     Venda vendaSalva = vendaRepository.save(novaVenda);
     System.out.println("LOG: VendaService.registrarVenda - Venda salva com ID: " + vendaSalva.getId());
@@ -180,7 +180,7 @@ public class VendaService {
       System.out
           .println("LOG: VendaService.registrarVenda - Iniciando atualização de saldo devedor para cliente FIADO: "
               + cliente.getName());
-      BigDecimal novoSaldoDevedor = cliente.getSaldoDevedor().add(vendaSalva.getValueTotal());
+      BigDecimal novoSaldoDevedor = cliente.getSaldoDevedor().add(vendaSalva.getValorTotal());
 
       // Busca configurações globais para cálculo de prazo e juros
       Optional<ConfiguracaoGeral> configOpt = configuracaoService.buscarEntidadeConfiguracao();
@@ -190,8 +190,8 @@ public class VendaService {
       System.out.println("LOG: VendaService.registrarVenda - Configurações globais - Prazo: " + prazoGlobal
           + ", Taxa de Juros: " + taxaGlobal);
       System.out.println(
-          "LOG: VendaService.registrarVenda - Saldo devedor atual: " + cliente.getSaldoDevedor() + ", Value da venda: "
-              + vendaSalva.getValueTotal() + ", Novo saldo: " + novoSaldoDevedor);
+          "LOG: VendaService.registrarVenda - Saldo devedor atual: " + cliente.getSaldoDevedor() + ", Valor da venda: "
+              + vendaSalva.getValorTotal() + ", Novo saldo: " + novoSaldoDevedor);
 
       if (cliente.getLimiteFiado() != null && novoSaldoDevedor.compareTo(cliente.getLimiteFiado()) > 0) {
         System.out.println(
@@ -279,7 +279,7 @@ public class VendaService {
     ZonedDateTime inicioQuery = (inicio != null) ? inicio : ZonedDateTime.parse("1900-01-01T00:00:00Z");
     ZonedDateTime fimQuery = (fim != null) ? fim : ZonedDateTime.parse("9999-12-31T23:59:59Z");
 
-    return vendaRepository.sumValueTotalComFilters(
+    return vendaRepository.sumValorTotalComFilters(
         inicioQuery, fimQuery, clienteId, formaPagamentoFilter, productId);
   }
 
@@ -289,7 +289,7 @@ public class VendaService {
     ZonedDateTime inicioQuery = (inicio != null) ? inicio : ZonedDateTime.parse("1900-01-01T00:00:00Z");
     ZonedDateTime fimQuery = (fim != null) ? fim : ZonedDateTime.parse("9999-12-31T23:59:59Z");
 
-    List<Object[]> results = vendaRepository.sumValueTotalGroupByFormaPagamentoBetween(inicioQuery, fimQuery);
+    List<Object[]> results = vendaRepository.sumValorTotalGroupByFormaPagamentoBetween(inicioQuery, fimQuery);
 
     return results.stream()
         .map(res -> new TotalPorFormaPagamentoDTO((FormaPagamento) res[0], (BigDecimal) res[1]))
@@ -365,12 +365,12 @@ public class VendaService {
           .println("DELETE_LOG_FIADO: VendaService.deleteVendaFisicamente. Estornando crédito de fiado ao cliente"
               + clienteDaVenda.getName() + "...");
       BigDecimal saldoAtual = clienteDaVenda.getSaldoDevedor();
-      BigDecimal valueVenda = vendaParaDelete.getValueTotal();
+      BigDecimal valorVenda = vendaParaDelete.getValorTotal();
 
       if (clienteDaVenda != null) {
-        clienteDaVenda.setSaldoDevedor(saldoAtual.subtract(valueVenda));
+        clienteDaVenda.setSaldoDevedor(saldoAtual.subtract(valorVenda));
 
-        System.out.println("DELETE_LOG_FIADO: SUCESSO ao estornar R$" + valueVenda + " para o cliente "
+        System.out.println("DELETE_LOG_FIADO: SUCESSO ao estornar R$" + valorVenda + " para o cliente "
             + clienteDaVenda.getName() + " totalizando no SALDO ATUAL: R$" + clienteDaVenda.getSaldoDevedor());
 
         if (clienteDaVenda.getSaldoDevedor().compareTo(BigDecimal.ZERO) <= 0

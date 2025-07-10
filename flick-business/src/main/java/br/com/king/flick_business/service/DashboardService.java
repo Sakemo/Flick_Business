@@ -37,13 +37,13 @@ public class DashboardService {
 
   @Transactional(readOnly = true)
   public DashboardSummaryDTO getDashboardSummary(ZonedDateTime inicio, ZonedDateTime fim) {
-    BigDecimal totalVendasBruto = vendaRepository.sumValueTotalByDataVendaBetween(inicio, fim);
+    BigDecimal totalVendasBruto = vendaRepository.sumValorTotalByDataVendaBetween(inicio, fim);
     Long quantidadeVendas = vendaRepository.countVendasByDataVendaBetween(inicio, fim);
-    List<Object[]> vendasPorFormaPgtoRaw = vendaRepository.sumValueTotalGroupByFormaPagamentoBetween(inicio, fim);
-    BigDecimal totalExpenses = expenseRepository.sumValueByDataExpenseBetween(inicio, fim);
+    List<Object[]> vendasPorFormaPgtoRaw = vendaRepository.sumValorTotalGroupByFormaPagamentoBetween(inicio, fim);
+    BigDecimal totalExpenses = expenseRepository.sumValorByDataExpenseBetween(inicio, fim);
     ProductMaisVendidoDTO productMaisVendido = itemVendaRepository.findProductMaisVendidoBetween(inicio.toLocalDate(),
         fim.toLocalDate());
-    List<Object[]> vendasDiariasRaw = vendaRepository.sumValueTotalGroupByDayBetweenNative(inicio, fim);
+    List<Object[]> vendasDiariasRaw = vendaRepository.sumValorTotalGroupByDayBetweenNative(inicio, fim);
 
     // Processar dados e calcular métricas
     BigDecimal lucroBrutoEstimado = totalVendasBruto.subtract(totalExpenses);
@@ -77,9 +77,9 @@ public class DashboardService {
         }
       }
 
-      BigDecimal value = (BigDecimal) row[1];
-      if (value != null) {
-        graficoVendasDiarias.add(new DataPointDTO(dia, value));
+      BigDecimal valor = (BigDecimal) row[1];
+      if (valor != null) {
+        graficoVendasDiarias.add(new DataPointDTO(dia, valor));
       }
     }
 

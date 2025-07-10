@@ -13,7 +13,7 @@ import br.com.king.flick_business.enums.FormaPagamento;
 public record VendaResponseDTO(
     Long id,
     ZonedDateTime dataVenda,
-    BigDecimal valueTotal,
+    BigDecimal valorTotal,
     ClienteResponseDTO cliente,
     List<ItemVendaResponseDTO> itens,
     FormaPagamento formaPagamento,
@@ -22,7 +22,7 @@ public record VendaResponseDTO(
     this(
         venda.getId(),
         venda.getDataVenda(),
-        venda.getValueTotal(),
+        venda.getValorTotal(),
         venda.getCliente() != null ? new ClienteResponseDTO(venda.getCliente()) : null,
         venda.getItens().stream()
             .map(ItemVendaResponseDTO::new)

@@ -10,7 +10,7 @@ public record ItemVendaResponseDTO(
     ProductResponseDTO product,
     BigDecimal quantidade,
     BigDecimal precoUnitarioVenda,
-    BigDecimal valueTotalItem) {
+    BigDecimal valorTotalItem) {
 
   public ItemVendaResponseDTO(ItemVenda item) {
     this(
@@ -18,6 +18,6 @@ public record ItemVendaResponseDTO(
         item.getProduct() != null ? new ProductResponseDTO(item.getProduct()) : null,
         item.getQuantidade(),
         item.getPrecoUnitarioVenda(),
-        item.getValueTotalItem());
+        item.getValorTotalItem());
   }
 }

@@ -37,7 +37,7 @@ public class ExpenseController {
   public ResponseEntity<ExpenseResponseDTO> criarExpense(
       @Valid @RequestBody ExpenseRequestDTO dto,
       UriComponentsBuilder uriBuilder) {
-    ExpenseResponseDTO expenseSalva = expenseService.saveExpense(dto);
+    ExpenseResponseDTO expenseSalva = expenseService.salvarExpense(dto);
 
     URI uri = uriBuilder.path("/api/expenses/{id}").buildAndExpand(expenseSalva.id()).toUri();
 
@@ -49,13 +49,13 @@ public class ExpenseController {
   public ResponseEntity<List<ExpenseResponseDTO>> listExpenses(
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime start,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime end,
-      @RequestParam(name = "expenseType", required = false) String expenseType,
+      @RequestParam(name = "tipoExpense", required = false) String tipoExpense,
       @RequestParam(required = false) String name) {
 
     List<ExpenseResponseDTO> expenses = expenseService.listExpenses(
         start != null ? start : null,
         end != null ? end : null,
-        expenseType, name);
+        tipoExpense, name);
 
     return ResponseEntity.ok(expenses);
   }
@@ -80,10 +80,10 @@ public class ExpenseController {
 
   // Atualizar Expense
   @PutMapping("/{id}")
-  public ResponseEntity<ExpenseResponseDTO> updateExpense(
+  public ResponseEntity<ExpenseResponseDTO> atualizarExpense(
       @PathVariable Long id,
       @Valid @RequestBody ExpenseRequestDTO dto) {
-    ExpenseResponseDTO expenseAtualizada = expenseService.updateExpense(id, dto);
+    ExpenseResponseDTO expenseAtualizada = expenseService.atualizarExpense(id, dto);
     return ResponseEntity.ok(expenseAtualizada);
   }
 

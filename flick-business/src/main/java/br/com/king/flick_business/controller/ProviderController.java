@@ -30,7 +30,7 @@ public class ProviderController {
   @PostMapping
   public ResponseEntity<ProviderDTO> criarProvider(@Valid @RequestBody ProviderDTO dto,
       UriComponentsBuilder uriBuilder) {
-    ProviderDTO providerSalvo = providerService.save(dto);
+    ProviderDTO providerSalvo = providerService.salvar(dto);
     URI uri = uriBuilder.path("api/providers/{id}").buildAndExpand(providerSalvo.id()).toUri();
     return ResponseEntity.created(uri).body(providerSalvo);
   }

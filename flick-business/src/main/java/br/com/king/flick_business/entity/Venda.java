@@ -39,9 +39,9 @@ public class Venda {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   // -- CALCULADO -- //
-  @NotNull(message = "O value total é obrigatório")
-  @Column(name = "value_total", nullable = false, precision = 10, scale = 2)
-  private BigDecimal valueTotal;
+  @NotNull(message = "O valor total é obrigatório")
+  @Column(name = "valor_total", nullable = false, precision = 10, scale = 2)
+  private BigDecimal valorTotal;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "id_cliente", nullable = true)

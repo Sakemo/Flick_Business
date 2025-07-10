@@ -19,7 +19,7 @@ public class CategoryService {
   }
 
   @Transactional
-  public CategoryDTO save(CategoryDTO dto) {
+  public CategoryDTO salvar(CategoryDTO dto) {
     Category category = CategoryMapper.toEntity(dto);
     Category categorySalva = categoryRepository.save(category);
     return CategoryMapper.toDto(categorySalva);
@@ -33,13 +33,13 @@ public class CategoryService {
 
   @Transactional(readOnly = true)
   public CategoryDTO buscarDtoPorId(Long id) {
-    Category category = searchEntityById(id);
+    Category category = buscarEntidadePorId(id);
     return CategoryMapper.toDto(category);
   }
 
   @Transactional
   public CategoryDTO atualizar(Long id, CategoryDTO dto) {
-    Category categoryExistente = searchEntityById(id);
+    Category categoryExistente = buscarEntidadePorId(id);
     categoryExistente.setName(dto.name());
     Category categoryAtualizada = categoryRepository.save(categoryExistente);
     return CategoryMapper.toDto(categoryAtualizada);
@@ -47,11 +47,11 @@ public class CategoryService {
 
   @Transactional
   public void delete(Long id) {
-    Category category = searchEntityById(id);
+    Category category = buscarEntidadePorId(id);
     categoryRepository.delete(category);
   }
 
-  public Category searchEntityById(Long id) {
+  public Category buscarEntidadePorId(Long id) {
     return categoryRepository.findById(id)
         .orElseThrow(() -> new RecursoNaoEncontrado("Category não encontrada com ID: " + id));
   }

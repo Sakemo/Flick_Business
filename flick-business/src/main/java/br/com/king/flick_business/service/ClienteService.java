@@ -25,7 +25,7 @@ public class ClienteService {
   }
 
   @Transactional
-  public ClienteResponseDTO save(ClienteRequestDTO requestDTO) {
+  public ClienteResponseDTO salvar(ClienteRequestDTO requestDTO) {
     validarCpf(requestDTO.cpf(), null);
 
     Cliente cliente = ClienteMapper.toEntity(requestDTO);
@@ -62,12 +62,12 @@ public class ClienteService {
         case "nameDesc" -> Sort.by(Sort.Direction.DESC, "name");
         case "saldoDesc" -> Sort.by(Sort.Direction.DESC, "saldoDevedor");
         case "saldoAsc" -> Sort.by(Sort.Direction.ASC, "saldoDevedor");
-        case "cadastroRecente" -> Sort.by(Sort.Direction.DESC, "createdAt");
-        case "cadastroAntigo" -> Sort.by(Sort.Direction.ASC, "createdAt");
-        default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        case "cadastroRecente" -> Sort.by(Sort.Direction.DESC, "dataCadastro");
+        case "cadastroAntigo" -> Sort.by(Sort.Direction.ASC, "dataCadastro");
+        default -> Sort.by(Sort.Direction.DESC, "dataCadastro");
       };
     } else {
-      sort = Sort.by(Sort.Direction.DESC, "createdAt");
+      sort = Sort.by(Sort.Direction.DESC, "dataCadastro");
     }
 
     // Boolean filtrarPorActive = apenasActivesParam;
@@ -82,7 +82,7 @@ public class ClienteService {
   }
 
   @Transactional(readOnly = true)
-  public ClienteResponseDTO searchById(Long id) {
+  public ClienteResponseDTO buscarPorId(Long id) {
     Cliente cliente = clienteRepository.findById(id)
         .orElseThrow(() -> new RecursoNaoEncontrado("Cliente não encontrado com o ID: " + id));
     return ClienteMapper.toDto(cliente);

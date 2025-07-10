@@ -37,22 +37,22 @@ public class ProductService {
   }
 
   @Transactional
-  public ProductResponseDTO save(ProductRequestDTO requestDTO) {
-    System.out.println("LOG: ProductService.save - categoryId recebido: " + requestDTO.categoryId());
-    Category category = categoryService.searchEntityById(requestDTO.categoryId());
+  public ProductResponseDTO salvar(ProductRequestDTO requestDTO) {
+    System.out.println("LOG: ProductService.salvar - categoryId recebido: " + requestDTO.categoryId());
+    Category category = categoryService.buscarEntidadePorId(requestDTO.categoryId());
     System.out
         .println(
-            "LOG: ProductService.save - Category buscada: " + (category != null ? category.getName() : "NULA"));
+            "LOG: ProductService.salvar - Category buscada: " + (category != null ? category.getName() : "NULA"));
     Provider provider = null;
     if (requestDTO.providerId() != null) {
-      provider = providerService.searchEntityById(requestDTO.providerId());
+      provider = providerService.buscarEntidadePorId(requestDTO.providerId());
     }
     Product product = productMapper.toEntity(requestDTO, category, provider);
-    System.out.println("LOG: ProductService.save - Product mapeado par save, category do product: "
+    System.out.println("LOG: ProductService.salvar - Product mapeado par salvar, category do product: "
         + (product.getCategory() != null ? product.getCategory().getName() : "NULA"));
     Product productSalvo = productRepository.save(product);
     System.out.println(
-        "LOG: ProductService.save - Product salvo, category do productSalvo: "
+        "LOG: ProductService.salvar - Product salvo, category do productSalvo: "
             + (productSalvo.getCategory() != null ? productSalvo.getCategory().getName() : "NULA"));
     return productMapper.toResponseDTO(productSalvo);
   }
@@ -62,12 +62,12 @@ public class ProductService {
     Product productExistente = productRepository.findById(id)
         .orElseThrow(() -> new RecursoNaoEncontrado("Product não encontrado com ID: " + id));
     System.out.println("LOG: ProductService.atualizar - categoryId recebido: " + (requestDTO.categoryId()));
-    Category novaCategory = categoryService.searchEntityById(requestDTO.categoryId());
+    Category novaCategory = categoryService.buscarEntidadePorId(requestDTO.categoryId());
     System.out.println("LOG: ProductService.atualizar - category buscada: "
         + (novaCategory != null ? novaCategory.getName() : "NULA"));
     Provider novoProvider;
     if (requestDTO.providerId() != null) {
-      novoProvider = providerService.searchEntityById(requestDTO.providerId());
+      novoProvider = providerService.buscarEntidadePorId(requestDTO.providerId());
     } else if (productExistente.getProvider() != null) {
       novoProvider = productExistente.getProvider();
     } else {
@@ -102,8 +102,8 @@ public class ProductService {
     return switch (orderBy) {
       case "nameDesc" -> Sort.by(Sort.Direction.DESC, "name");
       case "nameAsc" -> Sort.by(Sort.Direction.ASC, "name");
-      case "maisBarato" -> Sort.by(Sort.Direction.ASC, "salePrice");
-      case "maisCaro" -> Sort.by(Sort.Direction.DESC, "salePrice");
+      case "maisBarato" -> Sort.by(Sort.Direction.ASC, "precoVenda");
+      case "maisCaro" -> Sort.by(Sort.Direction.DESC, "precoVenda");
       case "maisAntigo" -> Sort.by(Sort.Direction.ASC, "criadoEm");
       case "maisRecente" -> Sort.by(Sort.Direction.DESC, "criadoEm");
       default -> Sort.by(Sort.Direction.ASC, "name");
@@ -167,7 +167,7 @@ public class ProductService {
   }
 
   @Transactional(readOnly = true)
-  public ProductResponseDTO searchById(Long id) {
+  public ProductResponseDTO buscarPorId(Long id) {
     Product product = productRepository.findById(id)
         .orElseThrow(() -> new RecursoNaoEncontrado("Product não encontrado com ID: " + id));
     return productMapper.toResponseDTO(product);

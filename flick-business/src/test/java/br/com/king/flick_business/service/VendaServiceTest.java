@@ -169,8 +169,8 @@ class VendaServiceTest {
         assertEquals(FormaPagamento.DINHEIRO, response.formaPagamento());
         assertNull(response.cliente()); // Cliente é nulo pois não é FIADO
         assertEquals(2, response.itens().size()); // 2 itens na venda
-        // Value Total = (2 * 25.50) + (1 * 10.00) = 51.00 + 10.00 = 61.00
-        assertEquals(0, new BigDecimal("61.00").compareTo(response.valueTotal()));
+        // Valor Total = (2 * 25.50) + (1 * 10.00) = 51.00 + 10.00 = 61.00
+        assertEquals(0, new BigDecimal("61.00").compareTo(response.valorTotal()));
         assertEquals(productComEstoque.getId(), response.itens().get(0).product().id());
         assertEquals(0, new BigDecimal("2.000").compareTo(response.itens().get(0).quantidade()));
         assertEquals(0, productComEstoque.getSalePrice().compareTo(response.itens().get(0).precoUnitarioVenda()));
@@ -180,7 +180,7 @@ class VendaServiceTest {
         verify(vendaRepositoryMock).save(vendaCaptor.capture());
         Venda vendaSalva = vendaCaptor.getValue();
         assertEquals(FormaPagamento.DINHEIRO, vendaSalva.getFormaPagamento());
-        assertEquals(0, new BigDecimal("61.00").compareTo(vendaSalva.getValueTotal()));
+        assertEquals(0, new BigDecimal("61.00").compareTo(vendaSalva.getValorTotal()));
         assertNull(vendaSalva.getCliente());
 
         // Verifica atualização de estoque
@@ -225,13 +225,13 @@ class VendaServiceTest {
         assertNotNull(response.cliente());
         assertEquals(clienteActiveFiadoPermitido.getId(), response.cliente().id());
         assertEquals(1, response.itens().size());
-        // Value Total = 2 * 25.50 = 51.00
-        assertEquals(0, new BigDecimal("51.00").compareTo(response.valueTotal()));
+        // Valor Total = 2 * 25.50 = 51.00
+        assertEquals(0, new BigDecimal("51.00").compareTo(response.valorTotal()));
 
         // Verifica save da Venda
         verify(vendaRepositoryMock).save(vendaCaptor.capture());
         assertEquals(clienteActiveFiadoPermitido, vendaCaptor.getValue().getCliente());
-        assertEquals(0, new BigDecimal("51.00").compareTo(vendaCaptor.getValue().getValueTotal()));
+        assertEquals(0, new BigDecimal("51.00").compareTo(vendaCaptor.getValue().getValorTotal()));
 
         // Verifica atualização de estoque
         verify(productRepositoryMock).saveAll(productsListCaptor.capture());
@@ -379,9 +379,9 @@ class VendaServiceTest {
             v.setDataVenda(ZonedDateTime.now());
             // Associa cliente para a validação posterior
             v.setCliente(clienteActiveFiadoPermitido);
-            // Calcula o value total que será usado na validação
+            // Calcula o valor total que será usado na validação
             // 4 * 25.50 = 102.00
-            v.setValueTotal(new BigDecimal("102.00"));
+            v.setValorTotal(new BigDecimal("102.00"));
             return v;
         });
 
@@ -417,7 +417,7 @@ class VendaServiceTest {
         Venda v1 = Venda.builder()
                 .id(1L)
                 .cliente(clienteActiveFiadoPermitido)
-                .valueTotal(BigDecimal.TEN)
+                .valorTotal(BigDecimal.TEN)
                 .dataVenda(ZonedDateTime.now().minusDays(1))
                 .formaPagamento(FormaPagamento.FIADO)
                 .build();
@@ -425,7 +425,7 @@ class VendaServiceTest {
         Venda v2 = Venda.builder()
                 .id(2L)
                 .cliente(null)
-                .valueTotal(BigDecimal.ONE)
+                .valorTotal(BigDecimal.ONE)
                 .dataVenda(ZonedDateTime.now())
                 .formaPagamento(FormaPagamento.DINHEIRO)
                 .build();
@@ -455,7 +455,7 @@ class VendaServiceTest {
         Venda vendaMock = Venda.builder()
                 .id(1L)
                 .cliente(clienteActiveFiadoPermitido)
-                .valueTotal(BigDecimal.TEN)
+                .valorTotal(BigDecimal.TEN)
                 .formaPagamento(FormaPagamento.FIADO)
                 .dataVenda(ZonedDateTime.now())
                 .build();
@@ -472,7 +472,7 @@ class VendaServiceTest {
         // Assert
         assertNotNull(resultado);
         assertEquals(vendaMock.getId(), resultado.id());
-        assertEquals(vendaMock.getValueTotal(), resultado.valueTotal());
+        assertEquals(vendaMock.getValorTotal(), resultado.valorTotal());
         assertNotNull(resultado.cliente());
         assertFalse(resultado.itens().isEmpty()); // Verifica se os itens foram mapeados
 

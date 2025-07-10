@@ -18,7 +18,7 @@ public class ProviderService {
   }
 
   @Transactional
-  public ProviderDTO save(ProviderDTO dto) {
+  public ProviderDTO salvar(ProviderDTO dto) {
     Provider provider = ProviderMapper.toEntity(dto);
     Provider providerSalvo = providerRepository.save(provider);
     return ProviderMapper.toDto(providerSalvo);
@@ -31,17 +31,17 @@ public class ProviderService {
 
   @Transactional(readOnly = true)
   public ProviderDTO buscarDtoPorId(Long id) {
-    return ProviderMapper.toDto(searchEntityById(id));
+    return ProviderMapper.toDto(buscarEntidadePorId(id));
   }
 
-  public Provider searchEntityById(Long id) {
+  public Provider buscarEntidadePorId(Long id) {
     return providerRepository.findById(id)
         .orElseThrow(() -> new RecursoNaoEncontrado("Provider não encontrado com ID: " + id));
   }
 
   @Transactional
   public ProviderDTO atualizar(Long id, ProviderDTO dto) {
-    Provider providerExistente = searchEntityById(id);
+    Provider providerExistente = buscarEntidadePorId(id);
 
     providerExistente.setName(dto.name());
     providerExistente.setTipoPessoa(dto.tipoPessoa());
@@ -56,7 +56,7 @@ public class ProviderService {
 
   @Transactional
   public void delete(Long id) {
-    Provider provider = searchEntityById(id);
+    Provider provider = buscarEntidadePorId(id);
     providerRepository.delete(provider);
   }
 }

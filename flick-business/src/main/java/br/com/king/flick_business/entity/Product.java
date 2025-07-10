@@ -92,5 +92,4 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "provider_id", nullable = true)
     private Provider provider;
-
 }

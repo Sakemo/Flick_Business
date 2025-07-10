@@ -4,25 +4,25 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 import br.com.king.flick_business.entity.Expense;
-import br.com.king.flick_business.enums.ExpenseType;
+import br.com.king.flick_business.enums.TipoExpense;
 
 public record ExpenseResponseDTO(
     Long id,
     String name,
-    BigDecimal value,
-    ZonedDateTime dateExpense,
-    ExpenseType expenseType,
-    ZonedDateTime createdAt,
-    ZonedDateTime updatedAt) {
+    BigDecimal valor,
+    ZonedDateTime dataExpense,
+    TipoExpense tipoExpense,
+    ZonedDateTime dataCriacao,
+    ZonedDateTime dataAtualizacao) {
 
   public ExpenseResponseDTO(Expense expense) {
     this(
         expense.getId(),
         expense.getName(),
-        expense.getValue(),
-        expense.getDateExpense(),
-        expense.getExpenseType(),
-        expense.getCreatedAt(),
-        expense.getUpdatedAt());
+        expense.getValor(),
+        expense.getDataExpense(),
+        expense.getTipoExpense(),
+        expense.getDataCriacao(),
+        expense.getDataAtualizacao());
   }
 }

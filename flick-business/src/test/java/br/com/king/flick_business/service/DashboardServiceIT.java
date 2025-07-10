@@ -29,7 +29,7 @@ import br.com.king.flick_business.entity.ItemVenda;
 import br.com.king.flick_business.entity.Product;
 import br.com.king.flick_business.entity.Venda;
 import br.com.king.flick_business.enums.FormaPagamento;
-import br.com.king.flick_business.enums.ExpenseType;
+import br.com.king.flick_business.enums.TipoExpense;
 import br.com.king.flick_business.repository.CategoryRepository;
 import br.com.king.flick_business.repository.ClienteRepository;
 import br.com.king.flick_business.repository.ExpenseRepository;
@@ -128,7 +128,7 @@ class DashboardServiceIT {
                                 .precoUnitarioVenda(productB.getSalePrice()).build(); // 50.00
                 venda1.adicionarItem(item1_1);
                 venda1.adicionarItem(item1_2);
-                venda1.setValueTotal(item1_1.getValueTotalItem().add(item1_2.getValueTotalItem())); // 250.00
+                venda1.setValorTotal(item1_1.getValorTotalItem().add(item1_2.getValorTotalItem())); // 250.00
                 vendaRepository.save(venda1);
 
                 // Venda 2: Ontem, FIADO (Cliente 1), Product B (3 unidades)
@@ -138,9 +138,9 @@ class DashboardServiceIT {
                 ItemVenda item2_1 = ItemVenda.builder().product(productB).quantidade(new BigDecimal("3.000"))
                                 .precoUnitarioVenda(productB.getSalePrice()).build(); // 150.00
                 venda2.adicionarItem(item2_1);
-                venda2.setValueTotal(item2_1.getValueTotalItem()); // 150.00
+                venda2.setValorTotal(item2_1.getValorTotalItem()); // 150.00
                 vendaRepository.save(venda2);
-                cliente1.setSaldoDevedor(cliente1.getSaldoDevedor().add(venda2.getValueTotal()));
+                cliente1.setSaldoDevedor(cliente1.getSaldoDevedor().add(venda2.getValorTotal()));
                 cliente1.setDataUltimaCompraFiado(venda2.getDataVenda());
                 clienteRepository.save(cliente1);
 
@@ -151,22 +151,22 @@ class DashboardServiceIT {
                 ItemVenda item3_1 = ItemVenda.builder().product(productC).quantidade(new BigDecimal("5.000"))
                                 .precoUnitarioVenda(productC.getSalePrice()).build(); // 100.00
                 venda3.adicionarItem(item3_1);
-                venda3.setValueTotal(item3_1.getValueTotalItem()); // 100.00
+                venda3.setValorTotal(item3_1.getValorTotalItem()); // 100.00
                 vendaRepository.save(venda3);
 
                 // --- DESPESAS ---
-                expenseRepository.save(Expense.builder().name("Aluguel Loja").value(new BigDecimal("50.00"))
-                                .expenseType(ExpenseType.EMPRESARIAL).dateExpense(hojeMeioDia.minusDays(2)).build());
-                expenseRepository.save(Expense.builder().name("Material Escritório").value(new BigDecimal("20.00"))
-                                .expenseType(ExpenseType.EMPRESARIAL).dateExpense(ontemMeioDia).build());
-                expenseRepository.save(Expense.builder().name("Marketing").value(new BigDecimal("30.00"))
-                                .expenseType(ExpenseType.INVESTIMENTO).dateExpense(inicioMesPassado.plusDays(10))
+                expenseRepository.save(Expense.builder().name("Aluguel Loja").valor(new BigDecimal("50.00"))
+                                .tipoExpense(TipoExpense.EMPRESARIAL).dataExpense(hojeMeioDia.minusDays(2)).build());
+                expenseRepository.save(Expense.builder().name("Material Escritório").valor(new BigDecimal("20.00"))
+                                .tipoExpense(TipoExpense.EMPRESARIAL).dataExpense(ontemMeioDia).build());
+                expenseRepository.save(Expense.builder().name("Marketing").valor(new BigDecimal("30.00"))
+                                .tipoExpense(TipoExpense.INVESTIMENTO).dataExpense(inicioMesPassado.plusDays(10))
                                 .build());
         }
 
         @Test
         @DisplayName("getDashboardSummary: Deve calcular corretamente para período HOJE")
-        void getDashboardSummary_periodoHoje_deveRetornarValueesCorretos() {
+        void getDashboardSummary_periodoHoje_deveRetornarValoresCorretos() {
                 // Período: Apenas HOJE
                 ZonedDateTime inicioHoje = LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault());
                 ZonedDateTime fimHoje = LocalDate.now().atTime(LocalTime.MAX).atZone(java.time.ZoneId.systemDefault());
@@ -194,17 +194,17 @@ class DashboardServiceIT {
                 assertEquals(productA.getId(), summary.productMaisVendido().productId());
                 assertEquals(0, new BigDecimal("2.000")
                                 .compareTo(summary.productMaisVendido().quantidadeTotalVendida()));
-                // Gráfico Vendas Diárias: 1 ponto para hoje com value 250.00
+                // Gráfico Vendas Diárias: 1 ponto para hoje com valor 250.00
                 assertFalse(summary.graficoVendasDiarias().isEmpty());
                 assertEquals(1, summary.graficoVendasDiarias().size());
                 DataPointDTO pontoHoje = summary.graficoVendasDiarias().get(0);
                 assertEquals(LocalDate.now(), pontoHoje.data());
-                assertEquals(0, new BigDecimal("250.00").compareTo(pontoHoje.value()));
+                assertEquals(0, new BigDecimal("250.00").compareTo(pontoHoje.valor()));
         }
 
         @Test
         @DisplayName("getDashboardSummary: Deve calcular corretamente para período ONTEM")
-        void getDashboardSummary_periodoOntem_deveRetornarValueesCorretos() {
+        void getDashboardSummary_periodoOntem_deveRetornarValoresCorretos() {
                 ZonedDateTime inicioOntem = LocalDate.now().minusDays(1).atStartOfDay(ZoneId.systemDefault());
                 ZonedDateTime fimOntem = LocalDate.now().minusDays(1).atTime(LocalTime.MAX)
                                 .atZone(ZoneId.systemDefault());
@@ -238,7 +238,7 @@ class DashboardServiceIT {
 
         @Test
         @DisplayName("getDashboardSummary: Deve calcular corretamente para TODO O PERÍODO (Mês Passado até Hoje)")
-        void getDashboardSummary_todoPeriodo_deveRetornarValueesGlobais() {
+        void getDashboardSummary_todoPeriodo_deveRetornarValoresGlobais() {
                 // Abrange todas as vendas e expenses criadas
                 ZonedDateTime inicioGlobal = inicioMesPassado.minusDays(1); // Um pouco antes do início do mês passado
                 ZonedDateTime fimGlobal = hojeMeioDia.plusDays(1); // Um pouco depois de hoje
@@ -292,8 +292,8 @@ class DashboardServiceIT {
                 assertNull(summary.productMaisVendido()); // Espera-se nulo
                 assertTrue(summary.graficoVendasDiarias().isEmpty());
                 // Verifica se todas as formas de pagamento estão zeradas
-                summary.totalVendasPorFormaPagamento().forEach((forma, value) -> {
-                        assertEquals(0, BigDecimal.ZERO.compareTo(value), "Value para " + forma + " deveria ser zero.");
+                summary.totalVendasPorFormaPagamento().forEach((forma, valor) -> {
+                        assertEquals(0, BigDecimal.ZERO.compareTo(valor), "Valor para " + forma + " deveria ser zero.");
                 });
         }
 }

@@ -18,12 +18,12 @@ public interface ItemVendaRepository extends JpaRepository<ItemVenda, Long> {
   List<ItemVenda> findByProductId(Long productId);
 
   // v.06.05.25
-  @Query("SELECT new br.com.king.flick_business.dto.ProductMaisVendidoDTO(iv.product.id, iv.product.name, SUM(iv.quantidade) as qtdTotal, SUM(iv.quantidade * iv.precoUnitarioVenda) as valueTotal) "
+  @Query("SELECT new br.com.king.flick_business.dto.ProductMaisVendidoDTO(iv.product.id, iv.product.name, SUM(iv.quantidade) as qtdTotal, SUM(iv.quantidade * iv.precoUnitarioVenda) as valorTotal) "
       +
       "FROM ItemVenda iv JOIN iv.venda v " +
       "WHERE v.dataVenda BETWEEN :inicio AND :fim " +
       "GROUP BY iv.product.id, iv.product.name " +
-      "ORDER BY qtdTotal DESC, valueTotal DESC " +
+      "ORDER BY qtdTotal DESC, valorTotal DESC " +
       "LIMIT 1")
   ProductMaisVendidoDTO findProductMaisVendidoBetween(@Param("inicio") LocalDate inicio, @Param("fim") LocalDate fim);
 }

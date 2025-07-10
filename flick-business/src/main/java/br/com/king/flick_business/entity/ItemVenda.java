@@ -60,7 +60,7 @@ public class ItemVenda {
 
   // -- AUXILIAR -- //
   @Transient
-  public BigDecimal getValueTotalItem() {
+  public BigDecimal getValorTotalItem() {
     if (quantidade != null && precoUnitarioVenda != null) {
       return quantidade.multiply(precoUnitarioVenda);
     }

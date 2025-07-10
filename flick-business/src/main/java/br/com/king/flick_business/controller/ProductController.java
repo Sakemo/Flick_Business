@@ -35,7 +35,7 @@ public class ProductController {
   @PostMapping
   public ResponseEntity<ProductResponseDTO> criarProduct(@Valid @RequestBody ProductRequestDTO requestDTO,
       UriComponentsBuilder uriBuilder) {
-    ProductResponseDTO productSalvoDTO = productService.save(requestDTO);
+    ProductResponseDTO productSalvoDTO = productService.salvar(requestDTO);
     URI uri = uriBuilder.path("/{id}").buildAndExpand(productSalvoDTO.id()).toUri();
     return ResponseEntity.created(uri).body(productSalvoDTO);
   }
@@ -56,7 +56,7 @@ public class ProductController {
   // Buscar Product por ID
   @GetMapping("/{id}")
   public ResponseEntity<ProductResponseDTO> buscarProductPorId(@PathVariable Long id) {
-    ProductResponseDTO product = productService.searchById(id);
+    ProductResponseDTO product = productService.buscarPorId(id);
     return ResponseEntity.ok(product);
   }
 

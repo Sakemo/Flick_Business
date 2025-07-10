@@ -80,11 +80,11 @@ public class Cliente {
   // Metadados
   @CreationTimestamp
   @Column(name = "data_cadastro", updatable = false)
-  private ZonedDateTime createdAt;
+  private ZonedDateTime dataCadastro;
 
   @UpdateTimestamp
   @Column(name = "data_atualizacao", nullable = false)
-  private ZonedDateTime updatedAt;
+  private ZonedDateTime dataAtualizacao;
 
   // Exclusão Lógica
   @Builder.Default
